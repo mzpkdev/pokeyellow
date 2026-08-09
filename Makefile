@@ -69,6 +69,7 @@ RGBGFXFLAGS  ?= -Weverything
 	_rom-test-gameplay-products \
 	_rom-test-all-products \
 	test-unit \
+	test-full-color-content-contract \
 	test-full-color-donor-contract \
 	test-full-color-harness-contracts \
 	test-full-color-evidence \
@@ -191,6 +192,10 @@ test-full-color-setup:
 test-unit: _rom-test-all-products
 	$(PYTHON) -m pytest tools/rom_tests/tests/unit \
 		--ignore=tools/rom_tests/tests/unit/full_color/test_overworld_color_data_donor.py -q
+
+test-full-color-content-contract:
+	$(PYTHON) -m pytest \
+		tools/rom_tests/tests/unit/full_color/test_map_background_content.py -q
 
 test-full-color-donor-contract:
 	@test -n "$(POKERED_GBC_ROOT)" || \
