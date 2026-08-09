@@ -1,4 +1,4 @@
-name: PR Labels
+name: Metadata
 
 on:
   pull_request_target:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   label:
-    name: Label
+    name: Labels
     runs-on: ubuntu-latest
     timeout-minutes: 2
 

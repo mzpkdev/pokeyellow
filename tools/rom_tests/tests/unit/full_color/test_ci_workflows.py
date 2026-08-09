@@ -17,10 +17,7 @@ from tools.rom_tests.full_color.evidence_runner import COMPONENTS
 
 ROOT = Path(__file__).parents[5]
 WORKFLOWS = {
-    "caller": ROOT / ".github/workflows/ci.yml",
-    "build": ROOT / ".github/workflows/ci-build.yml",
-    "full_color": ROOT / ".github/workflows/ci-full-color.yml",
-    "gameplay": ROOT / ".github/workflows/ci-gameplay.yml",
+    "ci": ROOT / ".github/workflows/ci.yml",
     "metadata": ROOT / ".github/workflows/metadata.yml",
     "labels": ROOT / ".github/workflows/pr-labels.yml",
     "release": ROOT / ".github/workflows/release.yml",
@@ -51,14 +48,19 @@ RELEASE_COPIES = {
     "cp pokeyellow_vc.sym release/pokeyellow-vc.sym",
 }
 FULL_COLOR_JOB_NAMES = {
-    "donor-contract": "Donor Contract",
+    "donor-contract": "Full-color Verification / Donor Contract",
     "unit-tests": "Unit Tests",
-    "harness-contracts": "Harness Contracts",
-    "evidence-capture": "Full-color Evidence Capture ${{ matrix.run }}",
-    "evidence-determinism": "Full-color Evidence Determinism",
-    "renderer-contracts": "Renderer Contract Fixtures",
-    "renderer-runtime": "Renderer Runtime Ownership",
-    "audit-evidence": "Full-color Audit Evidence",
+    "harness-contracts": "Repository Inventory & Bank Safety",
+    "evidence-capture": "Evidence / Capture ${{ matrix.name }}",
+    "evidence-determinism": "Evidence / Determinism",
+    "renderer-contracts": "Renderer / Contract Fixtures",
+    "renderer-runtime": "Renderer / Runtime Ownership",
+    "audit-evidence": "Evidence / Audit",
+}
+VERIFICATION_JOB_IDS = {
+    "build",
+    *FULL_COLOR_JOB_NAMES,
+    "e2e",
 }
 GAMEPLAY_MATRIX = [
     {
@@ -109,29 +111,18 @@ def _all_workflow_steps(workflow: dict[str, Any]) -> list[dict[str, Any]]:
 
 def _reopen_script() -> str:
     metadata = _load(WORKFLOWS["metadata"])
-    return _step(metadata["jobs"]["title"], "Require prior certification when reopening")[
+    return _step(metadata["jobs"]["lint"], "Require prior merge gate when reopening")[
         "run"
     ]
 
 
-def _run_certification_script(
-    *,
-    build: str = "success",
-    full_color: str = "success",
-    gameplay: str = "success",
-) -> subprocess.CompletedProcess[str]:
-    caller = _load(WORKFLOWS["caller"])
-    script = _step(
-        caller["jobs"]["certification"], "Require every verification group"
-    )["run"]
+def _run_merge_gate_script(**overrides: str) -> subprocess.CompletedProcess[str]:
+    ci = _load(WORKFLOWS["ci"])
+    gate = ci["jobs"]["merge-gate"]
+    script = _step(gate, "Require every verification job")["run"]
     env = os.environ.copy()
-    env.update(
-        {
-            "BUILD": build,
-            "FULL_COLOR": full_color,
-            "GAMEPLAY": gameplay,
-        }
-    )
+    env.update({name: "success" for name in gate["steps"][0]["env"]})
+    env.update(overrides)
     return subprocess.run(
         ["bash", "-eu", "-o", "pipefail", "-c", script],
         text=True,
@@ -191,53 +182,46 @@ printf '%s\n' "${FAKE_GH_OUTPUT:?}"
     )
 
 
-def test_ci_caller_is_the_only_release_gate() -> None:
-    caller = _load(WORKFLOWS["caller"])
+def test_ci_exposes_flat_checks_and_one_stable_merge_gate() -> None:
+    ci = _load(WORKFLOWS["ci"])
     release = _load(WORKFLOWS["release"])
 
-    assert caller["name"] == "CI"
-    assert caller["on"] == {
+    assert ci["name"] == "CI"
+    assert ci["on"] == {
         "pull_request": {
             "branches": ["main"],
             "types": ["opened", "synchronize"],
         },
         "push": {"branches": ["main"]},
     }
-    assert caller["permissions"] == {"contents": "read"}
-    assert set(caller["jobs"]) == {
-        "build",
-        "full-color",
-        "gameplay",
-        "certification",
-    }
-    assert caller["jobs"]["build"] == {
-        "name": "Build ROMs",
-        "uses": "./.github/workflows/ci-build.yml",
-    }
-    assert caller["jobs"]["full-color"] == {
-        "name": "Full-color Verification",
-        "needs": "build",
-        "uses": "./.github/workflows/ci-full-color.yml",
-    }
-    assert caller["jobs"]["gameplay"] == {
-        "name": "Gameplay Verification",
-        "needs": "build",
-        "uses": "./.github/workflows/ci-gameplay.yml",
-    }
+    assert ci["permissions"] == {"contents": "read"}
+    assert set(ci["jobs"]) == VERIFICATION_JOB_IDS | {"merge-gate"}
+    assert {job_id: ci["jobs"][job_id]["name"] for job_id in FULL_COLOR_JOB_NAMES} == (
+        FULL_COLOR_JOB_NAMES
+    )
+    assert ci["jobs"]["build"]["name"] == "Build"
+    assert ci["jobs"]["e2e"]["name"] == "E2E (${{ matrix.name }})"
 
-    certification = caller["jobs"]["certification"]
-    assert certification["name"] == "Certification"
-    assert set(certification["needs"]) == {"build", "full-color", "gameplay"}
-    assert certification["if"] == "always()"
-    certification_step = _step(certification, "Require every verification group")
-    assert certification_step["env"] == {
+    gate = ci["jobs"]["merge-gate"]
+    assert gate["name"] == "Merge Gate"
+    assert set(gate["needs"]) == VERIFICATION_JOB_IDS
+    assert gate["if"] == "always()"
+    gate_step = _step(gate, "Require every verification job")
+    assert gate_step["env"] == {
         "BUILD": "${{ needs.build.result }}",
-        "FULL_COLOR": "${{ needs.full-color.result }}",
-        "GAMEPLAY": "${{ needs.gameplay.result }}",
+        "DONOR_CONTRACT": "${{ needs.donor-contract.result }}",
+        "UNIT_TESTS": "${{ needs.unit-tests.result }}",
+        "REPOSITORY_INVENTORY": "${{ needs.harness-contracts.result }}",
+        "EVIDENCE_CAPTURE": "${{ needs.evidence-capture.result }}",
+        "EVIDENCE_DETERMINISM": "${{ needs.evidence-determinism.result }}",
+        "RENDERER_CONTRACTS": "${{ needs.renderer-contracts.result }}",
+        "RENDERER_RUNTIME": "${{ needs.renderer-runtime.result }}",
+        "AUDIT_EVIDENCE": "${{ needs.audit-evidence.result }}",
+        "E2E": "${{ needs.e2e.result }}",
     }
     syntax = subprocess.run(
         ["bash", "-n"],
-        input=certification_step["run"],
+        input=gate_step["run"],
         text=True,
         capture_output=True,
         check=False,
@@ -256,39 +240,41 @@ def test_ci_caller_is_the_only_release_gate() -> None:
     assert download["with"]["name"] == "pokeyellow-build"
 
 
-def test_certification_accepts_only_all_successful_groups() -> None:
-    result = _run_certification_script()
+def test_merge_gate_accepts_only_all_successful_jobs() -> None:
+    result = _run_merge_gate_script()
     assert result.returncode == 0, result.stdout + result.stderr
     assert result.stdout == ""
     assert result.stderr == ""
 
 
-@pytest.mark.parametrize("dependency", ("build", "full_color", "gameplay"))
+@pytest.mark.parametrize(
+    "dependency",
+    (
+        "BUILD",
+        "DONOR_CONTRACT",
+        "UNIT_TESTS",
+        "REPOSITORY_INVENTORY",
+        "EVIDENCE_CAPTURE",
+        "EVIDENCE_DETERMINISM",
+        "RENDERER_CONTRACTS",
+        "RENDERER_RUNTIME",
+        "AUDIT_EVIDENCE",
+        "E2E",
+    ),
+)
 @pytest.mark.parametrize("result", ("failure", "cancelled", "skipped"))
-def test_certification_rejects_any_unsuccessful_group(
+def test_merge_gate_rejects_any_unsuccessful_job(
     dependency: str, result: str
 ) -> None:
-    dependency_results = {
-        "build": "success",
-        "full_color": "success",
-        "gameplay": "success",
-    }
-    dependency_results[dependency] = result
-    completed = _run_certification_script(**dependency_results)
+    completed = _run_merge_gate_script(**{dependency: result})
     assert completed.returncode != 0
-    assert completed.stdout == f"::error::verification group finished as {result}\n"
+    assert completed.stdout == f"::error::verification job finished as {result}\n"
     assert completed.stderr == ""
 
 
-def test_build_workflow_produces_all_products_once() -> None:
-    build = _load(WORKFLOWS["build"])
-    assert build["name"] == "CI Build"
-    assert build["on"] == {"workflow_call": ""}
-    assert build["permissions"] == {"contents": "read"}
-    assert set(build["jobs"]) == {"build"}
-
-    job = build["jobs"]["build"]
-    assert job["name"] == "Build ROMs"
+def test_build_job_produces_all_products_once() -> None:
+    job = _load(WORKFLOWS["ci"])["jobs"]["build"]
+    assert job["name"] == "Build"
     build_step = _step(job, "Build ROM products")
     assert build_step["run"] == (
         'make -j"$(nproc)" yellow yellow_debug yellow_vc yellow_phase2_audit'
@@ -320,19 +306,17 @@ def test_build_workflow_produces_all_products_once() -> None:
     assert test_upload["with"]["if-no-files-found"] == "error"
 
 
-def test_full_color_workflow_splits_one_run_contracts_from_evidence() -> None:
-    workflow = _load(WORKFLOWS["full_color"])
-    assert workflow["name"] == "CI Full-color"
-    assert workflow["on"] == {"workflow_call": ""}
-    assert workflow["permissions"] == {"contents": "read"}
-    assert {
-        job_id: job["name"] for job_id, job in workflow["jobs"].items()
-    } == FULL_COLOR_JOB_NAMES
-    assert "continue-on-error" not in WORKFLOWS["full_color"].read_text(
-        encoding="utf-8"
-    )
-
+def test_full_color_jobs_split_one_run_contracts_from_evidence() -> None:
+    workflow = _load(WORKFLOWS["ci"])
     jobs = workflow["jobs"]
+    assert {job_id: jobs[job_id]["name"] for job_id in FULL_COLOR_JOB_NAMES} == (
+        FULL_COLOR_JOB_NAMES
+    )
+    assert "continue-on-error" not in WORKFLOWS["ci"].read_text(encoding="utf-8")
+    for job_id in FULL_COLOR_JOB_NAMES:
+        if job_id != "evidence-determinism":
+            assert jobs[job_id]["needs"] == "build"
+
     donor = jobs["donor-contract"]
     donor_checkout = _step(donor, "Checkout pinned pokered-gbc donor")
     assert donor_checkout["with"]["repository"] == "dannye/pokered-gbc"
@@ -357,7 +341,12 @@ def test_full_color_workflow_splits_one_run_contracts_from_evidence() -> None:
     capture = jobs["evidence-capture"]
     assert capture["strategy"] == {
         "fail-fast": "false",
-        "matrix": {"run": ["1", "2"]},
+        "matrix": {
+            "include": [
+                {"name": "A", "run": "1"},
+                {"name": "B", "run": "2"},
+            ]
+        },
     }
     assert COMPONENTS == ("observability", "traceability", "visual-pipeline")
     capture_command = _step(capture, "Capture deterministic evidence")["run"]
@@ -370,8 +359,8 @@ def test_full_color_workflow_splits_one_run_contracts_from_evidence() -> None:
     )
 
     comparison = jobs["evidence-determinism"]
-    assert comparison["needs"] == "evidence-capture"
-    assert comparison["if"] == "always()"
+    assert set(comparison["needs"]) == {"build", "evidence-capture"}
+    assert comparison["if"] == "always() && needs.build.result == 'success'"
     downloads = _artifact_steps(comparison, "actions/download-artifact@v7")
     assert {(step["with"]["name"], step["with"]["path"]) for step in downloads} == {
         (
@@ -387,20 +376,16 @@ def test_full_color_workflow_splits_one_run_contracts_from_evidence() -> None:
     assert "--compare-runs run-1 run-2" in compare_command
     assert _step(comparison, "Upload compared evidence")["if"] == "always()"
 
-    verification_workflows = [
-        _load(WORKFLOWS[name]) for name in ("build", "full_color", "gameplay")
-    ]
     one_run_commands = [
         step.get("run", "")
-        for verification_workflow in verification_workflows
-        for step in _all_workflow_steps(verification_workflow)
+        for step in _all_workflow_steps(workflow)
         if "make test-unit" in step.get("run", "")
     ]
     assert one_run_commands == ["make test-unit ROM_TEST_PREBUILT_PRODUCTS=1"]
 
 
 def test_full_color_product_consumers_use_same_revision_artifact() -> None:
-    jobs = _load(WORKFLOWS["full_color"])["jobs"]
+    jobs = _load(WORKFLOWS["ci"])["jobs"]
     consumer_ids = {
         "unit-tests",
         "harness-contracts",
@@ -441,14 +426,8 @@ def test_full_color_product_consumers_use_same_revision_artifact() -> None:
         assert upload[0]["with"]["if-no-files-found"] == "error"
 
 
-def test_gameplay_workflow_runs_three_independent_suites() -> None:
-    workflow = _load(WORKFLOWS["gameplay"])
-    assert workflow["name"] == "CI Gameplay"
-    assert workflow["on"] == {"workflow_call": ""}
-    assert workflow["permissions"] == {"contents": "read"}
-    assert set(workflow["jobs"]) == {"e2e"}
-
-    e2e = workflow["jobs"]["e2e"]
+def test_ci_runs_three_independent_gameplay_suites() -> None:
+    e2e = _load(WORKFLOWS["ci"])["jobs"]["e2e"]
     assert e2e["name"] == "E2E (${{ matrix.name }})"
     assert e2e["strategy"] == {
         "fail-fast": "false",
@@ -497,26 +476,25 @@ def test_metadata_and_trusted_label_workflows_keep_distinct_boundaries() -> None
         ),
         "cancel-in-progress": "true",
     }
-    assert set(metadata["jobs"]) == {"lint", "title"}
+    assert set(metadata["jobs"]) == {"lint"}
     lint = metadata["jobs"]["lint"]
-    assert lint["name"] == "Workflow Lint"
-    assert lint["if"] == (
-        "github.event_name == 'push' || github.event.action != 'edited'"
+    assert lint["name"] == "Lint"
+    checkout = _step(lint, "Checkout")
+    actionlint = _step(lint, "Run actionlint")
+    assert "if" not in checkout
+    assert "if" not in actionlint
+    assert actionlint["uses"] == "docker://rhysd/actionlint:1.7.12"
+    assert _step(lint, "Lint pull request title")["if"] == (
+        "github.event_name == 'pull_request'"
     )
-    assert _step(lint, "Run actionlint")["uses"] == "docker://rhysd/actionlint:1.7.12"
-
-    title = metadata["jobs"]["title"]
-    assert title["name"] == (
-        "${{ github.event.action == 'reopened' && "
-        "'PR Reopen Certification' || 'PR Title' }}"
-    )
-    assert title["if"] == "github.event_name == 'pull_request'"
-    reopen = _step(title, "Require prior certification when reopening")
+    reopen = _step(lint, "Require prior merge gate when reopening")
     assert reopen["if"] == "github.event.action == 'reopened'"
-    assert 'select(.name == "Certification" and .conclusion == "success")' in reopen[
+    assert 'select(.name == "Merge Gate" and .conclusion == "success")' in reopen[
         "run"
     ]
 
+    assert labels["name"] == "Metadata"
+    assert labels["jobs"]["label"]["name"] == "Labels"
     assert labels["on"] == {
         "pull_request_target": {
             "types": ["opened", "edited", "synchronize", "reopened"]
@@ -535,15 +513,15 @@ def test_metadata_and_trusted_label_workflows_keep_distinct_boundaries() -> None
 @pytest.mark.parametrize(
     "pages",
     [
-        [{"check_runs": [{"name": "Certification", "conclusion": "success"}]}],
+        [{"check_runs": [{"name": "Merge Gate", "conclusion": "success"}]}],
         [
-            {"check_runs": [{"name": "Certification", "conclusion": "failure"}]},
-            {"check_runs": [{"name": "Certification", "conclusion": "success"}]},
+            {"check_runs": [{"name": "Merge Gate", "conclusion": "failure"}]},
+            {"check_runs": [{"name": "Merge Gate", "conclusion": "success"}]},
         ],
     ],
     ids=("one-success", "success-on-later-page"),
 )
-def test_reopen_accepts_prior_successful_certification(
+def test_reopen_accepts_prior_successful_merge_gate(
     tmp_path: Path, pages: list[dict[str, Any]]
 ) -> None:
     result = _run_reopen_script(tmp_path, pages=pages)
@@ -556,18 +534,18 @@ def test_reopen_accepts_prior_successful_certification(
     "pages",
     [
         [{"check_runs": []}],
-        [{"check_runs": [{"name": "Certification", "conclusion": None}]}],
-        [{"check_runs": [{"name": "Test", "conclusion": "success"}]}],
+        [{"check_runs": [{"name": "Merge Gate", "conclusion": None}]}],
+        [{"check_runs": [{"name": "Certification", "conclusion": "success"}]}],
     ],
     ids=("zero-check-runs", "in-progress", "old-check-name"),
 )
-def test_reopen_rejects_heads_without_successful_certification(
+def test_reopen_rejects_heads_without_successful_merge_gate(
     tmp_path: Path, pages: list[dict[str, Any]]
 ) -> None:
     result = _run_reopen_script(tmp_path, pages=pages)
     assert result.returncode != 0
     assert result.stdout == (
-        "::error::reopened head SHA has no successful Certification check run\n"
+        "::error::reopened head SHA has no successful Merge Gate check run\n"
     )
     assert result.stderr == ""
 
@@ -576,7 +554,7 @@ def test_reopen_fails_closed_when_api_fails(tmp_path: Path) -> None:
     result = _run_reopen_script(tmp_path, gh_failure=True)
     assert result.returncode != 0
     assert result.stdout == (
-        "::error::could not enumerate Certification check runs for reopened head SHA\n"
+        "::error::could not enumerate Merge Gate check runs for reopened head SHA\n"
     )
     assert result.stderr == ""
 
@@ -592,15 +570,12 @@ def test_reopen_fails_closed_when_paginated_json_is_malformed(
     result = _run_reopen_script(tmp_path, raw_output=raw_output)
     assert result.returncode != 0
     assert result.stdout == (
-        "::error::could not parse Certification check runs for reopened head SHA\n"
+        "::error::could not parse Merge Gate check runs for reopened head SHA\n"
     )
     assert result.stderr == ""
 
 
-def test_verification_workflows_have_no_manual_bypass_or_soft_failures() -> None:
-    for name in ("caller", "build", "full_color", "gameplay"):
-        workflow = _load(WORKFLOWS[name])
-        assert "workflow_dispatch" not in workflow["on"], name
-        assert "continue-on-error" not in WORKFLOWS[name].read_text(
-            encoding="utf-8"
-        ), name
+def test_verification_workflow_has_no_manual_bypass_or_soft_failures() -> None:
+    workflow = _load(WORKFLOWS["ci"])
+    assert "workflow_dispatch" not in workflow["on"]
+    assert "continue-on-error" not in WORKFLOWS["ci"].read_text(encoding="utf-8")

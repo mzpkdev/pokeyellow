@@ -214,38 +214,29 @@ for map-aware content, or claim retained architecture is already active.
 
 Full `CI` is commit-bearing: it runs when a pull request is opened, when a new
 commit synchronizes the pull request, and for pushes to `main`. A newer commit
-on the same pull request cancels obsolete in-flight certification, so the
+on the same pull request cancels obsolete in-flight verification, so the
 latest revision is the one consuming hosted capacity.
 
 Title/body edits, reopening, and draft-state changes run `Metadata` only;
-metadata edits cannot repeat full certification. `Metadata` validates workflow
+metadata edits cannot repeat full verification. `Metadata / Lint` validates workflow
 syntax and the Conventional Commit title without rebuilding ROM products.
-Ordinary metadata events report the `PR Title` context. A reopen reports the
-distinct `PR Reopen Certification` context after running the same title
-validation and querying check runs for the exact current head SHA; it fails
-closed unless that revision already has a successful `Certification` check.
+On reopen, the same check queries the exact current head SHA and fails closed
+unless that revision already has a successful `Merge Gate` check.
 Concurrency is scoped by pull request and event action, so a later edit or
 draft-state change cannot cancel the reopen check or replace its result with a
 same-named job. Repeated runs of the same action may cancel their obsolete
-predecessors. The existing certification is reused until a new commit is
+predecessors. The existing merge gate is reused until a new commit is
 pushed; that commit starts a fresh full `CI` run.
 
-`Certification` is the stable final status. `Build ROMs` creates all products
-once. The full-color workflow runs Donor Contract, Unit Tests, Harness
-Contracts, two independent Full-color Evidence Capture jobs plus Full-color
-Evidence Determinism, Renderer Contract Fixtures, Renderer Runtime Ownership,
-and Full-color Audit Evidence. The gameplay workflow runs E2E (Core), E2E
-(Renderer), and E2E (Journey) independently against the same-revision products.
-Certification fails when any build, full-color, or gameplay dependency fails,
-is skipped, or is cancelled.
+`Merge Gate` is the stable final status. `Build` creates all products once.
+The remaining `CI` jobs expose the donor contract, unit contracts, repository
+inventory and bank safety, independent evidence captures and comparison,
+renderer contracts, audit evidence, and three E2E suites directly. `Merge Gate`
+fails when any dependency fails, is skipped, or is cancelled.
 
-`main` currently has no branch protection rule or ruleset. Until one is added,
-reviewers must explicitly verify `Certification`, the latest `PR Title`, and—after a
-reopen—the durable `PR Reopen Certification` result before merge.
-`Certification` represents all named verification dependencies, while `PR Title` remains
-independently responsive to metadata-only changes. An event-specific context
-such as `PR Reopen Certification` is absent on ordinary pull-request events, so
-it must not be configured as a universally required branch-protection context.
+The active `main` ruleset requires pull requests, `Metadata / Lint`, and
+`CI / Merge Gate`; it blocks branch deletion and force pushes. The trusted
+`Metadata / Labels` check remains non-required.
 
 ## Handoff, commit, and pull-request discipline
 

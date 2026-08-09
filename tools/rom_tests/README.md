@@ -50,7 +50,7 @@ There is no aggregate gameplay alias. Run the affected suite while iterating
 and all three independent suites when a change crosses their boundaries.
 
 ROM-consuming commands build their products by default. Hosted CI downloads
-the same-revision products from `Build ROMs` and passes
+the same-revision products from `Build` and passes
 `ROM_TEST_PREBUILT_PRODUCTS=1`; private prerequisites fail closed if any
 required ROM, map, or symbol file is absent.
 

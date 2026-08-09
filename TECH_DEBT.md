@@ -365,14 +365,14 @@ mailbox or runtime evidence.
   Pallet/Route 1, Oak's capture, menus/dialogue, battles, fallback,
   save/reset/Continue, and parcel delivery through natural inputs.
 - **Resolved risk:** a pull request can no longer receive a green
-  `Certification` result when any hosted gameplay suite fails, skips, or is
+  `Merge Gate` result when any hosted gameplay suite fails, skips, or is
   cancelled.
 - **Remaining boundary:** manual visual review still catches flicker, aesthetic
   failures, hardware differences, and unencoded scene coverage. Hosted E2E does
   not turn those human claims into automated facts.
 - **Closure proof:** `E2E (Core)`, `E2E (Renderer)`, and `E2E (Journey)` consume
   one build artifact, retain failure diagnostics, and feed the blocking
-  `Certification` job.
+  `Merge Gate` job.
 - **Sources:** [journey tests](tools/rom_tests/tests/e2e/journey/),
   [scenario helpers](tools/rom_tests/scenarios), and
   [hosted coverage](docs/TESTING.md#what-hosted-ci-covers).
