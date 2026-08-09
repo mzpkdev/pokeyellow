@@ -65,11 +65,14 @@ RGBGFXFLAGS  ?= -Weverything
 	measure-full-color-source-transition \
 	measure-full-color-audit-evidence-identities \
 	measure-full-color-phase2-audit \
+	measure-full-color-map-backgrounds \
+	promote-full-color-map-backgrounds-reviewed \
 	_rom-test-debug-products \
 	_rom-test-gameplay-products \
 	_rom-test-all-products \
 	test-unit \
 	test-full-color-content-contract \
+	test-full-color-map-backgrounds \
 	test-full-color-donor-contract \
 	test-full-color-harness-contracts \
 	test-full-color-evidence \
@@ -185,6 +188,14 @@ measure-full-color-audit-evidence-identities: measure-full-color-source-transiti
 measure-full-color-phase2-audit: measure-full-color-audit-evidence-identities
 	$(PYTHON) -m tools.rom_tests.full_color.phase2_measurements --root . --proposal-output "$(FULL_COLOR_PROPOSALS)/phase2-subjects.proposal.json"
 
+measure-full-color-map-backgrounds: _rom-test-all-products
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --proposal-output "$(FULL_COLOR_PROPOSALS)/map-background-content.proposal.json"
+
+# This target is deliberately named as a reviewed promotion and is never a
+# dependency of ordinary build, verification, or certification targets.
+promote-full-color-map-backgrounds-reviewed: _rom-test-all-products
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --output specs/full-colors/evidence/map-background-content.json --authority-reviewed
+
 test-full-color-setup:
 	python3 -m venv .venv
 	.venv/bin/python -m pip install -r tools/rom_tests/requirements.txt
@@ -197,13 +208,16 @@ test-full-color-content-contract:
 	$(PYTHON) -m pytest \
 		tools/rom_tests/tests/unit/full_color/test_map_background_content.py -q
 
+test-full-color-map-backgrounds: _rom-test-all-products
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --verify specs/full-colors/evidence/map-background-content.json
+
 test-full-color-donor-contract:
 	@test -n "$(POKERED_GBC_ROOT)" || \
 		{ echo "POKERED_GBC_ROOT is required" >&2; exit 1; }
 	POKERED_GBC_ROOT="$(POKERED_GBC_ROOT)" $(PYTHON) -m pytest \
 		tools/rom_tests/tests/unit/full_color/test_overworld_color_data_donor.py -q
 
-test-full-color-harness-contracts: _rom-test-debug-products
+test-full-color-harness-contracts: _rom-test-debug-products test-full-color-map-backgrounds
 	$(PYTHON) -m tools.rom_tests.full_color.baseline_discovery --repository .
 	$(PYTHON) -m tools.rom_tests.full_color.baseline_inventory --repository .
 	$(PYTHON) -m tools.rom_tests.full_color.bank_torture --rom pokeyellow_debug.gbc
@@ -236,7 +250,7 @@ test-full-color-e2e-journey: _rom-test-gameplay-products
 test-full-color-fast:
 	@$(PYTHON) -m tools.rom_tests.full_color.harness_runner --profile fast --root . --results "$(FULL_COLOR_HARNESS_RESULTS)"
 
-test-full-color-certify:
+test-full-color-certify: test-full-color-map-backgrounds
 	@$(PYTHON) -m tools.rom_tests.full_color.harness_runner --profile certify --root . --results "$(FULL_COLOR_HARNESS_RESULTS)"
 
 test-full-color-handoffs:

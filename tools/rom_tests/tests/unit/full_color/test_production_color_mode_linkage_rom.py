@@ -7,6 +7,7 @@ import re
 import pytest
 
 from tools.rom_tests.emulator import Emulator
+from tools.rom_tests.full_color.map_background_snapshot import MANIFEST_PATH, verify
 from tools.rom_tests.tests.conftest import REPOSITORY_ROOT, result_directory
 from tools.rom_tests.tests.unit.full_color.test_phase2_scheduler_rom import (
     Phase2Rom,
@@ -108,7 +109,9 @@ def _symbols(
 ) -> tuple[dict[str, tuple[int, int]], dict[tuple[int, int], set[str]]]:
     by_name: dict[str, tuple[int, int]] = {}
     by_address: dict[tuple[int, int], set[str]] = {}
-    for line in (REPOSITORY_ROOT / f"{product}.sym").read_text(encoding="utf-8").splitlines():
+    for line in (
+        (REPOSITORY_ROOT / f"{product}.sym").read_text(encoding="utf-8").splitlines()
+    ):
         match = re.fullmatch(r"([0-9a-fA-F]+):([0-9a-fA-F]+) (\S+)", line)
         if match is None:
             continue
@@ -120,7 +123,9 @@ def _symbols(
 
 
 @pytest.mark.parametrize("product", PRODUCTS)
-def test_shipped_products_link_renderer_and_exclude_audit_machinery(product: str) -> None:
+def test_shipped_products_link_renderer_and_exclude_audit_machinery(
+    product: str,
+) -> None:
     symbols, _ = _symbols(product)
     assert PRODUCTION_RENDERER_SURFACE <= symbols.keys()
     assert not {
@@ -134,12 +139,16 @@ def test_shipped_products_link_renderer_and_exclude_audit_machinery(product: str
     assert symbols["wPassiveFullColorStateStart"] == (2, 0xD800)
     assert symbols["wPassiveFullColorAttributeRectangle"] == (2, 0xD810)
     assert symbols["wPassiveFullColorStateEnd"] == (2, 0xDA50)
-    assert symbols["FullColorOverworldBGPalettesEnd"][1] - symbols[
-        "FullColorOverworldBGPalettes"
-    ][1] == 64
-    assert symbols["FullColorOverworldTileAttributesEnd"][1] - symbols[
-        "FullColorOverworldTileAttributes"
-    ][1] == 256
+    assert (
+        symbols["FullColorOverworldBGPalettesEnd"][1]
+        - symbols["FullColorOverworldBGPalettes"][1]
+        == 64
+    )
+    assert (
+        symbols["FullColorOverworldTileAttributesEnd"][1]
+        - symbols["FullColorOverworldTileAttributes"][1]
+        == 256
+    )
 
 
 def _read_wram2(emulator: Emulator, start: int, end: int) -> bytes:
@@ -232,9 +241,7 @@ def test_complete_product_vblank_reaches_passive_renderer_and_preserves_yellow(
     )
     try:
         rom = Phase2Rom(emulator, numeric_symbols(REPOSITORY_ROOT / f"{product}.sym"))
-        dma_stub = bytes(
-            (0x3E, 0xC3, 0xE0, 0x46, 0x3E, 0x28, 0x3D, 0x20, 0xFD, 0xC9)
-        )
+        dma_stub = bytes((0x3E, 0xC3, 0xE0, 0x46, 0x3E, 0x28, 0x3D, 0x20, 0xFD, 0xC9))
         for offset, value in enumerate(dma_stub):
             emulator.pyboy.memory[0xFF80 + offset] = value
         rom.call("InitRendererOwnership")
@@ -257,14 +264,15 @@ def test_complete_product_vblank_reaches_passive_renderer_and_preserves_yellow(
         )
         assert color_calls == ("PassiveFullColorVBlank",)
         assert set(YELLOW_VBLANK_CALLS) <= set(yellow_calls)
-        assert _read_wram2(
-            emulator,
-            emulator.symbols["wRendererStateStart"],
-            emulator.symbols["wRendererStateEnd"],
-        ) == owner_state
-        assert rom.read_wram2("wPassiveFullColorActive") == bytes(
-            (not yellow_mode,)
+        assert (
+            _read_wram2(
+                emulator,
+                emulator.symbols["wRendererStateStart"],
+                emulator.symbols["wRendererStateEnd"],
+            )
+            == owner_state
         )
+        assert rom.read_wram2("wPassiveFullColorActive") == bytes((not yellow_mode,))
         assert rom.read_wram2("wPassiveFullColorPalettePending") == b"\x00"
     finally:
         emulator.close()
@@ -307,7 +315,9 @@ def _reachable_symbols(
         if opcode in {0xC9, 0xD9, 0xE9, 0x10, 0x76}:
             continue
         if opcode in {0x18, 0x20, 0x28, 0x30, 0x38}:
-            displacement = int.from_bytes(rom[offset + 1 : offset + 2], "little", signed=True)
+            displacement = int.from_bytes(
+                rom[offset + 1 : offset + 2], "little", signed=True
+            )
             work.append((bank, (address + 2 + displacement) & 0xFFFF))
             if opcode != 0x18:
                 work.append(fallthrough)
@@ -317,8 +327,16 @@ def _reachable_symbols(
             target_bank = 0 if target_address < 0x4000 else bank
             target = (target_bank, target_address)
             bankswitch = symbols.get("Bankswitch")
-            if target == bankswitch and offset >= 5 and rom[offset - 5] == 0x06 and rom[offset - 3] == 0x21:
-                target = (rom[offset - 4], int.from_bytes(rom[offset - 2 : offset], "little"))
+            if (
+                target == bankswitch
+                and offset >= 5
+                and rom[offset - 5] == 0x06
+                and rom[offset - 3] == 0x21
+            ):
+                target = (
+                    rom[offset - 4],
+                    int.from_bytes(rom[offset - 2 : offset], "little"),
+                )
             work.append(target)
             if opcode != 0xC3:
                 work.append(fallthrough)
@@ -346,7 +364,9 @@ def test_static_production_roots_reach_bounded_renderer_not_audit_pipeline(
     reached = _reachable_symbols(product, PRODUCTION_ROOTS)
     assert REQUIRED_REACHABLE_RENDERER <= reached
     assert not {
-        name for name in reached if any(marker in name for marker in FORBIDDEN_PRODUCTION_MARKERS)
+        name
+        for name in reached
+        if any(marker in name for marker in FORBIDDEN_PRODUCTION_MARKERS)
     }
 
 
@@ -375,6 +395,22 @@ def test_audit_adds_diagnostics_without_changing_renderer_payload() -> None:
             audit_offset = audit[start][0] * 0x4000 + audit[start][1] - 0x4000
             product_offset = symbols[start][0] * 0x4000 + symbols[start][1] - 0x4000
             size = audit[end][1] - audit[start][1]
-            assert audit_rom[audit_offset : audit_offset + size] == rom[
-                product_offset : product_offset + size
-            ]
+            assert (
+                audit_rom[audit_offset : audit_offset + size]
+                == rom[product_offset : product_offset + size]
+            )
+
+
+def test_reviewed_map_background_evidence_covers_production_and_audit_products() -> (
+    None
+):
+    manifest = verify(REPOSITORY_ROOT, MANIFEST_PATH)
+    assert [row["product"] for row in manifest["products"]] == [
+        "pokeyellow",
+        "pokeyellow_debug",
+        "pokeyellow_vc",
+        "pokeyellow_phase2_audit",
+    ]
+    for product in manifest["products"]:
+        assert product["payloads"]["FullColorOverworldBGPalettes"]["size"] == 64
+        assert product["payloads"]["FullColorOverworldTileAttributes"]["size"] == 256

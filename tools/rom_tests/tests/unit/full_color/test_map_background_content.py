@@ -15,6 +15,7 @@ from tools.rom_tests.full_color.map_background_content import (
     MapBackgroundContentError,
     Presentation,
     _INCLUDE_DIRECTIVE_RE,
+    production_map_override_rules,
 )
 
 
@@ -119,6 +120,94 @@ def test_seed_records_current_content_and_presentation_as_independent_axes() -> 
     assert len(roofs) == 34
     assert roofs["PALLET_TOWN"] == "PALLET"
     assert roofs["ROUTE_6"] == "VERMILION"
+    overrides = {row.name: row.overrides for row in authority.maps if row.overrides}
+    assert overrides == {
+        "CELADON_MART_1F": ("CELADON_MART_1F_TILES_07_08_17_18_YELLOW",),
+        "CELADON_MART_ROOF": ("CELADON_MART_ROOF_TILES_4B_TO_4F_BLUE",),
+    }
+
+
+def test_production_override_exact_values_are_closed_source_authority(
+    tmp_path: Path,
+) -> None:
+    copy_map_source_universe(tmp_path)
+    path = tmp_path / "engine/full_color/passive_overworld.asm"
+    source = path.read_text(encoding="utf-8")
+    assert "\tcp $4b" in source
+    path.write_text(source.replace("\tcp $4b", "\tcp $4c", 1), encoding="utf-8")
+    authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    with pytest.raises(MapBackgroundContentError, match="exact values drifted"):
+        authority.reconcile(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "REDEF FULL_COLOR_INTERIOR_BLUE EQU 5",
+        "rEdEf FULL_COLOR_INTERIOR_YELLOW eQu 5",
+        "PURGE FULL_COLOR_INTERIOR_BLUE\nDEF FULL_COLOR_INTERIOR_BLUE EQU 5",
+        "pUrGe FULL_COLOR_INTERIOR_YELLOW",
+        'DEF FULL_COLOR_INTERIOR_BLUE EQUS "5"',
+        "FULL_COLOR_INTERIOR_YELLOW SeT 5",
+        "MACRO FULL_COLOR_INTERIOR_BLUE\nENDM",
+    ],
+)
+def test_override_palette_authority_rejects_every_effective_symbol_mutation(
+    tmp_path: Path, statement: str
+) -> None:
+    copy_map_source_universe(tmp_path)
+    path = tmp_path / "data/tilesets/full_color_interiors.asm"
+    source = path.read_text(encoding="utf-8")
+    marker = "DEF FULL_COLOR_INTERIOR_YELLOW     EQU 4"
+    assert marker in source
+    path.write_text(
+        source.replace(marker, f"{marker}\n{statement}", 1), encoding="utf-8"
+    )
+
+    with pytest.raises(MapBackgroundContentError, match="non-authoritative"):
+        MapBackgroundAuthority.load(REPOSITORY_ROOT).reconcile(tmp_path)
+
+
+def test_override_palette_authority_folds_directives_but_not_symbol_case(
+    tmp_path: Path,
+) -> None:
+    copy_map_source_universe(tmp_path)
+    path = tmp_path / "data/tilesets/full_color_interiors.asm"
+    source = path.read_text(encoding="utf-8")
+    source = source.replace(
+        "DEF FULL_COLOR_INTERIOR_BLUE       EQU 3",
+        "dEf FULL_COLOR_INTERIOR_BLUE       eQu 3",
+        1,
+    )
+    source += "\nREDEF full_color_interior_blue EQU 5\n"
+    path.write_text(source, encoding="utf-8")
+
+    rules = production_map_override_rules(tmp_path)
+    assert rules[0]["palette_value"] == 3
+
+
+@pytest.mark.parametrize(
+    "wrapper",
+    [
+        "IF 1\n{definition}\nENDC",
+        "MACRO define_override_blue\n{definition}\nENDM\ndefine_override_blue",
+    ],
+)
+def test_override_palette_authority_must_be_an_unconditional_top_level_definition(
+    tmp_path: Path, wrapper: str
+) -> None:
+    copy_map_source_universe(tmp_path)
+    path = tmp_path / "data/tilesets/full_color_interiors.asm"
+    source = path.read_text(encoding="utf-8")
+    definition = "DEF FULL_COLOR_INTERIOR_BLUE       EQU 3"
+    assert definition in source
+    path.write_text(
+        source.replace(definition, wrapper.format(definition=definition), 1),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(MapBackgroundContentError, match="non-authoritative"):
+        production_map_override_rules(tmp_path)
 
 
 def test_every_map_has_the_exact_recorded_tileset_status_and_fallback_contract() -> (

@@ -229,6 +229,93 @@ _BATCH_TILESETS = {
 }
 _PHASE1_ANIMATIONS = {"OVERWORLD": ("TILEANIM_WATER_FLOWER",)}
 _PHASE1_REPLACEMENTS = {"OVERWORLD": ("CUT_TREE",)}
+_MAP_OVERRIDE_IDENTITIES = {
+    "CELADON_MART_ROOF": ("CELADON_MART_ROOF_TILES_4B_TO_4F_BLUE",),
+    "CELADON_MART_1F": ("CELADON_MART_1F_TILES_07_08_17_18_YELLOW",),
+}
+_MAP_OVERRIDE_RULES = (
+    {
+        "identity": "CELADON_MART_ROOF_TILES_4B_TO_4F_BLUE",
+        "map": "CELADON_MART_ROOF",
+        "match": "inclusive-range",
+        "tiles": [0x4B, 0x4C, 0x4D, 0x4E, 0x4F],
+        "palette": "FULL_COLOR_INTERIOR_BLUE",
+    },
+    {
+        "identity": "CELADON_MART_1F_TILES_07_08_17_18_YELLOW",
+        "map": "CELADON_MART_1F",
+        "match": "exact-set",
+        "tiles": [0x07, 0x08, 0x17, 0x18],
+        "palette": "FULL_COLOR_INTERIOR_YELLOW",
+    },
+)
+_MAP_OVERRIDE_ROUTINE_CONTRACT = (
+    "PassiveFullColorAttributeForTile:",
+    "push hl",
+    "push de",
+    "push bc",
+    "ld c, a",
+    "ldh a, [rIE]",
+    "ld b, a",
+    "xor a",
+    "ldh [rIE], a",
+    "ldh a, [rSVBK]",
+    "ld d, a",
+    "ld a, 1",
+    "ldh [rSVBK], a",
+    "ld a, [wCurMap]",
+    "ld e, a",
+    "ld a, [wCurMapTileset]",
+    "ld h, a",
+    "ld a, d",
+    "ldh [rSVBK], a",
+    "ld a, b",
+    "ldh [rIE], a",
+    "PassiveFullColorResolveAttributeForIdentity:",
+    "ld a, e",
+    "cp CELADON_MART_ROOF",
+    "jr nz, .not_celadon_mart_roof",
+    "ld a, c",
+    "cp $4b",
+    "jr c, .lookup",
+    "cp $50",
+    "jr nc, .lookup",
+    "ld a, FULL_COLOR_INTERIOR_BLUE",
+    "jr .done",
+    ".not_celadon_mart_roof",
+    "cp CELADON_MART_1F",
+    "jr nz, .lookup",
+    "ld a, c",
+    "cp $07",
+    "jr z, .celadon_mart_1f",
+    "cp $08",
+    "jr z, .celadon_mart_1f",
+    "cp $17",
+    "jr z, .celadon_mart_1f",
+    "cp $18",
+    "jr nz, .lookup",
+    ".celadon_mart_1f",
+    "ld a, FULL_COLOR_INTERIOR_YELLOW",
+    "jr .done",
+    ".lookup",
+    "ld a, h",
+    "add a",
+    "ld e, a",
+    "ld d, 0",
+    "ld hl, FullColorTileAttributePointers",
+    "add hl, de",
+    "ld a, [hli]",
+    "ld h, [hl]",
+    "ld l, a",
+    "ld b, 0",
+    "add hl, bc",
+    "ld a, [hl]",
+    ".done",
+    "pop bc",
+    "pop de",
+    "pop hl",
+    "ret",
+)
 _PHASE1_REPLACEMENT_AUTHORITIES = {
     "CUT_TREE": (Path("data/tilesets/cut_tree_blocks.asm"), "CutTreeBlockSwaps")
 }
@@ -685,6 +772,137 @@ def _effective_literal_includes(source: str, *, path: Path) -> tuple[str, ...]:
             )
         includes.append(match.group(1))
     return tuple(includes)
+
+
+def _effective_asm_lines(root: Path) -> tuple[tuple[Path, int, str], ...]:
+    """Expand the literal ``main.asm`` include universe in assembler order.
+
+    Reconciliation fixtures intentionally contain only the map-background slice of
+    the repository. Missing unrelated includes are therefore ignored, while every
+    present dependency is expanded and checked. A real checkout contains the full
+    graph and the build independently rejects a missing include.
+    """
+    entry = root / "main.asm"
+    if not entry.is_file():
+        return tuple(
+            (path, line_number, raw_line)
+            for path in sorted(root.rglob("*.asm"))
+            for line_number, raw_line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), start=1
+            )
+        )
+
+    active: set[Path] = set()
+    lines: list[tuple[Path, int, str]] = []
+
+    def expand(path: Path) -> None:
+        resolved = path.resolve()
+        if resolved in active:
+            raise MapBackgroundContentError(f"{path}: recursive INCLUDE dependency")
+        if not path.is_file():
+            return
+        active.add(resolved)
+        source = path.read_text(encoding="utf-8")
+        for line_number, raw_line in enumerate(source.splitlines(), start=1):
+            if _INCLUDE_DIRECTIVE_RE.match(raw_line) is None:
+                lines.append((path, line_number, raw_line))
+                continue
+            match = _LITERAL_INCLUDE_RE.fullmatch(raw_line)
+            if match is None:
+                raise MapBackgroundContentError(
+                    f"{path}:{line_number}: effective INCLUDE must be exactly one "
+                    "quoted literal path"
+                )
+            relative = PurePosixPath(match.group(1))
+            if relative.is_absolute() or ".." in relative.parts:
+                raise MapBackgroundContentError(
+                    f"{path}:{line_number}: effective INCLUDE dependency must be a "
+                    "repo-root-contained relative path"
+                )
+            expand(root.joinpath(*relative.parts))
+        active.remove(resolved)
+
+    expand(entry)
+    return tuple(lines)
+
+
+def _override_palette_values(root: Path) -> dict[str, int]:
+    """Resolve immutable literal authorities for production override palettes."""
+    authority_path = root / "data/tilesets/full_color_interiors.asm"
+    required = {str(rule["palette"]) for rule in _MAP_OVERRIDE_RULES}
+    values: dict[str, int] = {}
+    conditional_depth = 0
+    macro_depth = 0
+    for path, line_number, raw_line in _effective_asm_lines(root):
+        code = raw_line.split(";", 1)[0].strip()
+        if not code:
+            continue
+        normalized = _canonicalize_asm_directives(code)
+
+        if normalized == "ENDC":
+            conditional_depth = max(conditional_depth - 1, 0)
+        if normalized == "ENDM":
+            macro_depth = max(macro_depth - 1, 0)
+
+        declaration = re.match(r"^(DEF|REDEF)\s+(\S+)\b", normalized)
+        legacy = re.match(
+            r"^(\S+)\s+(?i:EQU|EQUS|SET)\b",
+            code,
+        )
+        macro = re.match(r"^MACRO\??\s+(\S+)\b", normalized)
+        purge = re.fullmatch(r"PURGE\s+(.+)", normalized)
+
+        touched: set[str] = set()
+        if declaration is not None and declaration.group(2) in required:
+            touched.add(declaration.group(2))
+        if legacy is not None and legacy.group(1) in required:
+            touched.add(legacy.group(1))
+        if macro is not None and macro.group(1) in required:
+            touched.add(macro.group(1))
+        if purge is not None:
+            touched.update(
+                token
+                for token in re.split(r"[\s,]+", purge.group(1).strip())
+                if token in required
+            )
+
+        for palette in touched:
+            exact = re.fullmatch(
+                rf"DEF\s+{re.escape(palette)}\s+EQU\s+(\$[0-9A-Fa-f]+|[0-9]+)",
+                normalized,
+            )
+            if (
+                path == authority_path
+                and exact is not None
+                and palette not in values
+                and conditional_depth == 0
+                and macro_depth == 0
+            ):
+                value = _const_literal(
+                    exact.group(1), path=authority_path, directive=palette
+                )
+                if value > 7:
+                    raise MapBackgroundContentError(
+                        f"{authority_path}: {palette} exceeds the palette-bit range"
+                    )
+                values[palette] = value
+                continue
+            raise MapBackgroundContentError(
+                f"{path}:{line_number}: {palette} has a non-authoritative "
+                "definition, redefinition, purge, SET/EQUS alias, or macro shadow"
+            )
+
+        if re.match(r"^IF\b", normalized):
+            conditional_depth += 1
+        if re.match(r"^MACRO\??\s+", normalized):
+            macro_depth += 1
+
+    missing = sorted(required - values.keys())
+    if missing:
+        raise MapBackgroundContentError(
+            f"{authority_path}: expected one exact palette authority for {missing}"
+        )
+    return values
 
 
 def _validate_effective_include_dependencies(
@@ -1326,6 +1544,43 @@ def _validate_phase1_semantic_identities(root: Path) -> None:
             )
 
 
+def production_map_override_rules(root: Path | str) -> tuple[dict[str, object], ...]:
+    """Return the exact production map override rules after validating source."""
+    root = Path(root)
+    path = root / "engine/full_color/passive_overworld.asm"
+    normalized = _normalized_asm(path.read_text(encoding="utf-8"))
+    starts = [
+        index
+        for index, line in enumerate(normalized)
+        if line == _MAP_OVERRIDE_ROUTINE_CONTRACT[0]
+    ]
+    if len(starts) != 1:
+        raise MapBackgroundContentError(
+            f"{path}: expected one complete production tile-dispatch authority"
+        )
+    start = starts[0]
+    try:
+        end = normalized.index("POPS", start + 1)
+    except ValueError as exc:
+        raise MapBackgroundContentError(
+            f"{path}: production tile-dispatch boundary is absent"
+        ) from exc
+    actual = normalized[start:end]
+    if actual != _MAP_OVERRIDE_ROUTINE_CONTRACT:
+        raise MapBackgroundContentError(
+            f"{path}: production map override identities, control flow, or exact values drifted"
+        )
+
+    palette_values = _override_palette_values(root)
+    rules: list[dict[str, object]] = []
+    for template in _MAP_OVERRIDE_RULES:
+        rule = dict(template)
+        palette = str(rule["palette"])
+        rule["palette_value"] = palette_values[palette]
+        rules.append(rule)
+    return tuple(rules)
+
+
 def _expected_batch(tileset: str) -> str | None:
     matches = [batch for batch, names in _BATCH_TILESETS.items() if tileset in names]
     if len(matches) != 1:
@@ -1498,6 +1753,7 @@ class MapBackgroundAuthority:
         discovered_maps = _maps(root)
         payloads = _payload_pointer_authorities(root, discovered_tilesets)
         roofs = _roof_authorities(root)
+        production_map_override_rules(root)
         _validate_phase1_semantic_identities(root)
         _validate_production_presentation_predicate(root)
         findings: list[str] = []
@@ -1582,9 +1838,10 @@ class MapBackgroundAuthority:
                 findings.append(
                     f"map {row.name}: replacements disagree with Phase 1 metadata contract"
                 )
-            if row.overrides:
+            expected_overrides = _MAP_OVERRIDE_IDENTITIES.get(row.name, ())
+            if row.overrides != expected_overrides:
                 findings.append(
-                    f"map {row.name}: overrides are outside the Phase 1 empty vocabulary"
+                    f"map {row.name}: overrides disagree with exact production source"
                 )
             tileset_id = tileset_ids.get(row.tileset)
             if tileset_id is not None:
