@@ -17,8 +17,7 @@ concurrency:
 
 jobs:
   lint:
-    name: Workflow Lint
-    if: github.event_name == 'push' || github.event.action != 'edited'
+    name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -28,13 +27,8 @@ jobs:
       - name: Run actionlint
         uses: docker://rhysd/actionlint:1.7.12
 
-  title:
-    name: ${{ github.event.action == 'reopened' && 'PR Reopen Certification' || 'PR Title' }}
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    steps:
       - name: Lint pull request title
+        if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
@@ -44,7 +38,7 @@ jobs:
             exit 1
           fi
 
-      - name: Require prior certification when reopening
+      - name: Require prior merge gate when reopening
         if: github.event.action == 'reopened'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -54,18 +48,18 @@ jobs:
           if ! check_run_pages="$(gh api --paginate --slurp \
             "repos/$REPOSITORY/commits/$HEAD_SHA/check-runs?filter=all&per_page=100" \
             2>/dev/null)"; then
-            echo "::error::could not enumerate Certification check runs for reopened head SHA"
+            echo "::error::could not enumerate Merge Gate check runs for reopened head SHA"
             exit 1
           fi
 
-          if ! successful_certification_count="$(jq -er \
-            '[.[] | .check_runs[] | select(.name == "Certification" and .conclusion == "success")] | length' \
+          if ! successful_merge_gate_count="$(jq -er \
+            '[.[] | .check_runs[] | select(.name == "Merge Gate" and .conclusion == "success")] | length' \
             <<<"$check_run_pages" 2>/dev/null)"; then
-            echo "::error::could not parse Certification check runs for reopened head SHA"
+            echo "::error::could not parse Merge Gate check runs for reopened head SHA"
             exit 1
           fi
 
-          if [ "$successful_certification_count" -lt 1 ]; then
-            echo "::error::reopened head SHA has no successful Certification check run"
+          if [ "$successful_merge_gate_count" -lt 1 ]; then
+            echo "::error::reopened head SHA has no successful Merge Gate check run"
             exit 1
           fi

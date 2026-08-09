@@ -384,10 +384,10 @@ reserved worst-case budget.
 - Emit a machine-readable traceability report mapping every concrete `R…` and
   `AC-…` to named `CHK-…` checks and artifacts, and fail on unknown or
   uncovered IDs.
-- Publish one blocking `Certification` result.
+- Publish one blocking `Merge Gate` result.
 
-Pass condition: every called workflow reports its named boundary, mutations
-fail their intended contract, and `Certification` stays fail-closed.
+Pass condition: every CI job reports its named boundary, mutations fail their
+intended contract, and `Merge Gate` stays fail-closed.
 
 ## Required commands
 

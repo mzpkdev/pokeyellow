@@ -174,29 +174,32 @@ playtest claim.
 
 ## What hosted CI covers
 
-The top-level `CI` workflow is a thin release-gating caller. It delegates to
-three reusable workflows while keeping one stable `Certification` result:
+The top-level `CI` workflow exposes purpose-grouped jobs and one stable
+`Merge Gate` result:
 
-- `Build ROMs` builds normal, debug, VC, and audit products once, publishes the
+- `Build` builds normal, debug, VC, and audit products once, publishes the
   unchanged release artifact, and publishes exact same-revision test products.
-- `Donor Contract` verifies the pinned external authority.
+- `Full-color Verification / Donor Contract` verifies the pinned external
+  authority until repository-owned palette coverage replaces it under issue
+  #17.
 - `Unit Tests` runs the complete non-donor unit tree once.
-- `Harness Contracts` runs discovery, reviewed inventory, and bank contracts
-  once.
-- `Full-color Evidence Capture 1` and `Full-color Evidence Capture 2` capture
-  stable evidence independently; `Full-color Evidence Determinism` compares
+- `Repository Inventory & Bank Safety` runs discovery, reviewed inventory, and
+  bank contracts once.
+- `Evidence / Capture A` and `Evidence / Capture B` capture stable evidence
+  independently; `Evidence / Determinism` compares
   their stable files byte-for-byte.
-- `Renderer Contract Fixtures`, `Renderer Runtime Ownership`, and
-  `Full-color Audit Evidence` run their named independent contracts.
+- `Renderer / Contract Fixtures`, `Renderer / Runtime Ownership`, and
+  `Evidence / Audit` run their named independent contracts.
 - `E2E (Core)`, `E2E (Renderer)`, and `E2E (Journey)` download the same-revision
   products and run independently.
-- `Certification` fails if build, full-color, or gameplay verification fails,
-  is skipped, or is cancelled.
+- `Merge Gate` fails if any verification job fails, is skipped, or is
+  cancelled.
 
 The workflow runs when a pull request is opened or synchronized and on pushes
 to `main`. A newer commit cancels obsolete work for the same pull request.
-Metadata-only checks are separate in `.github/workflows/metadata.yml`, and the
-trusted labeler remains isolated in `.github/workflows/pr-labels.yml`.
+`Metadata / Lint` combines workflow and title validation. The non-required
+`Metadata / Labels` check remains isolated in the trusted
+`pull_request_target` workflow.
 
 Hosted gameplay reduces the chance of merging a visibly broken ROM, but it does
 not replace manual frame review, full-game play, hardware checks, or claims not

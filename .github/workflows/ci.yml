@@ -16,35 +16,485 @@ concurrency:
 
 jobs:
   build:
-    name: Build ROMs
-    uses: ./.github/workflows/ci-build.yml
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
 
-  full-color:
-    name: Full-color Verification
+      - name: Set up build dependencies
+        uses: ./.github/actions/setup-build
+
+      - name: Build ROM products
+        run: make -j"$(nproc)" yellow yellow_debug yellow_vc yellow_phase2_audit
+
+      - name: Check for modified tracked files
+        run: |
+          if ! git diff-index --quiet HEAD --; then
+            git diff-index HEAD --
+            exit 1
+          fi
+
+      - name: Stage release files
+        run: |
+          mkdir release
+          cp pokeyellow.gbc release/pokeyellow.gbc
+          cp pokeyellow.map release/pokeyellow.map
+          cp pokeyellow.sym release/pokeyellow.sym
+          cp pokeyellow_debug.gbc release/pokeyellow-debug.gbc
+          cp pokeyellow_debug.map release/pokeyellow-debug.map
+          cp pokeyellow_debug.sym release/pokeyellow-debug.sym
+          cp pokeyellow_vc.gbc release/pokeyellow-vc.gbc
+          cp pokeyellow_vc.map release/pokeyellow-vc.map
+          cp pokeyellow_vc.sym release/pokeyellow-vc.sym
+
+      - name: Upload release products
+        uses: actions/upload-artifact@v7
+        with:
+          name: pokeyellow-build
+          path: release/
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Upload test products
+        uses: actions/upload-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: |
+            pokeyellow.gbc
+            pokeyellow.map
+            pokeyellow.sym
+            pokeyellow_debug.gbc
+            pokeyellow_debug.map
+            pokeyellow_debug.sym
+            pokeyellow_vc.gbc
+            pokeyellow_vc.map
+            pokeyellow_vc.sym
+            pokeyellow_phase2_audit.gbc
+            pokeyellow_phase2_audit.map
+            pokeyellow_phase2_audit.sym
+          if-no-files-found: error
+          retention-days: 3
+
+  donor-contract:
+    name: Full-color Verification / Donor Contract
     needs: build
-    uses: ./.github/workflows/ci-full-color.yml
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      POKERED_GBC_ROOT: ${{ github.workspace }}/pokered-gbc-donor
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
 
-  gameplay:
-    name: Gameplay Verification
+      - name: Checkout pinned pokered-gbc donor
+        uses: actions/checkout@v7
+        with:
+          repository: dannye/pokered-gbc
+          ref: c1a3b6c5a7591472241036d0cf09c3817f841f93
+          path: pokered-gbc-donor
+          fetch-depth: 0
+
+      - name: Normalize donor origin
+        run: git -C "$POKERED_GBC_ROOT" remote set-url origin git@github.com:dannye/pokered-gbc.git
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Run exact donor contract
+        run: make test-full-color-donor-contract
+
+  unit-tests:
+    name: Unit Tests
     needs: build
-    uses: ./.github/workflows/ci-gameplay.yml
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
 
-  certification:
-    name: Certification
-    needs: [build, full-color, gameplay]
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Download same-revision test products
+        uses: actions/download-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: .
+
+      - name: Run complete unit contracts once
+        run: make test-unit ROM_TEST_PREBUILT_PRODUCTS=1
+
+  harness-contracts:
+    name: Repository Inventory & Bank Safety
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FULL_COLOR_CONTRACT_RESULTS: test-results/full-color-contracts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize contract evidence root
+        run: mkdir -p "$FULL_COLOR_CONTRACT_RESULTS"
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Download same-revision test products
+        uses: actions/download-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: .
+
+      - name: Run repository and bank contracts
+        shell: bash
+        run: |
+          set -o pipefail
+          make test-full-color-harness-contracts ROM_TEST_PREBUILT_PRODUCTS=1 \
+            2>&1 | tee "$FULL_COLOR_CONTRACT_RESULTS/contracts.log"
+
+      - name: Upload harness contract evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: full-color-contracts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_CONTRACT_RESULTS }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  evidence-capture:
+    name: Evidence / Capture ${{ matrix.name }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: A
+            run: 1
+          - name: B
+            run: 2
+    env:
+      FULL_COLOR_EVIDENCE_RESULTS: test-results/full-color-evidence
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize evidence root
+        run: mkdir -p "$FULL_COLOR_EVIDENCE_RESULTS/run-${{ matrix.run }}/diagnostics"
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Download same-revision test products
+        uses: actions/download-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: .
+
+      - name: Capture deterministic evidence
+        run: >-
+          .venv/bin/python -m tools.rom_tests.full_color.evidence_runner
+          --root . --results "$FULL_COLOR_EVIDENCE_RESULTS"
+          --one-run run-${{ matrix.run }}
+
+      - name: Upload evidence capture
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: full-color-evidence-run-${{ matrix.run }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_EVIDENCE_RESULTS }}/run-${{ matrix.run }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  evidence-determinism:
+    name: Evidence / Determinism
+    needs: [build, evidence-capture]
+    if: always() && needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FULL_COLOR_EVIDENCE_RESULTS: test-results/full-color-evidence
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Download evidence capture 1
+        uses: actions/download-artifact@v7
+        with:
+          name: full-color-evidence-run-1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_EVIDENCE_RESULTS }}/run-1
+
+      - name: Download evidence capture 2
+        uses: actions/download-artifact@v7
+        with:
+          name: full-color-evidence-run-2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_EVIDENCE_RESULTS }}/run-2
+
+      - name: Compare independent evidence
+        run: >-
+          python -m tools.rom_tests.full_color.evidence_runner
+          --root . --results "$FULL_COLOR_EVIDENCE_RESULTS"
+          --compare-runs run-1 run-2
+
+      - name: Upload compared evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: full-color-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_EVIDENCE_RESULTS }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  renderer-contracts:
+    name: Renderer / Contract Fixtures
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FULL_COLOR_RENDERER_CONTRACT_RESULTS: test-results/full-color-renderer-contracts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize renderer contract evidence root
+        run: mkdir -p "$FULL_COLOR_RENDERER_CONTRACT_RESULTS"
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Run renderer contract fixtures
+        run: make test-full-color-renderer-contracts
+
+      - name: Upload renderer contract evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: renderer-contracts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_RENDERER_CONTRACT_RESULTS }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  renderer-runtime:
+    name: Renderer / Runtime Ownership
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FULL_COLOR_RUNTIME_RESULTS: test-results/full-color-renderer-runtime
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize renderer runtime evidence root
+        run: mkdir -p "$FULL_COLOR_RUNTIME_RESULTS"
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Download same-revision test products
+        uses: actions/download-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: .
+
+      - name: Run renderer runtime ownership
+        run: make test-full-color-renderer-runtime ROM_TEST_PREBUILT_PRODUCTS=1
+
+      - name: Upload renderer runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: renderer-runtime-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_RUNTIME_RESULTS }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  audit-evidence:
+    name: Evidence / Audit
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FULL_COLOR_AUDIT_RESULTS: test-results/full-color-audit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize audit evidence root
+        run: mkdir -p "$FULL_COLOR_AUDIT_RESULTS"
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Download same-revision test products
+        uses: actions/download-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: .
+
+      - name: Verify audit evidence
+        shell: bash
+        run: |
+          set -o pipefail
+          make test-full-color-audit ROM_TEST_PREBUILT_PRODUCTS=1 \
+            2>&1 | tee "$FULL_COLOR_AUDIT_RESULTS/audit.log"
+
+      - name: Upload audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: full-color-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.FULL_COLOR_AUDIT_RESULTS }}/
+          if-no-files-found: error
+          retention-days: 14
+
+  e2e:
+    name: E2E (${{ matrix.name }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Core
+            suite: core
+            target: test-full-color-e2e-core
+          - name: Renderer
+            suite: renderer
+            target: test-full-color-e2e-renderer
+          - name: Journey
+            suite: journey
+            target: test-full-color-e2e-journey
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Download same-revision test products
+        uses: actions/download-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: .
+
+      - name: Run gameplay suite
+        run: make ROM_TEST_PREBUILT_PRODUCTS=1 ${{ matrix.target }}
+
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-${{ matrix.suite }}-failure-evidence
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+  merge-gate:
+    name: Merge Gate
+    needs:
+      - build
+      - donor-contract
+      - unit-tests
+      - harness-contracts
+      - evidence-capture
+      - evidence-determinism
+      - renderer-contracts
+      - renderer-runtime
+      - audit-evidence
+      - e2e
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require every verification group
+      - name: Require every verification job
         env:
           BUILD: ${{ needs.build.result }}
-          FULL_COLOR: ${{ needs.full-color.result }}
-          GAMEPLAY: ${{ needs.gameplay.result }}
+          DONOR_CONTRACT: ${{ needs.donor-contract.result }}
+          UNIT_TESTS: ${{ needs.unit-tests.result }}
+          REPOSITORY_INVENTORY: ${{ needs.harness-contracts.result }}
+          EVIDENCE_CAPTURE: ${{ needs.evidence-capture.result }}
+          EVIDENCE_DETERMINISM: ${{ needs.evidence-determinism.result }}
+          RENDERER_CONTRACTS: ${{ needs.renderer-contracts.result }}
+          RENDERER_RUNTIME: ${{ needs.renderer-runtime.result }}
+          AUDIT_EVIDENCE: ${{ needs.audit-evidence.result }}
+          E2E: ${{ needs.e2e.result }}
         run: |
-          for result in "$BUILD" "$FULL_COLOR" "$GAMEPLAY"; do
+          for result in \
+            "$BUILD" \
+            "$DONOR_CONTRACT" \
+            "$UNIT_TESTS" \
+            "$REPOSITORY_INVENTORY" \
+            "$EVIDENCE_CAPTURE" \
+            "$EVIDENCE_DETERMINISM" \
+            "$RENDERER_CONTRACTS" \
+            "$RENDERER_RUNTIME" \
+            "$AUDIT_EVIDENCE" \
+            "$E2E"; do
             if [ "$result" != success ]; then
-              echo "::error::verification group finished as $result"
+              echo "::error::verification job finished as $result"
               exit 1
             fi
           done
