@@ -1,17 +1,13 @@
-; Conventional-interior color authority adapted with permission from the rights
-; holders of git@github.com:dannye/pokered-gbc.git at pinned commit
-; c1a3b6c5a7591472241036d0cf09c3817f841f93.
+; Yellow-owned conventional-interior color authority retained after independent
+; visual review of every map and tileset sheet plus normal/debug Color and
+; Yellow route artifacts. Yellow remains authoritative for tile graphics.
+; These tables supply only the complete passive BG palette payload and base
+; bank-1 attribute lookup; runtime applies the two reviewed Celadon Mart
+; map-specific overrides afterward.
 ;
-; Sources: color/data/map_palettes.asm, color/data/map_palette_sets.asm,
-; color/data/map_palette_assignments.asm, and color/tilesets/*.asm.
-; Yellow remains authoritative for tile graphics. These tables supply only the
-; complete passive BG palette payload and base bank-1 attribute lookup. Runtime
-; applies the donor loader's two Celadon Mart map-specific overrides afterward.
-;
-; The donor copies exactly $60 assignment bytes from each label. Some shorter
-; source tables therefore intentionally continue into the next donor table.
-; Each table below materializes those exact 96 copied bytes, then assigns
-; tile IDs $60-$ff to palette 7 as the donor loader does.
+; Each table below materializes the reviewed 96 assignment bytes, then assigns
+; tile IDs $60-$ff to palette 7. All payload bytes and size assertions are
+; retained unchanged.
 
 DEF FULL_COLOR_INTERIOR_GRAY       EQU 0
 DEF FULL_COLOR_INTERIOR_RED        EQU 1

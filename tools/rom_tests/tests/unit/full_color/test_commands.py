@@ -60,6 +60,7 @@ E2E_MODULES = {
     "renderer": {
         "test_full_color_connection_palette.py",
         "test_full_color_house_palette_visual.py",
+        "test_full_color_map_background_batches.py",
         "test_full_color_oak_battle_handoff.py",
         "test_full_color_oaks_lab_save_confirmation.py",
         "test_full_color_start_menu_journey.py",
@@ -79,10 +80,10 @@ MAKE_INVOCATION = re.compile(
     r"make\b(?P<arguments>.*)$"
 )
 MAKE_TARGET = re.compile(r"^[A-Za-z0-9_.%/-]+$")
-MAKE_OPTIONS_WITH_VALUE = frozenset(("-C", "--directory", "-f", "--file", "-j", "--jobs"))
-E2E_PATH = re.compile(
-    r"tools/rom_tests/tests/e2e/[A-Za-z0-9_./-]+\.py"
+MAKE_OPTIONS_WITH_VALUE = frozenset(
+    ("-C", "--directory", "-f", "--file", "-j", "--jobs")
 )
+E2E_PATH = re.compile(r"tools/rom_tests/tests/e2e/[A-Za-z0-9_./-]+\.py")
 OUTPUT_PATH = re.compile(r"test-results(?:/[A-Za-z0-9_.{}-]+)+/?")
 REPOSITORY_PATH = re.compile(
     r"(?<![A-Za-z0-9_.@/-])"
@@ -91,9 +92,7 @@ REPOSITORY_PATH = re.compile(
 )
 E2E_JOB_NAME = re.compile(r"^E2E \([A-Za-z0-9 _-]+\)$")
 TITLE_NAME = re.compile(r"^[A-Z][A-Za-z0-9]*(?:[ ()-]+[A-Za-z0-9]+)*$")
-INLINE_LINK = re.compile(
-    r"!?\[[^\]\n]*\]\((?P<destination>[^)\n]+)\)"
-)
+INLINE_LINK = re.compile(r"!?\[[^\]\n]*\]\((?P<destination>[^)\n]+)\)")
 REFERENCE_LINK = re.compile(
     r"^\s*\[[^\]\n]+\]:\s*(?P<destination><[^>]+>|\S+)",
     re.MULTILINE,
@@ -144,9 +143,7 @@ def _tracked_markdown_paths() -> tuple[Path, ...]:
         check=True,
     )
     return tuple(
-        Path(raw.decode("utf-8"))
-        for raw in completed.stdout.split(b"\0")
-        if raw
+        Path(raw.decode("utf-8")) for raw in completed.stdout.split(b"\0") if raw
     )
 
 
@@ -189,7 +186,10 @@ def _markdown_code_fragments(markdown: str) -> tuple[str, ...]:
             for match in fenced
             for line in _logical_code_lines(match.group("body"))
         ),
-        *(match.group("body").strip() for match in INLINE_CODE.finditer(outside_fences)),
+        *(
+            match.group("body").strip()
+            for match in INLINE_CODE.finditer(outside_fences)
+        ),
     )
 
 
@@ -257,18 +257,23 @@ def _documented_job_names(markdown: str, known: frozenset[str]) -> tuple[str, ..
     outside_fences = FENCED_CODE.sub("", markdown)
     for match in INLINE_CODE.finditer(outside_fences):
         name = match.group("body").strip()
-        nearby = outside_fences[max(0, match.start() - 24):match.start()] + outside_fences[
-            match.end():match.end() + 32
-        ]
+        nearby = (
+            outside_fences[max(0, match.start() - 24) : match.start()]
+            + outside_fences[match.end() : match.end() + 32]
+        )
         has_job_context = re.search(
             r"\b(job|jobs|check|checks|context|result|status)\b",
             nearby,
             re.IGNORECASE,
         )
-        if name in known or E2E_JOB_NAME.fullmatch(name) or (
-            has_job_context
-            and TITLE_NAME.fullmatch(name)
-            and name.split(maxsplit=1)[0] in known_initial_words
+        if (
+            name in known
+            or E2E_JOB_NAME.fullmatch(name)
+            or (
+                has_job_context
+                and TITLE_NAME.fullmatch(name)
+                and name.split(maxsplit=1)[0] in known_initial_words
+            )
         ):
             names.append(name)
     return tuple(names)
@@ -377,7 +382,9 @@ def _documentation_contract_findings(
                 findings.append(f"{location}: link leaves repository {destination}")
             else:
                 if not resolved.exists():
-                    findings.append(f"{location}: missing link destination {destination}")
+                    findings.append(
+                        f"{location}: missing link destination {destination}"
+                    )
     return tuple(sorted(findings))
 
 
@@ -454,7 +461,7 @@ def test_each_e2e_module_belongs_to_exactly_one_suite() -> None:
     }
     assert actual == E2E_MODULES
     all_modules = [name for modules in actual.values() for name in modules]
-    assert len(all_modules) == 9
+    assert len(all_modules) == 10
     assert len(all_modules) == len(set(all_modules))
 
 
@@ -586,14 +593,9 @@ def test_workflow_coupled_local_runner_is_removed() -> None:
 
 
 def test_all_tracked_markdown_references_live_repository_contracts() -> None:
-    paths = tuple(
-        path for path in _tracked_markdown_paths() if (ROOT / path).is_file()
-    )
+    paths = tuple(path for path in _tracked_markdown_paths() if (ROOT / path).is_file())
     assert paths
-    documents = {
-        path: (ROOT / path).read_text(encoding="utf-8")
-        for path in paths
-    }
+    documents = {path: (ROOT / path).read_text(encoding="utf-8") for path in paths}
     findings = _documentation_contract_findings(documents)
     assert findings == (), "\n".join(findings)
 
@@ -602,9 +604,7 @@ def test_documentation_contract_rejects_stale_make_target_mutation() -> None:
     source = Path("docs/PROBE.md")
     baseline = {source: "Run `make yellow_debug`.\n"}
     assert _documentation_contract_findings(baseline) == ()
-    mutated = {
-        source: baseline[source].replace("yellow_debug", "yellow_debog")
-    }
+    mutated = {source: baseline[source].replace("yellow_debug", "yellow_debog")}
     assert _documentation_contract_findings(mutated) == (
         "docs/PROBE.md: missing Make target yellow_debog",
     )
@@ -666,9 +666,7 @@ def test_documentation_contract_rejects_unknown_output_root_mutation() -> None:
     baseline = {source: "Evidence lives under `test-results/full-color-evidence/`.\n"}
     assert _documentation_contract_findings(baseline) == ()
     mutated = {
-        source: baseline[source].replace(
-            "full-color-evidence", "does-not-exist"
-        )
+        source: baseline[source].replace("full-color-evidence", "does-not-exist")
     }
     assert _documentation_contract_findings(mutated) == (
         "docs/PROBE.md: unknown output root test-results/does-not-exist/",
@@ -680,9 +678,7 @@ def test_documentation_contract_rejects_retired_runner_and_command() -> None:
     runner_findings = _documentation_contract_findings(
         {source: "Run `python tools/run_ci.py`.\n"}
     )
-    assert runner_findings == (
-        "docs/PROBE.md: retired tools/run_ci.py reference",
-    )
+    assert runner_findings == ("docs/PROBE.md: retired tools/run_ci.py reference",)
 
     retired = RETIRED_COMMANDS[0]
     command_findings = _documentation_contract_findings(

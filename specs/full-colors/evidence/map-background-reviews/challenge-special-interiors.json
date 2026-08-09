@@ -1,0 +1,1336 @@
+{
+  "atlas": {
+    "artifacts": [
+      {
+        "path": "challenge-special-interiors/maps/agathas_room.png",
+        "sha256": "5719f1dfb93dfb166a75ed69d9e1720ceaf3ad8d94efaf77c09366838cd33c69"
+      },
+      {
+        "path": "challenge-special-interiors/maps/bills_house.png",
+        "sha256": "1bdb17f760c0040abd25ff8ae359ec143f316b7f85cd32ea2f9f8f6605055d57"
+      },
+      {
+        "path": "challenge-special-interiors/maps/brunos_room.png",
+        "sha256": "90eb0128da77467ac1412e25ef725a02574058700a0ff617cf9f7640e577b00c"
+      },
+      {
+        "path": "challenge-special-interiors/maps/celadon_chief_house.png",
+        "sha256": "dad5ff06844c0d3611a5169ecc11ccdbcd233dd893a48e498ce5b4d57398020f"
+      },
+      {
+        "path": "challenge-special-interiors/maps/celadon_gym.png",
+        "sha256": "5ea98f514e347a29cecbe1f204cfcfbf47cdc3356e852514a486d49552dd3f3a"
+      },
+      {
+        "path": "challenge-special-interiors/maps/celadon_mansion_1f.png",
+        "sha256": "c116283bdbfdc6e00dfde0f94d0e0523fb9b53ce6bbc4a996f63b8401a49ffd4"
+      },
+      {
+        "path": "challenge-special-interiors/maps/celadon_mansion_2f.png",
+        "sha256": "3f7497005c780a0fa8857386f73fbce4df2212999719d677cbfdb4a8ec5d1dd2"
+      },
+      {
+        "path": "challenge-special-interiors/maps/celadon_mansion_3f.png",
+        "sha256": "fa84785126c4ed3d8b00453623164b7d37a8cfb501e6169da571eb3573f99ae6"
+      },
+      {
+        "path": "challenge-special-interiors/maps/celadon_mansion_roof.png",
+        "sha256": "c16148267b823923f2a5a7a69f72c75d813dc0f9e89bc6e9ea39a362eef03364"
+      },
+      {
+        "path": "challenge-special-interiors/maps/cerulean_badge_house.png",
+        "sha256": "8cfb71f9d0f7e6f61b7a2a5a1af042dcf86aaa20a6a8dbb415f35ebc7f4f556d"
+      },
+      {
+        "path": "challenge-special-interiors/maps/cerulean_gym.png",
+        "sha256": "5c62ea5bf4eeb5afa3191d2fd4e9673149b17946a52ef5bfe97c1c7455594f13"
+      },
+      {
+        "path": "challenge-special-interiors/maps/champions_room.png",
+        "sha256": "f9d6066a4c812a3c51e8deb4d9c503790362bee5502eca3fe2e0bd596db17729"
+      },
+      {
+        "path": "challenge-special-interiors/maps/cinnabar_gym.png",
+        "sha256": "dc78b18e258dc28d45ab5fd048ab62d30cf567c0023db62e438a249b02b284ab"
+      },
+      {
+        "path": "challenge-special-interiors/maps/fighting_dojo.png",
+        "sha256": "b92f959b851195aeef3326d3e30a39ba931577e0aec40c60258048cd1337ba6f"
+      },
+      {
+        "path": "challenge-special-interiors/maps/fuchsia_good_rod_house.png",
+        "sha256": "cd480d8f008b87a8ebb631b3cbad8745433ca9fb94877881675afe523d1cdfc9"
+      },
+      {
+        "path": "challenge-special-interiors/maps/fuchsia_gym.png",
+        "sha256": "a6b1fdfcc57640ea064513e1183328ebcbf97c7860b86046fa323ace98e22e4c"
+      },
+      {
+        "path": "challenge-special-interiors/maps/hall_of_fame.png",
+        "sha256": "0d7b73630f770ba1fe0d9390e5c96cc89738fb03e22d3f2173aa909d7ea6a4ba"
+      },
+      {
+        "path": "challenge-special-interiors/maps/lances_room.png",
+        "sha256": "88936fcdafbe28062085b35bdc6f93eafbab1d352f89295d8af1e44f4bbf050e"
+      },
+      {
+        "path": "challenge-special-interiors/maps/loreleis_room.png",
+        "sha256": "495ce86c083a4f71f9aabaf01be5b5257cbf095ded7eec4ab02cac115fc7b3dd"
+      },
+      {
+        "path": "challenge-special-interiors/maps/oaks_lab.png",
+        "sha256": "e2920afca63926ff7a4f649fd48b14f5100754aedb299117566072bd7dcaeadb"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pewter_gym.png",
+        "sha256": "a49d9d8d69b3697c4bc9402b5c445b43a77e88c11cf51688c998620cc1fd89a3"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_fan_club.png",
+        "sha256": "f9970f2d366fa7dce543187fde586d74dd9d39962c50f179f3625ebe0172db50"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_mansion_1f.png",
+        "sha256": "a0306625d359b7c0b7645ed4c83b02a8c1be88d89532e1a8755000e6cde57eff"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_mansion_2f.png",
+        "sha256": "68bc7008f0eec8c314b48c66ac2f7749bbcdf4ff6c7a51d8a7a47353975e3385"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_mansion_3f.png",
+        "sha256": "eba38a8f3d68a12e3021554e8fc204b9c8a78c0aef8311fdd3c955032cb965dc"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_mansion_b1f.png",
+        "sha256": "122567e499b548953de509b106252d09a24a300fbd31a5c2f57f75519a4574bb"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_tower_1f.png",
+        "sha256": "cd9790bf53d36e4c8abdd3b32fb00e0c2dd6651a12ed241cfd510db35719126e"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_tower_2f.png",
+        "sha256": "f6bb649d21051c25c6383c8b01af0c964cc6c246d5c7d33feb87aea2ebd606cb"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_tower_3f.png",
+        "sha256": "431c70886a8fbe38a307d0eb86295ef78ecd471367676a858ff1de10532107ad"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_tower_4f.png",
+        "sha256": "1f5c6706e722653a452a1798814ac65f0ee1cc152692c5cf9edb81098a3b86b5"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_tower_5f.png",
+        "sha256": "0a5109f27c63b36c9fd10d15b5ae2b30018eca3f95a70d9e8c9218886023b0a3"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_tower_6f.png",
+        "sha256": "97e11131b6e45d6c3105adc3a25d58cb62e6aee4c04af5b63f34722ff9ed7e55"
+      },
+      {
+        "path": "challenge-special-interiors/maps/pokemon_tower_7f.png",
+        "sha256": "85b5d90936722963d8b78b17ec773074006d41acbca52704f5bf52717143cccb"
+      },
+      {
+        "path": "challenge-special-interiors/maps/power_plant.png",
+        "sha256": "9305b77dee07a128c9818565eac0a7f2db16e56d881376db4deefe98c9c45bac"
+      },
+      {
+        "path": "challenge-special-interiors/maps/rocket_hideout_b1f.png",
+        "sha256": "7aa653d0bbda87730209c7bfe836ffd97761d4b3c70f9ca29a6480067beb4d8f"
+      },
+      {
+        "path": "challenge-special-interiors/maps/rocket_hideout_b2f.png",
+        "sha256": "1c613e24e322580cdf90e1576c78a06580d02d381894192df35aa656c49c331d"
+      },
+      {
+        "path": "challenge-special-interiors/maps/rocket_hideout_b3f.png",
+        "sha256": "9cad23dbb82dadd1b8117c11ae74415b923bfa0ca7165bbc48fc98a74cbd7f0d"
+      },
+      {
+        "path": "challenge-special-interiors/maps/rocket_hideout_b4f.png",
+        "sha256": "cbed9d6b76cf08aabc242b5bf719eccb617d64ff28902bd8e38f563a9f48cd78"
+      },
+      {
+        "path": "challenge-special-interiors/maps/saffron_gym.png",
+        "sha256": "f1ad102ace84a00cb1eb520a2535dcef5797bbcb583b89b531f8b52201ae75bf"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_10f.png",
+        "sha256": "be7c2cd846a690b9a2a76f668fce08e5210818782bfee6362def6d091a3e5f80"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_11f.png",
+        "sha256": "742f644836bf66527f48b27c6ea2563e6cc1af748e23b97dab60eb6407cda10b"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_1f.png",
+        "sha256": "43891340457bc03d1d8cfeb5d407f2ecc97e8e552d1b31c08f93ec6aaf575470"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_2f.png",
+        "sha256": "06d9f1efda014eb95a27954d4e7eeae3b621df500d65a4be29b55343a065fd78"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_3f.png",
+        "sha256": "f062058408f9bd924fe6e3effa055321a93a2cf0cda72feff01cf38bed44c1b0"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_4f.png",
+        "sha256": "92f48193d15e5b1b49c5f80fdefa577bb9d83d29c053143badd141ad4b6463a9"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_5f.png",
+        "sha256": "74f94fced60b9088440b83777c24fabf188dae7c4aa0ef698e40a18c578bd803"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_6f.png",
+        "sha256": "9f578ef8e611e22b9b98f8cfb33da454a731117135c3348885f718533fb510e2"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_7f.png",
+        "sha256": "fa89b531717ee5a3f97054d38119cd475f4d00beb0f60d3c0fe3ab193a2b883b"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_8f.png",
+        "sha256": "cd14c9ddc2502b55768e047572b822551dfabec9885a6b06668fc805441bf27c"
+      },
+      {
+        "path": "challenge-special-interiors/maps/silph_co_9f.png",
+        "sha256": "f90e6397570931ab289abb25b759c36814a978d224bebfa1014167bf888ec24b"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_1f.png",
+        "sha256": "8bd14d3c7f83bf2a5e96743167b54008faf04772c3ebe1df336db772495eae69"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_1f_rooms.png",
+        "sha256": "3e5412781ba814c3b0b9f9c634c859c7248e585644bf24f83465149a81c72471"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_2f.png",
+        "sha256": "8d69684ebe711e7af399ed45b7b06618775da80795cceba38ac03f243b145df5"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_2f_rooms.png",
+        "sha256": "697bce0acce60a1949e3857456ee0ce10e4f190384175a8aed5a5fa9d69c0f80"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_3f.png",
+        "sha256": "fc6c04976cf651169a960eca2b67ef10f792e1283de1b4ecbad45dcade62a86b"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_b1f.png",
+        "sha256": "6e214baa5c71b7ac06e6a27415ef4ed11c553420d9e48d6b2e75e781312a3224"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_b1f_rooms.png",
+        "sha256": "452dca3fccb6b6da28610a45cd73bf19bcdd6a38e9859b163262775ec1ba2d98"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_bow.png",
+        "sha256": "41009188d271f96e6a48e98e3cd405cb938161f2de15254a413a4be103e7ee02"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_captains_room.png",
+        "sha256": "44c57fcd81b0025b43d1456d559f586a9d2ad4a5ce7dda1ad10b01fdd800b160"
+      },
+      {
+        "path": "challenge-special-interiors/maps/ss_anne_kitchen.png",
+        "sha256": "5988c6689347fa2f25cb3f86133c874bdc40633475f4f0678f1a1c2e64578398"
+      },
+      {
+        "path": "challenge-special-interiors/maps/underground_path_north_south.png",
+        "sha256": "06745232ae16ec7a5afa99865921fce95ba596eab893eb9cc9ad38aebdf5c1e2"
+      },
+      {
+        "path": "challenge-special-interiors/maps/underground_path_west_east.png",
+        "sha256": "c7fbad5758d4d2704d993a3b4d0d135757e852cdf180cc64f215548dbd89ea3a"
+      },
+      {
+        "path": "challenge-special-interiors/maps/vermilion_gym.png",
+        "sha256": "9b4db9d12d9b73ad3089feecf1ae0c7c5b2e72c2903bc9493f29f36c204baf5a"
+      },
+      {
+        "path": "challenge-special-interiors/maps/viridian_gym.png",
+        "sha256": "99c1f4da74af668749d31232f4ff6a9b7b70aa1194ac4158fbe46224f6b93051"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/cemetery.png",
+        "sha256": "6ea0876ca1b3aeb99daa032749aaf7593df14b247c635709002f2549f7987473"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/dojo.png",
+        "sha256": "d165f5b67fa97120dcf8f792a4095b50c9e2d90981c03f4eb723b9860db27ddb"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/facility.png",
+        "sha256": "81a2bbf4d2285ac659d0cca83e9e0460e4f130da19947f1af63a4487c59bc97a"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/gym.png",
+        "sha256": "d165f5b67fa97120dcf8f792a4095b50c9e2d90981c03f4eb723b9860db27ddb"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/interior.png",
+        "sha256": "d7633a99024d22cfe8f98a8bed6a505d606b64b3a7e11f1637ff08a0d93a8344"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/mansion.png",
+        "sha256": "5998f327fa1e71884794cec4f6380a6216d950c01ff8b362fed8f4414d54f3dc"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/ship.png",
+        "sha256": "200683eb33f4e7c64b204cf7a2720df74f167f9fd4bdd2b84194ddcb8a9496fa"
+      },
+      {
+        "path": "challenge-special-interiors/tilesets/underground.png",
+        "sha256": "a375581b5662b7a7fbe931c3a1468484b12674fbb31fecbcfdc880d549c9ca0b"
+      }
+    ],
+    "content_sha256": "95390973ab3b6bbb31800fcd577bc3791873b0a6501a32536fd75b1881291741",
+    "manifest_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+    "path": "test-results/full-color-map-background-atlases/manifest.json"
+  },
+  "batch": "challenge-special-interiors",
+  "content": {
+    "maps": [
+      {
+        "id": 247,
+        "name": "AGATHAS_ROOM",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 88,
+        "name": "BILLS_HOUSE",
+        "tileset": "INTERIOR"
+      },
+      {
+        "id": 246,
+        "name": "BRUNOS_ROOM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 139,
+        "name": "CELADON_CHIEF_HOUSE",
+        "tileset": "MANSION"
+      },
+      {
+        "id": 134,
+        "name": "CELADON_GYM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 128,
+        "name": "CELADON_MANSION_1F",
+        "tileset": "MANSION"
+      },
+      {
+        "id": 129,
+        "name": "CELADON_MANSION_2F",
+        "tileset": "MANSION"
+      },
+      {
+        "id": 130,
+        "name": "CELADON_MANSION_3F",
+        "tileset": "MANSION"
+      },
+      {
+        "id": 131,
+        "name": "CELADON_MANSION_ROOF",
+        "tileset": "MANSION"
+      },
+      {
+        "id": 230,
+        "name": "CERULEAN_BADGE_HOUSE",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 65,
+        "name": "CERULEAN_GYM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 120,
+        "name": "CHAMPIONS_ROOM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 166,
+        "name": "CINNABAR_GYM",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 177,
+        "name": "FIGHTING_DOJO",
+        "tileset": "DOJO"
+      },
+      {
+        "id": 164,
+        "name": "FUCHSIA_GOOD_ROD_HOUSE",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 157,
+        "name": "FUCHSIA_GYM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 118,
+        "name": "HALL_OF_FAME",
+        "tileset": "GYM"
+      },
+      {
+        "id": 113,
+        "name": "LANCES_ROOM",
+        "tileset": "DOJO"
+      },
+      {
+        "id": 245,
+        "name": "LORELEIS_ROOM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 40,
+        "name": "OAKS_LAB",
+        "tileset": "DOJO"
+      },
+      {
+        "id": 54,
+        "name": "PEWTER_GYM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 90,
+        "name": "POKEMON_FAN_CLUB",
+        "tileset": "INTERIOR"
+      },
+      {
+        "id": 165,
+        "name": "POKEMON_MANSION_1F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 214,
+        "name": "POKEMON_MANSION_2F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 215,
+        "name": "POKEMON_MANSION_3F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 216,
+        "name": "POKEMON_MANSION_B1F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 142,
+        "name": "POKEMON_TOWER_1F",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 143,
+        "name": "POKEMON_TOWER_2F",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 144,
+        "name": "POKEMON_TOWER_3F",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 145,
+        "name": "POKEMON_TOWER_4F",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 146,
+        "name": "POKEMON_TOWER_5F",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 147,
+        "name": "POKEMON_TOWER_6F",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 148,
+        "name": "POKEMON_TOWER_7F",
+        "tileset": "CEMETERY"
+      },
+      {
+        "id": 83,
+        "name": "POWER_PLANT",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 199,
+        "name": "ROCKET_HIDEOUT_B1F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 200,
+        "name": "ROCKET_HIDEOUT_B2F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 201,
+        "name": "ROCKET_HIDEOUT_B3F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 202,
+        "name": "ROCKET_HIDEOUT_B4F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 178,
+        "name": "SAFFRON_GYM",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 234,
+        "name": "SILPH_CO_10F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 235,
+        "name": "SILPH_CO_11F",
+        "tileset": "INTERIOR"
+      },
+      {
+        "id": 181,
+        "name": "SILPH_CO_1F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 207,
+        "name": "SILPH_CO_2F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 208,
+        "name": "SILPH_CO_3F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 209,
+        "name": "SILPH_CO_4F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 210,
+        "name": "SILPH_CO_5F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 211,
+        "name": "SILPH_CO_6F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 212,
+        "name": "SILPH_CO_7F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 213,
+        "name": "SILPH_CO_8F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 233,
+        "name": "SILPH_CO_9F",
+        "tileset": "FACILITY"
+      },
+      {
+        "id": 95,
+        "name": "SS_ANNE_1F",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 102,
+        "name": "SS_ANNE_1F_ROOMS",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 96,
+        "name": "SS_ANNE_2F",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 103,
+        "name": "SS_ANNE_2F_ROOMS",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 97,
+        "name": "SS_ANNE_3F",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 98,
+        "name": "SS_ANNE_B1F",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 104,
+        "name": "SS_ANNE_B1F_ROOMS",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 99,
+        "name": "SS_ANNE_BOW",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 101,
+        "name": "SS_ANNE_CAPTAINS_ROOM",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 100,
+        "name": "SS_ANNE_KITCHEN",
+        "tileset": "SHIP"
+      },
+      {
+        "id": 119,
+        "name": "UNDERGROUND_PATH_NORTH_SOUTH",
+        "tileset": "UNDERGROUND"
+      },
+      {
+        "id": 121,
+        "name": "UNDERGROUND_PATH_WEST_EAST",
+        "tileset": "UNDERGROUND"
+      },
+      {
+        "id": 92,
+        "name": "VERMILION_GYM",
+        "tileset": "GYM"
+      },
+      {
+        "id": 45,
+        "name": "VIRIDIAN_GYM",
+        "tileset": "GYM"
+      }
+    ],
+    "tilesets": [
+      {
+        "id": 5,
+        "name": "DOJO"
+      },
+      {
+        "id": 7,
+        "name": "GYM"
+      },
+      {
+        "id": 11,
+        "name": "UNDERGROUND"
+      },
+      {
+        "id": 13,
+        "name": "SHIP"
+      },
+      {
+        "id": 15,
+        "name": "CEMETERY"
+      },
+      {
+        "id": 16,
+        "name": "INTERIOR"
+      },
+      {
+        "id": 19,
+        "name": "MANSION"
+      },
+      {
+        "id": 22,
+        "name": "FACILITY"
+      }
+    ]
+  },
+  "retained_artifacts": [
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow-color-e3764ef9/challenge-special-interiors/oaks-lab-dojo/frame-strip.png",
+          "sha256": "2f8089a37b28d00d89fcbf59afd987c4e80f8c83a765b59d7a90e418aadde13b"
+        },
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow-color-e3764ef9/challenge-special-interiors/oaks-lab-dojo/screenshot.png",
+          "sha256": "b634a82f83faa760ce87fd9f0567a6ad5ce9fd960d4dcbf190f132605e8b7862"
+        }
+      ],
+      "manifest_path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow-color-e3764ef9/retained-artifacts.json",
+      "manifest_sha256": "b55b7229847feab64be740f6f596715cdc4acf87ec34a9687b0e40156ccb32bc",
+      "mode": "color",
+      "product": "pokeyellow"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow-yellow-d88ee1eb/challenge-special-interiors/oaks-lab-dojo/frame-strip.png",
+          "sha256": "e1f23ceadb676ef7a3d9d55a000fa087f98d038caba8d25df06f3f776ae0933d"
+        },
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow-yellow-d88ee1eb/challenge-special-interiors/oaks-lab-dojo/screenshot.png",
+          "sha256": "a594112bfb07fec253f6da01a44ee7611a06b501292db8f1ae26bae0ad7450da"
+        }
+      ],
+      "manifest_path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow-yellow-d88ee1eb/retained-artifacts.json",
+      "manifest_sha256": "0a8767088e5c9c9d0064a9ab059f8f2c6c3342c9290ef8ffc77eb25d1dff7e2d",
+      "mode": "yellow",
+      "product": "pokeyellow"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow_debug-color-0dc86374/challenge-special-interiors/oaks-lab-dojo/frame-strip.png",
+          "sha256": "2f8089a37b28d00d89fcbf59afd987c4e80f8c83a765b59d7a90e418aadde13b"
+        },
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow_debug-color-0dc86374/challenge-special-interiors/oaks-lab-dojo/screenshot.png",
+          "sha256": "b634a82f83faa760ce87fd9f0567a6ad5ce9fd960d4dcbf190f132605e8b7862"
+        }
+      ],
+      "manifest_path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow_debug-color-0dc86374/retained-artifacts.json",
+      "manifest_sha256": "32f3c9a244a682ea9d55cb07f184b20ad0d7bcc96f738eaa73c89c85d2fa03a6",
+      "mode": "color",
+      "product": "pokeyellow_debug"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow_debug-yellow-18355017/challenge-special-interiors/oaks-lab-dojo/frame-strip.png",
+          "sha256": "e1f23ceadb676ef7a3d9d55a000fa087f98d038caba8d25df06f3f776ae0933d"
+        },
+        {
+          "path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow_debug-yellow-18355017/challenge-special-interiors/oaks-lab-dojo/screenshot.png",
+          "sha256": "a594112bfb07fec253f6da01a44ee7611a06b501292db8f1ae26bae0ad7450da"
+        }
+      ],
+      "manifest_path": "test-results/phase3-challenge-oaks-lab-dojo-pokeyellow_debug-yellow-18355017/retained-artifacts.json",
+      "manifest_sha256": "fea0ec80d918896abca325b150beb149e263541a72cdae2286e5f0469bc5cd8a",
+      "mode": "yellow",
+      "product": "pokeyellow_debug"
+    }
+  ],
+  "review": {
+    "observations": [
+      "All 64 challenge-special-interior map sheets and all eight tileset sheets retained coherent room boundaries, machinery, ship, tower, mansion, gym, and facility detail without stray palette regions.",
+      "Normal and debug Color route frames retained coherent Oak's Lab detail under the shared DOJO/GYM attribute authority; the paired Yellow frames retained the Yellow reference presentation."
+    ],
+    "products": [
+      {
+        "mode": "color",
+        "product": "pokeyellow"
+      },
+      {
+        "mode": "yellow",
+        "product": "pokeyellow"
+      },
+      {
+        "mode": "color",
+        "product": "pokeyellow_debug"
+      },
+      {
+        "mode": "yellow",
+        "product": "pokeyellow_debug"
+      }
+    ],
+    "result": "accepted",
+    "review_kind": "independent-ai-visual",
+    "reviewer": "Codex independent visual review (challenge-special-interiors)",
+    "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+    "route": "phase3-challenge-oaks-lab-dojo"
+  },
+  "reviewed_candidate": {
+    "ledger_canonical_sha256": "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
+    "path": "test-results/full-color-proposals/map-background-content.proposal.json",
+    "sha256": "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
+    "source_semantic_sha256": "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c"
+  },
+  "reviews": {
+    "map-100": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 100,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_KITCHEN",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-101": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 101,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_CAPTAINS_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-102": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 102,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_1F_ROOMS",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-103": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 103,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_2F_ROOMS",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-104": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 104,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_B1F_ROOMS",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-113": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 113,
+      "content_kind": "map",
+      "content_name": "LANCES_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-118": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 118,
+      "content_kind": "map",
+      "content_name": "HALL_OF_FAME",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-119": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 119,
+      "content_kind": "map",
+      "content_name": "UNDERGROUND_PATH_NORTH_SOUTH",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-120": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 120,
+      "content_kind": "map",
+      "content_name": "CHAMPIONS_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-121": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 121,
+      "content_kind": "map",
+      "content_name": "UNDERGROUND_PATH_WEST_EAST",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-128": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 128,
+      "content_kind": "map",
+      "content_name": "CELADON_MANSION_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-129": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 129,
+      "content_kind": "map",
+      "content_name": "CELADON_MANSION_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-130": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 130,
+      "content_kind": "map",
+      "content_name": "CELADON_MANSION_3F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-131": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 131,
+      "content_kind": "map",
+      "content_name": "CELADON_MANSION_ROOF",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-134": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 134,
+      "content_kind": "map",
+      "content_name": "CELADON_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-139": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 139,
+      "content_kind": "map",
+      "content_name": "CELADON_CHIEF_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-142": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 142,
+      "content_kind": "map",
+      "content_name": "POKEMON_TOWER_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-143": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 143,
+      "content_kind": "map",
+      "content_name": "POKEMON_TOWER_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-144": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 144,
+      "content_kind": "map",
+      "content_name": "POKEMON_TOWER_3F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-145": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 145,
+      "content_kind": "map",
+      "content_name": "POKEMON_TOWER_4F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-146": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 146,
+      "content_kind": "map",
+      "content_name": "POKEMON_TOWER_5F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-147": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 147,
+      "content_kind": "map",
+      "content_name": "POKEMON_TOWER_6F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-148": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 148,
+      "content_kind": "map",
+      "content_name": "POKEMON_TOWER_7F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-157": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 157,
+      "content_kind": "map",
+      "content_name": "FUCHSIA_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-164": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 164,
+      "content_kind": "map",
+      "content_name": "FUCHSIA_GOOD_ROD_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-165": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 165,
+      "content_kind": "map",
+      "content_name": "POKEMON_MANSION_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-166": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 166,
+      "content_kind": "map",
+      "content_name": "CINNABAR_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-177": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 177,
+      "content_kind": "map",
+      "content_name": "FIGHTING_DOJO",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-178": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 178,
+      "content_kind": "map",
+      "content_name": "SAFFRON_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-181": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 181,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-199": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 199,
+      "content_kind": "map",
+      "content_name": "ROCKET_HIDEOUT_B1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-200": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 200,
+      "content_kind": "map",
+      "content_name": "ROCKET_HIDEOUT_B2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-201": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 201,
+      "content_kind": "map",
+      "content_name": "ROCKET_HIDEOUT_B3F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-202": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 202,
+      "content_kind": "map",
+      "content_name": "ROCKET_HIDEOUT_B4F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-207": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 207,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-208": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 208,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_3F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-209": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 209,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_4F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-210": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 210,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_5F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-211": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 211,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_6F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-212": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 212,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_7F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-213": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 213,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_8F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-214": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 214,
+      "content_kind": "map",
+      "content_name": "POKEMON_MANSION_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-215": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 215,
+      "content_kind": "map",
+      "content_name": "POKEMON_MANSION_3F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-216": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 216,
+      "content_kind": "map",
+      "content_name": "POKEMON_MANSION_B1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-230": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 230,
+      "content_kind": "map",
+      "content_name": "CERULEAN_BADGE_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-233": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 233,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_9F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-234": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 234,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_10F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-235": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 235,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_11F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-245": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 245,
+      "content_kind": "map",
+      "content_name": "LORELEIS_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-246": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 246,
+      "content_kind": "map",
+      "content_name": "BRUNOS_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-247": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 247,
+      "content_kind": "map",
+      "content_name": "AGATHAS_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-40": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 40,
+      "content_kind": "map",
+      "content_name": "OAKS_LAB",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-45": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 45,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-54": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 54,
+      "content_kind": "map",
+      "content_name": "PEWTER_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-65": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 65,
+      "content_kind": "map",
+      "content_name": "CERULEAN_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-83": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 83,
+      "content_kind": "map",
+      "content_name": "POWER_PLANT",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-88": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 88,
+      "content_kind": "map",
+      "content_name": "BILLS_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-90": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 90,
+      "content_kind": "map",
+      "content_name": "POKEMON_FAN_CLUB",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-92": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 92,
+      "content_kind": "map",
+      "content_name": "VERMILION_GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-95": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 95,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-96": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 96,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-97": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 97,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_3F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-98": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 98,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_B1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "map-99": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 99,
+      "content_kind": "map",
+      "content_name": "SS_ANNE_BOW",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-11": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 11,
+      "content_kind": "tileset",
+      "content_name": "UNDERGROUND",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-13": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 13,
+      "content_kind": "tileset",
+      "content_name": "SHIP",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-15": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 15,
+      "content_kind": "tileset",
+      "content_name": "CEMETERY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-16": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 16,
+      "content_kind": "tileset",
+      "content_name": "INTERIOR",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-19": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 19,
+      "content_kind": "tileset",
+      "content_name": "MANSION",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-22": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 22,
+      "content_kind": "tileset",
+      "content_name": "FACILITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-5": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 5,
+      "content_kind": "tileset",
+      "content_name": "DOJO",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    },
+    "tileset-7": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 7,
+      "content_kind": "tileset",
+      "content_name": "GYM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-challenge-oaks-lab-dojo"
+    }
+  },
+  "schema": "full-color-map-background-review-v2"
+}

@@ -66,6 +66,7 @@ RGBGFXFLAGS  ?= -Weverything
 	measure-full-color-audit-evidence-identities \
 	measure-full-color-phase2-audit \
 	measure-full-color-map-backgrounds \
+	render-full-color-map-background-atlases \
 	promote-full-color-map-backgrounds-reviewed \
 	_rom-test-debug-products \
 	_rom-test-gameplay-products \
@@ -136,6 +137,7 @@ FULL_COLOR_RENDERER_CONTRACT_RESULTS ?= test-results/full-color-renderer-contrac
 FULL_COLOR_RUNTIME_RESULTS ?= test-results/full-color-renderer-runtime
 FULL_COLOR_HARNESS_RESULTS ?= test-results/full-color-harness
 FULL_COLOR_PROPOSALS ?= test-results/full-color-proposals
+FULL_COLOR_MAP_BACKGROUND_ATLASES ?= test-results/full-color-map-background-atlases
 ROM_TEST_PREBUILT_PRODUCTS ?= 0
 
 ROM_TEST_DEBUG_PRODUCTS := \
@@ -191,6 +193,11 @@ measure-full-color-phase2-audit: measure-full-color-audit-evidence-identities
 measure-full-color-map-backgrounds: _rom-test-all-products
 	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --proposal-output "$(FULL_COLOR_PROPOSALS)/map-background-content.proposal.json"
 
+# Review proposal only: generated pictures and hashes do not accept content or
+# update the source-controlled review ledger.
+render-full-color-map-background-atlases: yellow
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_atlas --root . --output "$(FULL_COLOR_MAP_BACKGROUND_ATLASES)"
+
 # This target is deliberately named as a reviewed promotion and is never a
 # dependency of ordinary build, verification, or certification targets.
 promote-full-color-map-backgrounds-reviewed: _rom-test-all-products
@@ -217,7 +224,7 @@ test-full-color-donor-contract:
 	POKERED_GBC_ROOT="$(POKERED_GBC_ROOT)" $(PYTHON) -m pytest \
 		tools/rom_tests/tests/unit/full_color/test_overworld_color_data_donor.py -q
 
-test-full-color-harness-contracts: _rom-test-debug-products test-full-color-map-backgrounds
+test-full-color-harness-contracts: _rom-test-debug-products
 	$(PYTHON) -m tools.rom_tests.full_color.baseline_discovery --repository .
 	$(PYTHON) -m tools.rom_tests.full_color.baseline_inventory --repository .
 	$(PYTHON) -m tools.rom_tests.full_color.bank_torture --rom pokeyellow_debug.gbc
@@ -250,7 +257,7 @@ test-full-color-e2e-journey: _rom-test-gameplay-products
 test-full-color-fast:
 	@$(PYTHON) -m tools.rom_tests.full_color.harness_runner --profile fast --root . --results "$(FULL_COLOR_HARNESS_RESULTS)"
 
-test-full-color-certify: test-full-color-map-backgrounds
+test-full-color-certify:
 	@$(PYTHON) -m tools.rom_tests.full_color.harness_runner --profile certify --root . --results "$(FULL_COLOR_HARNESS_RESULTS)"
 
 test-full-color-handoffs:

@@ -1,0 +1,858 @@
+{
+  "atlas": {
+    "artifacts": [
+      {
+        "path": "overworld/animations/overworld-flower-1.png",
+        "sha256": "24831b461f992a8efcc5cff25ff0d1d0fbb729c5fd7153a8a4516b04b135d08e"
+      },
+      {
+        "path": "overworld/animations/overworld-flower-2.png",
+        "sha256": "a9c5bb1d146091c1c1d8fb003dbfda022838bf7c3e5838c6ea91b0b8fe09af6c"
+      },
+      {
+        "path": "overworld/animations/overworld-flower-3.png",
+        "sha256": "4f0958dd93cbbfa79d2b6cf2074c602e73d2c18bd14a6673e691d05f926b1de0"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-0.png",
+        "sha256": "024acb2dfc66c2b631cd0e757ec2c835b62be90e75ebace53e7af14530039b56"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-1.png",
+        "sha256": "a3d093312a4f4aa3c5f52c8a07c7488b75914af13144b0164fa44b25876088b2"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-2.png",
+        "sha256": "cdcbe3963856974d6c349e93ec7693a690281b8afcd9caa65e67ff3b3804766c"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-3.png",
+        "sha256": "a3d093312a4f4aa3c5f52c8a07c7488b75914af13144b0164fa44b25876088b2"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-4.png",
+        "sha256": "024acb2dfc66c2b631cd0e757ec2c835b62be90e75ebace53e7af14530039b56"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-5.png",
+        "sha256": "8b4a005550aacfa15a16c5a4e05061475da59dd345f9d0150450333600aeaa0e"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-6.png",
+        "sha256": "024690eb91d706b83c84bee12ec8605d30d90ba7c04d84ec5c756bfc6d3e6f4d"
+      },
+      {
+        "path": "overworld/animations/overworld-water-rotation-7.png",
+        "sha256": "8b4a005550aacfa15a16c5a4e05061475da59dd345f9d0150450333600aeaa0e"
+      },
+      {
+        "path": "overworld/maps/celadon_city.png",
+        "sha256": "32fd8db8c0c4f1b8a811a74eb483f5eda860e94981971090276de48ff8e5fd39"
+      },
+      {
+        "path": "overworld/maps/cerulean_city.png",
+        "sha256": "195c9454a8638cc7c56515d131c220486be7bde9aa58520156848dac020c8bed"
+      },
+      {
+        "path": "overworld/maps/cinnabar_island.png",
+        "sha256": "f7ea35b383a6521df44e1ed4d118c87b5d3430ed0e01a540f4514de51f60d3d5"
+      },
+      {
+        "path": "overworld/maps/fuchsia_city.png",
+        "sha256": "d45c98ab18ea19b4c55aa460f0cc6f477de35458667c72495cb8c0428f250cae"
+      },
+      {
+        "path": "overworld/maps/lavender_town.png",
+        "sha256": "1c28615b6a04973cce5c59893eaf8767350aa045de5e37dd65990a6bf929d18c"
+      },
+      {
+        "path": "overworld/maps/pallet_town.png",
+        "sha256": "e04b45341aa4bf8d391468544a559937fa47a28a607a2f7800e20980ca85c24c"
+      },
+      {
+        "path": "overworld/maps/pewter_city.png",
+        "sha256": "65f5d40a7455ae5dda4f1fe2ec1268bad792caa0d080ec3286e401897efac75e"
+      },
+      {
+        "path": "overworld/maps/route_1.png",
+        "sha256": "d0de9f704a5865c9d8b269478a4187f0951c8fd31cf522d8e0b84f4780a46adb"
+      },
+      {
+        "path": "overworld/maps/route_10.png",
+        "sha256": "743308913cace1e6e29398ee3aef18ca2585da0384e7e16a40aff74ccc6442e5"
+      },
+      {
+        "path": "overworld/maps/route_11.png",
+        "sha256": "b0e9320bed03333c8e8e5f2ffa6af11e49a047a212b4534708a82a2821f87aa2"
+      },
+      {
+        "path": "overworld/maps/route_12.png",
+        "sha256": "1576c213270c2413c1456a4525b341fe78ece62e6426c209c353b7effe267507"
+      },
+      {
+        "path": "overworld/maps/route_13.png",
+        "sha256": "089577590a04247e593c565208bc5087ee8b1295d5895dfdb971843acaceb122"
+      },
+      {
+        "path": "overworld/maps/route_14.png",
+        "sha256": "4c3583642a0103b69bfc7e886e66c23f4457ce1fe4148598427b06e2b324fa0b"
+      },
+      {
+        "path": "overworld/maps/route_15.png",
+        "sha256": "bb523f34649b00da7b57ff4142f77250242c1facb1687f13e41b824203cb739c"
+      },
+      {
+        "path": "overworld/maps/route_16.png",
+        "sha256": "7269accc426b2079652abba3680b7c1e0cd2870403a904675176a6639d5b08af"
+      },
+      {
+        "path": "overworld/maps/route_17.png",
+        "sha256": "34a81e515925a6374d22f02b60b98fa4bced85e6a64e70efb3074c5a0ded084e"
+      },
+      {
+        "path": "overworld/maps/route_18.png",
+        "sha256": "4245de31806ecbccfd77a8e2f14505834d7899903542708bf8d21c8809b11458"
+      },
+      {
+        "path": "overworld/maps/route_19.png",
+        "sha256": "da9546a9931b42e15af5c252bc01f2d7173ebb9454bee4acd9c32123bd38ae41"
+      },
+      {
+        "path": "overworld/maps/route_2.png",
+        "sha256": "407df610d31a8f2d80299805546a7832562e7b18b8f25a60c9c456cd54fb3c6b"
+      },
+      {
+        "path": "overworld/maps/route_20.png",
+        "sha256": "b6c88eb02d64a2a4b96b24eb7e9ffb6289235b011dd9e6ca0b6ba5f4b3442809"
+      },
+      {
+        "path": "overworld/maps/route_21.png",
+        "sha256": "2d245d77dae4dcb3566a72c7199334e45fdf9e27147777dc734d805546c26baf"
+      },
+      {
+        "path": "overworld/maps/route_22.png",
+        "sha256": "534ce4bdc9fa41af998d7b3273dcacc572fc777bd04f1db7bd1ceda29915778d"
+      },
+      {
+        "path": "overworld/maps/route_24.png",
+        "sha256": "4475b08a2691b94b308c2be327c28ba4d302b1659781fac03eb2ba64f8857e3f"
+      },
+      {
+        "path": "overworld/maps/route_25.png",
+        "sha256": "ac2a7115fab34e9484ec3451dac235c8e2e037b72d3ac1e0bc4c4bbc754753a9"
+      },
+      {
+        "path": "overworld/maps/route_3.png",
+        "sha256": "77c1a7d27229f91b7b9b7b0cbe61f3c4864297b2f6099f24ff7b14c3183c5c9c"
+      },
+      {
+        "path": "overworld/maps/route_4.png",
+        "sha256": "78b8ab7e57dfc3e60ef48e6bea2123af15447f542d7f3578041f647873fe1184"
+      },
+      {
+        "path": "overworld/maps/route_5.png",
+        "sha256": "7f7a7c99a81eae75682aad172c7adae8f8cc71e24450f6a44e1abc1088b08f2b"
+      },
+      {
+        "path": "overworld/maps/route_6.png",
+        "sha256": "406f4eefa11458a206c6d3a140cd4f735150924f4a273c07de0558d2d3080f16"
+      },
+      {
+        "path": "overworld/maps/route_7.png",
+        "sha256": "6bfa5a5b921286b3592109a2ca7d355261d099b6c90776e3c62dbcd481d05723"
+      },
+      {
+        "path": "overworld/maps/route_8.png",
+        "sha256": "77f6daccb8c41a9dbf366db9a2e9f4042238de4e306291b6c5ef67e72201f28a"
+      },
+      {
+        "path": "overworld/maps/route_9.png",
+        "sha256": "633fc7e2c835209b4bf21e07da88ee5be8c961f60cc372ce4fdcb12535207e8a"
+      },
+      {
+        "path": "overworld/maps/saffron_city.png",
+        "sha256": "5eafb78d68fbfd87f4f44f02c868cd388f23efdadb5958da5c72d6653e998642"
+      },
+      {
+        "path": "overworld/maps/vermilion_city.png",
+        "sha256": "2b104519d15c0061f26f78aab686e0f6ec6237053af5a673860e80801b303fea"
+      },
+      {
+        "path": "overworld/maps/viridian_city.png",
+        "sha256": "2c7563a548b385110a6ea8dac7d6740f759ebb91eb74807f0ddad61ecaad4af3"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-00.png",
+        "sha256": "bea608fc50a13156df4d11e1f3c7b5977d38af1ba22727b974e9e1cfcaecccc5"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-01.png",
+        "sha256": "18f3838eb3f3bd5a285d106acbc063920a259697e23dd334a2f74f24eb7a6d2d"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-02.png",
+        "sha256": "08942735d7313f36214416ce29fd3e812a0104fede1519e5b0596a11379e6d4a"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-03.png",
+        "sha256": "3cd444c0752771d1f080a67effb033233a6ebf93c1a569c8eb63400bedbfd668"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-04.png",
+        "sha256": "3bf1511c254abcefb68593a4e51d7016d7719efa3875f3229a131c2b5521a7cd"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-05.png",
+        "sha256": "c93acb529affc1064ff879b57e0f82a20ea874802f32c369dc0aec1554c75b01"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-06.png",
+        "sha256": "db7240718c9f27ce1ea0f98e69248b80f4467e417dbc23ab883dc9098967b950"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-07.png",
+        "sha256": "9f759ae6ec75052d278835606e86a600d0bda8b6dbb92d0de1553810c081de12"
+      },
+      {
+        "path": "overworld/replacements/cut-tree-08.png",
+        "sha256": "5422255495a8082463f6665e1edba5b291c2b7aad3108b1b8af22c156069331a"
+      },
+      {
+        "path": "overworld/tilesets/overworld.png",
+        "sha256": "f0f9d60f728ebe380b286f0340af59a06bc6218a33b158479d36839437a109e4"
+      }
+    ],
+    "content_sha256": "95390973ab3b6bbb31800fcd577bc3791873b0a6501a32536fd75b1881291741",
+    "manifest_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+    "path": "test-results/full-color-map-background-atlases/manifest.json"
+  },
+  "batch": "overworld",
+  "content": {
+    "maps": [
+      {
+        "id": 6,
+        "name": "CELADON_CITY",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 3,
+        "name": "CERULEAN_CITY",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 8,
+        "name": "CINNABAR_ISLAND",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 7,
+        "name": "FUCHSIA_CITY",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 4,
+        "name": "LAVENDER_TOWN",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 0,
+        "name": "PALLET_TOWN",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 2,
+        "name": "PEWTER_CITY",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 12,
+        "name": "ROUTE_1",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 21,
+        "name": "ROUTE_10",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 22,
+        "name": "ROUTE_11",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 23,
+        "name": "ROUTE_12",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 24,
+        "name": "ROUTE_13",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 25,
+        "name": "ROUTE_14",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 26,
+        "name": "ROUTE_15",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 27,
+        "name": "ROUTE_16",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 28,
+        "name": "ROUTE_17",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 29,
+        "name": "ROUTE_18",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 30,
+        "name": "ROUTE_19",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 13,
+        "name": "ROUTE_2",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 31,
+        "name": "ROUTE_20",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 32,
+        "name": "ROUTE_21",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 33,
+        "name": "ROUTE_22",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 35,
+        "name": "ROUTE_24",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 36,
+        "name": "ROUTE_25",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 14,
+        "name": "ROUTE_3",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 15,
+        "name": "ROUTE_4",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 16,
+        "name": "ROUTE_5",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 17,
+        "name": "ROUTE_6",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 18,
+        "name": "ROUTE_7",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 19,
+        "name": "ROUTE_8",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 20,
+        "name": "ROUTE_9",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 10,
+        "name": "SAFFRON_CITY",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 5,
+        "name": "VERMILION_CITY",
+        "tileset": "OVERWORLD"
+      },
+      {
+        "id": 1,
+        "name": "VIRIDIAN_CITY",
+        "tileset": "OVERWORLD"
+      }
+    ],
+    "tilesets": [
+      {
+        "id": 0,
+        "name": "OVERWORLD"
+      }
+    ]
+  },
+  "retained_artifacts": [
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-color-3e5cd79c/overworld/pallet-after-lab/frame-strip.png",
+          "sha256": "2abe2a01b853d84677c8b4f27b6f9a6121bc0928b8e1c09672f09b021282f232"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-color-3e5cd79c/overworld/pallet-after-lab/screenshot.png",
+          "sha256": "3d8165df63ad6c797efc8d91a58922189399b41767d969eb803671d9ef2cc1ce"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-color-3e5cd79c/overworld/route1-mid/frame-strip.png",
+          "sha256": "54b3e7e00f10b8ad2975398ae0de054d0c289f66dceca60ae471c9ee7bd389ea"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-color-3e5cd79c/overworld/route1-mid/screenshot.png",
+          "sha256": "ceb86f8fb757ccf53f5c3d06e34146624497fb271885b788a391b1f7db95ffe6"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-color-3e5cd79c/overworld/viridian-entry/frame-strip.png",
+          "sha256": "0810a92f582819cd47dd1237e4027c7058207eed3c2e5e28a0c0bdb8d869cbce"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-color-3e5cd79c/overworld/viridian-entry/screenshot.png",
+          "sha256": "7132e861111157131f703fd5b79d1f6461deff7548bce46330cd987fa23d61fe"
+        }
+      ],
+      "manifest_path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-color-3e5cd79c/retained-artifacts.json",
+      "manifest_sha256": "7cd8f509854d2de73d80b61783c0a75541b4da6a15a48db34bf82be1408ab134",
+      "mode": "color",
+      "product": "pokeyellow"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-yellow-b9ac8b8d/overworld/pallet-after-lab/frame-strip.png",
+          "sha256": "16377919512e2fd82f9c5b84aa950c5c6434b70fc98d2bba77b81e8eb22f3f53"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-yellow-b9ac8b8d/overworld/pallet-after-lab/screenshot.png",
+          "sha256": "a8f61e0bc971939e7183bd6a18690b35d3aae52f1200103250681f30f976c4a5"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-yellow-b9ac8b8d/overworld/route1-mid/frame-strip.png",
+          "sha256": "977ef5c33c726a1bb4f10183b42efea82dee9b783a5c38afa2fbec03f70c2b11"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-yellow-b9ac8b8d/overworld/route1-mid/screenshot.png",
+          "sha256": "56e1d8deb6262ab8af88872f36bd16122a52d11d42573b630cb00c20bf59d0b1"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-yellow-b9ac8b8d/overworld/viridian-entry/frame-strip.png",
+          "sha256": "39683ff3fb3a9e50d9bc878d60689e50a33271d26253faeb57672469761d3b52"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-yellow-b9ac8b8d/overworld/viridian-entry/screenshot.png",
+          "sha256": "f6cf003875b6ffc5cc09c2b48cbe473586d6c90660bf0826ac56a3aaca60bc11"
+        }
+      ],
+      "manifest_path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow-yellow-b9ac8b8d/retained-artifacts.json",
+      "manifest_sha256": "849833e39cbdf4f4df6e95aaa6af635ca601669f89487f1067e174c250c0c6ae",
+      "mode": "yellow",
+      "product": "pokeyellow"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-color-8f6d31d1/overworld/pallet-after-lab/frame-strip.png",
+          "sha256": "8a6342dacebdc496ff427e62922f60263069fc265982bf44ebc65b3624f536c6"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-color-8f6d31d1/overworld/pallet-after-lab/screenshot.png",
+          "sha256": "74896798827fa1fd171590227908ac2a67ce3362c77f8f9984b91514a41cc675"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-color-8f6d31d1/overworld/route1-mid/frame-strip.png",
+          "sha256": "ec95b78545aa4245505ed7b111ba7eb3ab03db2546ac8ccd50828fc3b9468c45"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-color-8f6d31d1/overworld/route1-mid/screenshot.png",
+          "sha256": "660b8eeee93b09c6d515ef3c6a41909c71b967ca565ebe688e23ad09864f7fd9"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-color-8f6d31d1/overworld/viridian-entry/frame-strip.png",
+          "sha256": "0810a92f582819cd47dd1237e4027c7058207eed3c2e5e28a0c0bdb8d869cbce"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-color-8f6d31d1/overworld/viridian-entry/screenshot.png",
+          "sha256": "7132e861111157131f703fd5b79d1f6461deff7548bce46330cd987fa23d61fe"
+        }
+      ],
+      "manifest_path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-color-8f6d31d1/retained-artifacts.json",
+      "manifest_sha256": "992d44a6465cb2cc0c6eb2518075497404bcc5729fcff50660d272acb16e4a8a",
+      "mode": "color",
+      "product": "pokeyellow_debug"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-yellow-c70c1a1a/overworld/pallet-after-lab/frame-strip.png",
+          "sha256": "0057895aaeea900ee6adaf16f041f27b96ca41e1879397476aacc19eb2582ab1"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-yellow-c70c1a1a/overworld/pallet-after-lab/screenshot.png",
+          "sha256": "c39cf4e85207d31395b1e48912320e88c701d772fe75f66245c65446bc08a2ff"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-yellow-c70c1a1a/overworld/route1-mid/frame-strip.png",
+          "sha256": "977ef5c33c726a1bb4f10183b42efea82dee9b783a5c38afa2fbec03f70c2b11"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-yellow-c70c1a1a/overworld/route1-mid/screenshot.png",
+          "sha256": "56e1d8deb6262ab8af88872f36bd16122a52d11d42573b630cb00c20bf59d0b1"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-yellow-c70c1a1a/overworld/viridian-entry/frame-strip.png",
+          "sha256": "39683ff3fb3a9e50d9bc878d60689e50a33271d26253faeb57672469761d3b52"
+        },
+        {
+          "path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-yellow-c70c1a1a/overworld/viridian-entry/screenshot.png",
+          "sha256": "f6cf003875b6ffc5cc09c2b48cbe473586d6c90660bf0826ac56a3aaca60bc11"
+        }
+      ],
+      "manifest_path": "test-results/phase3-overworld-pallet-route1-viridian-pokeyellow_debug-yellow-c70c1a1a/retained-artifacts.json",
+      "manifest_sha256": "b30fe545bc6c9c0c681d5512ea490f8e70b31246ea3d3cad3d856e8f400d19ba",
+      "mode": "yellow",
+      "product": "pokeyellow_debug"
+    }
+  ],
+  "review": {
+    "observations": [
+      "All 34 OVERWORLD map sheets and the tileset, animation, and replacement sheets retained coherent terrain, roof, water, flower, and cut-tree palette separation without stray text-palette regions.",
+      "Normal and debug Color route frames retained intended outdoor color across Pallet Town, Route 1, and Viridian City; the paired Yellow frames retained the Yellow reference presentation."
+    ],
+    "products": [
+      {
+        "mode": "color",
+        "product": "pokeyellow"
+      },
+      {
+        "mode": "yellow",
+        "product": "pokeyellow"
+      },
+      {
+        "mode": "color",
+        "product": "pokeyellow_debug"
+      },
+      {
+        "mode": "yellow",
+        "product": "pokeyellow_debug"
+      }
+    ],
+    "result": "accepted",
+    "review_kind": "independent-ai-visual",
+    "reviewer": "Codex independent visual review (overworld)",
+    "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+    "route": "phase3-overworld-pallet-route1-viridian"
+  },
+  "reviewed_candidate": {
+    "ledger_canonical_sha256": "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
+    "path": "test-results/full-color-proposals/map-background-content.proposal.json",
+    "sha256": "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
+    "source_semantic_sha256": "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c"
+  },
+  "reviews": {
+    "map-0": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 0,
+      "content_kind": "map",
+      "content_name": "PALLET_TOWN",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-1": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 1,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_CITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-10": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 10,
+      "content_kind": "map",
+      "content_name": "SAFFRON_CITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-12": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 12,
+      "content_kind": "map",
+      "content_name": "ROUTE_1",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-13": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 13,
+      "content_kind": "map",
+      "content_name": "ROUTE_2",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-14": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 14,
+      "content_kind": "map",
+      "content_name": "ROUTE_3",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-15": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 15,
+      "content_kind": "map",
+      "content_name": "ROUTE_4",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-16": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 16,
+      "content_kind": "map",
+      "content_name": "ROUTE_5",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-17": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 17,
+      "content_kind": "map",
+      "content_name": "ROUTE_6",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-18": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 18,
+      "content_kind": "map",
+      "content_name": "ROUTE_7",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-19": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 19,
+      "content_kind": "map",
+      "content_name": "ROUTE_8",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-2": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 2,
+      "content_kind": "map",
+      "content_name": "PEWTER_CITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-20": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 20,
+      "content_kind": "map",
+      "content_name": "ROUTE_9",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-21": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 21,
+      "content_kind": "map",
+      "content_name": "ROUTE_10",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-22": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 22,
+      "content_kind": "map",
+      "content_name": "ROUTE_11",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-23": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 23,
+      "content_kind": "map",
+      "content_name": "ROUTE_12",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-24": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 24,
+      "content_kind": "map",
+      "content_name": "ROUTE_13",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-25": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 25,
+      "content_kind": "map",
+      "content_name": "ROUTE_14",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-26": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 26,
+      "content_kind": "map",
+      "content_name": "ROUTE_15",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-27": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 27,
+      "content_kind": "map",
+      "content_name": "ROUTE_16",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-28": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 28,
+      "content_kind": "map",
+      "content_name": "ROUTE_17",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-29": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 29,
+      "content_kind": "map",
+      "content_name": "ROUTE_18",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-3": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 3,
+      "content_kind": "map",
+      "content_name": "CERULEAN_CITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-30": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 30,
+      "content_kind": "map",
+      "content_name": "ROUTE_19",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-31": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 31,
+      "content_kind": "map",
+      "content_name": "ROUTE_20",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-32": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 32,
+      "content_kind": "map",
+      "content_name": "ROUTE_21",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-33": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 33,
+      "content_kind": "map",
+      "content_name": "ROUTE_22",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-35": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 35,
+      "content_kind": "map",
+      "content_name": "ROUTE_24",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-36": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 36,
+      "content_kind": "map",
+      "content_name": "ROUTE_25",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-4": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 4,
+      "content_kind": "map",
+      "content_name": "LAVENDER_TOWN",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-5": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 5,
+      "content_kind": "map",
+      "content_name": "VERMILION_CITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-6": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 6,
+      "content_kind": "map",
+      "content_name": "CELADON_CITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-7": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 7,
+      "content_kind": "map",
+      "content_name": "FUCHSIA_CITY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "map-8": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 8,
+      "content_kind": "map",
+      "content_name": "CINNABAR_ISLAND",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    },
+    "tileset-0": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 0,
+      "content_kind": "tileset",
+      "content_name": "OVERWORLD",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-overworld-pallet-route1-viridian"
+    }
+  },
+  "schema": "full-color-map-background-review-v2"
+}

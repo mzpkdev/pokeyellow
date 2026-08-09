@@ -1,6 +1,6 @@
 {
   "baseline_manifest_sha256": "75c058f0d0df07a25918c710dc8ddebf43d3e5b809a06faaf7391cf015a9d774",
-  "current_source_sha256": "32648a656779a67a92ea61c0d3dbec82287acdf9eddf0c7d9b1f53f300e71b29",
+  "current_source_sha256": "dd64284310a3f09c8737e06e1ecccaad047cb6b1b8391ea566c7dd47146aa8c0",
   "reviewed_delta_paths": {
     "constants/full_color_constants.asm": {
       "current_sha256": "33ea30e6b29ba1c5b14ddade6fdb4e6a049640810404a4859b402721f5b2446c",
@@ -15,11 +15,11 @@
       "reviewed_sha256": "b9413152b2b6c846ca918544f6f517ca9c775446d0bb2d93e231adb7e5aec4ee"
     },
     "data/tilesets/full_color_interiors.asm": {
-      "current_sha256": "83d59e7439b8e8eb97deffe46d267f61b5e0a8f1a0c97ee365bddad71deea6e3",
+      "current_sha256": "7bd932169f8b1bc6cd7dd4f8996b64f4c32a5eb2117d559f96827c324765ab9b",
       "reviewed_sha256": null
     },
     "data/tilesets/full_color_overworld.asm": {
-      "current_sha256": "d7d2ae958778d240e74993728f44b421b99218b5978261b2897ea40b741d1757",
+      "current_sha256": "13d7448c0489c47295356b2f5d12fcb3c9d109410b6dcb2b429aab2c1d9632dc",
       "reviewed_sha256": null
     },
     "engine/battle/init_battle.asm": {

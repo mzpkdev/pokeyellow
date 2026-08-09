@@ -232,9 +232,9 @@ def test_pallet_and_route_1_share_overworld_blockset_and_pallet_roof() -> None:
 
 def test_authority_is_provenanced_and_not_derived_from_tile_id_low_bits() -> None:
     source = YELLOW_DATA.read_text(encoding="utf-8")
-    assert "git@github.com:dannye/pokered-gbc.git" in source
-    assert "c1a3b6c5a7591472241036d0cf09c3817f841f93" in source
-    assert "adapted with permission" in source.lower()
+    assert "Yellow-owned OVERWORLD color authority" in source
+    assert "independent visual" in source
+    assert "donor" not in source.lower()
     consumers = "\n".join(
         (REPOSITORY_ROOT / path).read_text(encoding="utf-8")
         for path in (

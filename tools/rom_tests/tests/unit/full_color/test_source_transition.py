@@ -132,24 +132,32 @@ def test_source_transition_rebinds_authorized_unchanged_line_shift(tmp_path) -> 
         kind="source",
     ) == {row.subject.sha256: source_finding_subject(current).sha256}
 
-    with pytest.raises(source_transition.SourceTransitionError, match="semantic matches"):
+    with pytest.raises(
+        source_transition.SourceTransitionError, match="semantic matches"
+    ):
         source_transition._unique_rebindings(
             (row,),
             (current,),
             subject=source_finding_subject,
-            rebound=lambda finding, authority: source_transition._rebound_source_finding(
-                tmp_path, set(), finding, authority
+            rebound=lambda finding, authority: (
+                source_transition._rebound_source_finding(
+                    tmp_path, set(), finding, authority
+                )
             ),
             kind="source",
         )
 
-    with pytest.raises(source_transition.SourceTransitionError, match="semantic matches"):
+    with pytest.raises(
+        source_transition.SourceTransitionError, match="semantic matches"
+    ):
         source_transition._unique_rebindings(
             (row,),
             (replace(current, symbol="UnrelatedRoot.local"),),
             subject=source_finding_subject,
-            rebound=lambda finding, authority: source_transition._rebound_source_finding(
-                tmp_path, {relative}, finding, authority
+            rebound=lambda finding, authority: (
+                source_transition._rebound_source_finding(
+                    tmp_path, {relative}, finding, authority
+                )
             ),
             kind="source",
         )
@@ -182,13 +190,17 @@ def test_source_transition_rejects_changed_line_in_authorized_file(tmp_path) -> 
     )
     row = SimpleNamespace(subject=source_finding_subject(reviewed))
 
-    with pytest.raises(source_transition.SourceTransitionError, match="semantic matches"):
+    with pytest.raises(
+        source_transition.SourceTransitionError, match="semantic matches"
+    ):
         source_transition._unique_rebindings(
             (row,),
             (current,),
             subject=source_finding_subject,
-            rebound=lambda finding, authority: source_transition._rebound_source_finding(
-                tmp_path, {relative}, finding, authority
+            rebound=lambda finding, authority: (
+                source_transition._rebound_source_finding(
+                    tmp_path, {relative}, finding, authority
+                )
             ),
             kind="source",
         )
@@ -203,7 +215,8 @@ def test_rom_rebinding_rejects_unrelated_same_depth_call_path() -> None:
         REPOSITORY_ROOT / source_transition.ASSIGNMENTS_PATH
     ).for_product(BASELINE_PRODUCT)
     row = next(
-        row for row in assignments.rows
+        row
+        for row in assignments.rows
         if row.subject.kind.value == "ROM_FINDING"
         and len(row.subject.metadata["call_path"]) == 1
     )
@@ -214,13 +227,16 @@ def test_rom_rebinding_rejects_unrelated_same_depth_call_path() -> None:
     )
     current_digest = authority["rom_subject_rebindings"][row.subject.sha256]
     finding = next(
-        finding for finding in rom_report.findings
+        finding
+        for finding in rom_report.findings
         if rom_finding_subject(finding).sha256 == current_digest
     )
     unrelated = replace(finding, call_path=("UnrelatedSameDepth",))
 
     assert source_transition._rebound_rom_finding(unrelated, row) == unrelated
-    with pytest.raises(source_transition.SourceTransitionError, match="0 semantic matches"):
+    with pytest.raises(
+        source_transition.SourceTransitionError, match="0 semantic matches"
+    ):
         source_transition._unique_rebindings(
             (row,),
             (unrelated,),
@@ -231,15 +247,15 @@ def test_rom_rebinding_rejects_unrelated_same_depth_call_path() -> None:
 
 
 @pytest.mark.parametrize("mutation", ("missing", "ambiguous", "semantic"))
-def test_source_transition_rejects_non_unique_or_changed_subjects(mutation: str) -> None:
+def test_source_transition_rejects_non_unique_or_changed_subjects(
+    mutation: str,
+) -> None:
     report = source_transition.baseline.discover_baseline_sources(REPOSITORY_ROOT)
     assignments = DiscoveryAssignmentAuthority.load(
         REPOSITORY_ROOT / source_transition.ASSIGNMENTS_PATH
     ).for_product(BASELINE_PRODUCT)
     row = next(
-        row
-        for row in assignments.rows
-        if row.subject.kind.value == "SOURCE_FINDING"
+        row for row in assignments.rows if row.subject.kind.value == "SOURCE_FINDING"
     )
     authority = json.loads(
         (REPOSITORY_ROOT / source_transition.TRANSITION_PATH).read_text(
@@ -264,13 +280,17 @@ def test_source_transition_rejects_non_unique_or_changed_subjects(mutation: str)
         findings.append(matching)
     else:
         findings[0] = replace(matching, resource="SEMANTIC_CHANGE")
-    with pytest.raises(source_transition.SourceTransitionError, match="semantic matches"):
+    with pytest.raises(
+        source_transition.SourceTransitionError, match="semantic matches"
+    ):
         source_transition._unique_rebindings(
             (row,),
             findings,
             subject=source_finding_subject,
-            rebound=lambda finding, authority: source_transition._rebound_source_finding(
-                REPOSITORY_ROOT, reviewed_delta_paths, finding, authority
+            rebound=lambda finding, authority: (
+                source_transition._rebound_source_finding(
+                    REPOSITORY_ROOT, reviewed_delta_paths, finding, authority
+                )
             ),
             kind="source",
         )
@@ -291,19 +311,21 @@ def test_audit_identity_rebinding_proposes_hashes_without_approving_or_writing(
     transition.parent.mkdir(parents=True)
     transition.write_text(
         json.dumps(
-            _proposal_envelope({
-                "schema": source_transition.SCHEMA,
-                "reviewed_source_sha256": (
-                    audit_evidence_identities.REVIEWED_SOURCE_SHA256
-                ),
-                "current_source_sha256": "f" * 64,
-                "baseline_manifest_sha256": (
-                    audit_evidence_identities.BASELINE_MANIFEST_SHA256
-                ),
-                "reviewed_delta_paths": {},
-                "subject_rebindings": {},
-                "rom_subject_rebindings": {},
-            })
+            _proposal_envelope(
+                {
+                    "schema": source_transition.SCHEMA,
+                    "reviewed_source_sha256": (
+                        audit_evidence_identities.REVIEWED_SOURCE_SHA256
+                    ),
+                    "current_source_sha256": "f" * 64,
+                    "baseline_manifest_sha256": (
+                        audit_evidence_identities.BASELINE_MANIFEST_SHA256
+                    ),
+                    "reviewed_delta_paths": {},
+                    "subject_rebindings": {},
+                    "rom_subject_rebindings": {},
+                }
+            )
         )
     )
     for relative in (
@@ -324,9 +346,7 @@ def test_audit_identity_rebinding_proposes_hashes_without_approving_or_writing(
         )["proposal"],
     )
     proposal = audit_evidence_identities.propose(tmp_path, transition)
-    baseline_hashes = audit_evidence_identities._baseline_hashes(
-        tmp_path, "f" * 64
-    )
+    baseline_hashes = audit_evidence_identities._baseline_hashes(tmp_path, "f" * 64)
     assert proposal["schema"] == audit_evidence_identities.PROPOSAL_SCHEMA
     assert proposal["reviewed"] is False
     assert set(proposal["documents"]) == {
@@ -336,16 +356,49 @@ def test_audit_identity_rebinding_proposes_hashes_without_approving_or_writing(
         assert json.loads((tmp_path / relative).read_text(encoding="utf-8")) == before
         changes = proposal["documents"][relative.as_posix()]["changes"]
         changed_ids = {change["id"] for change in changes}
-        expected_ids = (
-            audit_evidence_identities.BASELINE_ASSIGNMENT_IDS
-            if relative.name == "assignments.json"
-            else audit_evidence_identities.BASELINE_INVENTORY_IDS[relative.name]
-        )
+        expected_ids = {row["id"] for row in before["rows"]}
         assert changed_ids == expected_ids
         for change in changes:
-            assert change["proposed"] == baseline_hashes
+            assert change["proposed"]["source_sha256"] == "f" * 64
+            if change["id"] in audit_evidence_identities.BASELINE_ASSIGNMENT_IDS or (
+                relative.name != "assignments.json"
+                and change["id"]
+                in audit_evidence_identities.BASELINE_INVENTORY_IDS[relative.name]
+            ):
+                assert change["proposed"] == baseline_hashes
+            else:
+                assert {
+                    key
+                    for key in change["current"]
+                    if change["current"][key] != change["proposed"][key]
+                } == {"source_sha256"}
             assert "reviewer" not in change
             assert "reviewed" not in change
+
+
+def test_reviewed_identity_apply_requires_exact_canonical_proposal(
+    tmp_path, monkeypatch
+) -> None:
+    proposal = {
+        "schema": audit_evidence_identities.PROPOSAL_SCHEMA,
+        "reviewed": False,
+        "source_transition_proposal": "transition.json",
+        "documents": {},
+    }
+    proposal_path = tmp_path / "proposal.json"
+    proposal_path.write_text(json.dumps(proposal), encoding="utf-8")
+    monkeypatch.setattr(
+        audit_evidence_identities,
+        "propose",
+        lambda root, transition: {**proposal, "reviewed": True},
+    )
+    with pytest.raises(
+        audit_evidence_identities.AuditEvidenceIdentityError,
+        match="does not match canonical recomputation",
+    ):
+        audit_evidence_identities.apply_reviewed_proposal(
+            tmp_path, tmp_path / "transition.json", proposal_path
+        )
 
 
 @pytest.mark.parametrize(
@@ -376,9 +429,7 @@ def test_audit_identity_rebinding_rejects_untrusted_transition(
     }
     if mutation == "schema":
         authority["schema"] = "fabricated-source-transition-schema"
-    transition.write_text(
-        json.dumps(_proposal_envelope(authority)), encoding="utf-8"
-    )
+    transition.write_text(json.dumps(_proposal_envelope(authority)), encoding="utf-8")
     monkeypatch.setattr(
         audit_evidence_identities,
         "discover_baseline_sources",
@@ -422,9 +473,7 @@ def test_audit_identity_rebinding_rejects_fabricated_nondigest_authority(
         authority[mutation] = "0" * 64
     else:
         authority[mutation] = {"fabricated": "authority"}
-    transition.write_text(
-        json.dumps(_proposal_envelope(authority)), encoding="utf-8"
-    )
+    transition.write_text(json.dumps(_proposal_envelope(authority)), encoding="utf-8")
     monkeypatch.setattr(
         audit_evidence_identities,
         "discover_baseline_sources",
@@ -460,11 +509,7 @@ def test_assignment_identity_rebinding_rejects_authority_mutation(
             encoding="utf-8"
         )
     )
-    normal = [
-        row
-        for row in raw["rows"]
-        if row["product"] == BASELINE_PRODUCT
-    ]
+    normal = [row for row in raw["rows"] if row["product"] == BASELINE_PRODUCT]
     if mutation == "product":
         normal[0]["product"] = "pokeyellow_phase2_audit"
     elif mutation == "id":
@@ -504,12 +549,14 @@ def test_assignment_identity_rebinding_rejects_parsed_ninth_baseline_row() -> No
     )
     baseline = [row for row in raw["rows"] if row["product"] == BASELINE_PRODUCT]
     baseline_subjects = {row["subject"]["sha256"] for row in baseline}
-    extra = deepcopy(next(
-        row
-        for row in raw["rows"]
-        if row["product"] != BASELINE_PRODUCT
-        and row["subject"]["sha256"] not in baseline_subjects
-    ))
+    extra = deepcopy(
+        next(
+            row
+            for row in raw["rows"]
+            if row["product"] != BASELINE_PRODUCT
+            and row["subject"]["sha256"] not in baseline_subjects
+        )
+    )
     extra["id"] = "AS-BASELINE-EXTRA"
     extra["product"] = BASELINE_PRODUCT
     extra["evidence"] = deepcopy(baseline[0]["evidence"])

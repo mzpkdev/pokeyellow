@@ -62,7 +62,7 @@
     },
     "specs/full-colors/definitions/phase1-audit-source-transition.json": {
       "path": "specs/full-colors/definitions/phase1-audit-source-transition.json",
-      "sha256": "77e5c57e66b3e4e6ad97552dbf30c8eb6d2040f93f05258f7125e845d0239442"
+      "sha256": "6e9b9917485e3159e1f1dfbf9c7eaba32dc350ab489508e34485abd4c0248d68"
     },
     "specs/full-colors/definitions/phase2-hostile-slice-representation.json": {
       "path": "specs/full-colors/definitions/phase2-hostile-slice-representation.json",
@@ -74,19 +74,19 @@
     },
     "specs/full-colors/inventory/assignments.json": {
       "path": "specs/full-colors/inventory/assignments.json",
-      "sha256": "57266748a0b207667bbc16a67bc7c68aed9664d097714b98cafd9d7ef0a52d40"
+      "sha256": "2305a913d02621b869279e5188dc1ee826638c94db3ad7665e75030e2f5a094b"
     },
     "specs/full-colors/inventory/mutations.json": {
       "path": "specs/full-colors/inventory/mutations.json",
-      "sha256": "abf811e937dc28ea09fa8de87a4f120142df1e8534cf1f9075c2d7b7695b3430"
+      "sha256": "66cb1618c7ed535d47bc22526504fd40d4295cb38efed5d9528883ea789cbcad"
     },
     "specs/full-colors/inventory/scenes.json": {
       "path": "specs/full-colors/inventory/scenes.json",
-      "sha256": "999fe6e99af3262548f8ddbcf27617e72e302c746c3311812560206dc536146b"
+      "sha256": "44ab8fd2917319f25295ed844416d785f0a29ebbdcd74039447472445bb36bb3"
     },
     "specs/full-colors/inventory/writers.json": {
       "path": "specs/full-colors/inventory/writers.json",
-      "sha256": "1af3efecf9f90aa52585c86ef349acd1bd634d364265df7ba91c6b091a8f7247"
+      "sha256": "d53ffd9742a7e38f988664717c7d5ed8d54fcf015f162632fafa5831fa98857a"
     }
   },
   "inventory_audit": {

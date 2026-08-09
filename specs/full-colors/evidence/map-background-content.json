@@ -1,9 +1,9 @@
 {
   "ledger": {
-    "canonical_sha256": "3b6ec78695e9e32e8485f621f76829004907d0b5836487a324c5e4b81f3b8cb4",
+    "canonical_sha256": "5256c2da3bc4f2faaece7e9a50669eb545f754615b9b915733cc247551c0379b",
     "path": "specs/full-colors/inventory/map-background-content.json",
-    "sha256": "d5e7b9a62739138dcb6b00408102a28f6b9a24ec0eeb0c1788d8f1b746ab08d4",
-    "size": 69547
+    "sha256": "997ddb3beb7514e0cd8de033ed04f39b79eba267e5d54ee87e92cea425e2b6a6",
+    "size": 130309
   },
   "parity_sha256": "de045ba744ad8bba66ce36e9a3565a03d4dedf5bece18adde877bb5472fbdce7",
   "products": [
@@ -2853,13 +2853,13 @@
     "authorities": [
       {
         "path": "data/tilesets/full_color_overworld.asm",
-        "sha256": "d7d2ae958778d240e74993728f44b421b99218b5978261b2897ea40b741d1757",
-        "size": 9117
+        "sha256": "13d7448c0489c47295356b2f5d12fcb3c9d109410b6dcb2b429aab2c1d9632dc",
+        "size": 8647
       },
       {
         "path": "data/tilesets/full_color_interiors.asm",
-        "sha256": "83d59e7439b8e8eb97deffe46d267f61b5e0a8f1a0c97ee365bddad71deea6e3",
-        "size": 13594
+        "sha256": "7bd932169f8b1bc6cd7dd4f8996b64f4c32a5eb2117d559f96827c324765ab9b",
+        "size": 13324
       },
       {
         "path": "data/tilesets/tileset_headers.asm",
@@ -2886,89 +2886,119 @@
       "animations": [
         "TILEANIM_WATER_FLOWER"
       ],
-      "map_identities_sha256": "a859086be4d142b3ecb9d9d538efe7699baef5451b5d082477888d9b87f010a2",
+      "map_identities_sha256": "e16b661e200bdf9c97889148615aac84f770f90d5487f52a6389b887f1eef986",
       "maps": [
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 247,
           "name": "AGATHAS_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-247",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 66,
           "name": "BIKE_SHOP",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-66",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "CLUB"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 88,
           "name": "BILLS_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-88",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "INTERIOR"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 39,
           "name": "BLUES_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-39",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 246,
           "name": "BRUNOS_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-246",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 139,
           "name": "CELADON_CHIEF_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-139",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "MANSION"
         },
@@ -2977,7 +3007,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 6,
           "name": "CELADON_CITY",
@@ -2986,126 +3016,171 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-6",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CELADON",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 138,
           "name": "CELADON_DINER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-138",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 134,
           "name": "CELADON_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-134",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 140,
           "name": "CELADON_HOTEL",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-140",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 128,
           "name": "CELADON_MANSION_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-128",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "MANSION"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 129,
           "name": "CELADON_MANSION_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-129",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "MANSION"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 130,
           "name": "CELADON_MANSION_3F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-130",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "MANSION"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 131,
           "name": "CELADON_MANSION_ROOF",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-131",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "MANSION"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 132,
           "name": "CELADON_MANSION_ROOF_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-132",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 122,
           "name": "CELADON_MART_1F",
@@ -3114,84 +3189,114 @@
           ],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-122",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 123,
           "name": "CELADON_MART_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-123",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 124,
           "name": "CELADON_MART_3F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-124",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 125,
           "name": "CELADON_MART_4F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-125",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 136,
           "name": "CELADON_MART_5F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-136",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 127,
           "name": "CELADON_MART_ELEVATOR",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-127",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 126,
           "name": "CELADON_MART_ROOF",
@@ -3200,35 +3305,50 @@
           ],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-126",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 133,
           "name": "CELADON_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-133",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 230,
           "name": "CERULEAN_BADGE_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-230",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
@@ -3288,7 +3408,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 3,
           "name": "CERULEAN_CITY",
@@ -3297,105 +3417,145 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-3",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CERULEAN",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 65,
           "name": "CERULEAN_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-65",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 67,
           "name": "CERULEAN_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-67",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 63,
           "name": "CERULEAN_MELANIES_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-63",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 64,
           "name": "CERULEAN_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-64",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 62,
           "name": "CERULEAN_TRASHED_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-62",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 120,
           "name": "CHAMPIONS_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-120",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 166,
           "name": "CINNABAR_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-166",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
@@ -3404,7 +3564,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 8,
           "name": "CINNABAR_ISLAND",
@@ -3413,147 +3573,202 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-8",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CINNABAR",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 167,
           "name": "CINNABAR_LAB",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-167",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LAB"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 170,
           "name": "CINNABAR_LAB_FOSSIL_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-170",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LAB"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 169,
           "name": "CINNABAR_LAB_METRONOME_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-169",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LAB"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 168,
           "name": "CINNABAR_LAB_TRADE_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-168",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LAB"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 172,
           "name": "CINNABAR_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-172",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 171,
           "name": "CINNABAR_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-171",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 240,
           "name": "COLOSSEUM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-240",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "CLUB"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 175,
           "name": "COPYCATS_HOUSE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-175",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "REDS_HOUSE_1"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 176,
           "name": "COPYCATS_HOUSE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-176",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "REDS_HOUSE_2"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 72,
           "name": "DAYCARE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-72",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
@@ -3611,28 +3826,38 @@
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 177,
           "name": "FIGHTING_DOJO",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-177",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "DOJO"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 153,
           "name": "FUCHSIA_BILLS_GRANDPAS_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-153",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
@@ -3641,7 +3866,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 7,
           "name": "FUCHSIA_CITY",
@@ -3650,119 +3875,164 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-7",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "FUCHSIA",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 164,
           "name": "FUCHSIA_GOOD_ROD_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-164",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 157,
           "name": "FUCHSIA_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-157",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 152,
           "name": "FUCHSIA_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-152",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 158,
           "name": "FUCHSIA_MEETING_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-158",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LAB"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 154,
           "name": "FUCHSIA_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-154",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 135,
           "name": "GAME_CORNER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-135",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 137,
           "name": "GAME_CORNER_PRIZE_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-137",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 118,
           "name": "HALL_OF_FAME",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-118",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
@@ -3786,70 +4056,95 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 174,
           "name": "INDIGO_PLATEAU_LOBBY",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-174",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 113,
           "name": "LANCES_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-113",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "DOJO"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 151,
           "name": "LAVENDER_CUBONE_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-151",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 150,
           "name": "LAVENDER_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-150",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 141,
           "name": "LAVENDER_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-141",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
@@ -3858,7 +4153,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 4,
           "name": "LAVENDER_TOWN",
@@ -3867,49 +4162,69 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-4",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "LAVENDER",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 245,
           "name": "LORELEIS_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-245",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 149,
           "name": "MR_FUJIS_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-149",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 183,
           "name": "MR_PSYCHICS_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-183",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
@@ -3967,70 +4282,95 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 68,
           "name": "MT_MOON_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-68",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 52,
           "name": "MUSEUM_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-52",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MUSEUM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 53,
           "name": "MUSEUM_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-53",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MUSEUM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 229,
           "name": "NAME_RATERS_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-229",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 40,
           "name": "OAKS_LAB",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-40",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "DOJO"
         },
@@ -4039,7 +4379,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 0,
           "name": "PALLET_TOWN",
@@ -4048,7 +4388,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-0",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "PALLET",
           "tileset": "OVERWORLD"
         },
@@ -4057,7 +4402,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 2,
           "name": "PEWTER_CITY",
@@ -4066,357 +4411,487 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-2",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "PEWTER",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 54,
           "name": "PEWTER_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-54",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 56,
           "name": "PEWTER_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-56",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 55,
           "name": "PEWTER_NIDORAN_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-55",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 58,
           "name": "PEWTER_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-58",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 57,
           "name": "PEWTER_SPEECH_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-57",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 90,
           "name": "POKEMON_FAN_CLUB",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-90",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "INTERIOR"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 165,
           "name": "POKEMON_MANSION_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-165",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 214,
           "name": "POKEMON_MANSION_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-214",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 215,
           "name": "POKEMON_MANSION_3F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-215",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 216,
           "name": "POKEMON_MANSION_B1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-216",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 142,
           "name": "POKEMON_TOWER_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-142",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 143,
           "name": "POKEMON_TOWER_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-143",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 144,
           "name": "POKEMON_TOWER_3F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-144",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 145,
           "name": "POKEMON_TOWER_4F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-145",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 146,
           "name": "POKEMON_TOWER_5F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-146",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 147,
           "name": "POKEMON_TOWER_6F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-147",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 148,
           "name": "POKEMON_TOWER_7F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-148",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "CEMETERY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 83,
           "name": "POWER_PLANT",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-83",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 37,
           "name": "REDS_HOUSE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-37",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "REDS_HOUSE_1"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 38,
           "name": "REDS_HOUSE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-38",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "REDS_HOUSE_2"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 199,
           "name": "ROCKET_HIDEOUT_B1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-199",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 200,
           "name": "ROCKET_HIDEOUT_B2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-200",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 201,
           "name": "ROCKET_HIDEOUT_B3F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-201",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 202,
           "name": "ROCKET_HIDEOUT_B4F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-202",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 203,
           "name": "ROCKET_HIDEOUT_ELEVATOR",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-203",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
@@ -4457,14 +4932,19 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 81,
           "name": "ROCK_TUNNEL_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-81",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
@@ -4473,7 +4953,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 12,
           "name": "ROUTE_1",
@@ -4482,7 +4962,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-12",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "PALLET",
           "tileset": "OVERWORLD"
         },
@@ -4491,7 +4976,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 21,
           "name": "ROUTE_10",
@@ -4500,7 +4985,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-21",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "LAVENDER",
           "tileset": "OVERWORLD"
         },
@@ -4509,7 +4999,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 22,
           "name": "ROUTE_11",
@@ -4518,35 +5008,50 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-22",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "VERMILION",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 84,
           "name": "ROUTE_11_GATE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-84",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 86,
           "name": "ROUTE_11_GATE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-86",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -4555,7 +5060,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 23,
           "name": "ROUTE_12",
@@ -4564,49 +5069,69 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-23",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "VERMILION",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 87,
           "name": "ROUTE_12_GATE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-87",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 195,
           "name": "ROUTE_12_GATE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-195",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 189,
           "name": "ROUTE_12_SUPER_ROD_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-189",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
@@ -4615,7 +5140,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 24,
           "name": "ROUTE_13",
@@ -4624,7 +5149,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-24",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "FUCHSIA",
           "tileset": "OVERWORLD"
         },
@@ -4633,7 +5163,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 25,
           "name": "ROUTE_14",
@@ -4642,7 +5172,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-25",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "FUCHSIA",
           "tileset": "OVERWORLD"
         },
@@ -4651,7 +5186,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 26,
           "name": "ROUTE_15",
@@ -4660,35 +5195,50 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-26",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "FUCHSIA",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 184,
           "name": "ROUTE_15_GATE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-184",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 185,
           "name": "ROUTE_15_GATE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-185",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -4697,7 +5247,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 27,
           "name": "ROUTE_16",
@@ -4706,49 +5256,69 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-27",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CELADON",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 188,
           "name": "ROUTE_16_FLY_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-188",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 186,
           "name": "ROUTE_16_GATE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-186",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 187,
           "name": "ROUTE_16_GATE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-187",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -4757,7 +5327,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 28,
           "name": "ROUTE_17",
@@ -4766,7 +5336,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-28",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CELADON",
           "tileset": "OVERWORLD"
         },
@@ -4775,7 +5350,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 29,
           "name": "ROUTE_18",
@@ -4784,35 +5359,50 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-29",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CELADON",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 190,
           "name": "ROUTE_18_GATE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-190",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 191,
           "name": "ROUTE_18_GATE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-191",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -4821,7 +5411,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 30,
           "name": "ROUTE_19",
@@ -4830,7 +5420,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-30",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CINNABAR",
           "tileset": "OVERWORLD"
         },
@@ -4839,7 +5434,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 13,
           "name": "ROUTE_2",
@@ -4848,7 +5443,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-13",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "VIRIDIAN",
           "tileset": "OVERWORLD"
         },
@@ -4857,7 +5457,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 31,
           "name": "ROUTE_20",
@@ -4866,7 +5466,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-31",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CINNABAR",
           "tileset": "OVERWORLD"
         },
@@ -4875,7 +5480,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 32,
           "name": "ROUTE_21",
@@ -4884,7 +5489,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-32",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CINNABAR",
           "tileset": "OVERWORLD"
         },
@@ -4893,7 +5503,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 33,
           "name": "ROUTE_22",
@@ -4902,21 +5512,31 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-33",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "INDIGO",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 193,
           "name": "ROUTE_22_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-193",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -4942,7 +5562,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 35,
           "name": "ROUTE_24",
@@ -4951,7 +5571,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-35",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CERULEAN",
           "tileset": "OVERWORLD"
         },
@@ -4960,7 +5585,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 36,
           "name": "ROUTE_25",
@@ -4969,35 +5594,50 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-36",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "CERULEAN",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 49,
           "name": "ROUTE_2_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-49",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 48,
           "name": "ROUTE_2_TRADE_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-48",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
@@ -5006,7 +5646,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 14,
           "name": "ROUTE_3",
@@ -5015,7 +5655,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-14",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "PEWTER",
           "tileset": "OVERWORLD"
         },
@@ -5024,7 +5669,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 15,
           "name": "ROUTE_4",
@@ -5033,7 +5678,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-15",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "PEWTER",
           "tileset": "OVERWORLD"
         },
@@ -5042,7 +5692,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 16,
           "name": "ROUTE_5",
@@ -5051,21 +5701,31 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-16",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "SAFFRON",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 70,
           "name": "ROUTE_5_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-70",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -5074,7 +5734,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 17,
           "name": "ROUTE_6",
@@ -5083,21 +5743,31 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-17",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "VERMILION",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 73,
           "name": "ROUTE_6_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-73",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -5106,7 +5776,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 18,
           "name": "ROUTE_7",
@@ -5115,21 +5785,31 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-18",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "SAFFRON",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 76,
           "name": "ROUTE_7_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-76",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -5138,7 +5818,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 19,
           "name": "ROUTE_8",
@@ -5147,21 +5827,31 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-19",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "SAFFRON",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 79,
           "name": "ROUTE_8_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-79",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -5170,7 +5860,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 20,
           "name": "ROUTE_9",
@@ -5179,7 +5869,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-20",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "LAVENDER",
           "tileset": "OVERWORLD"
         },
@@ -5203,14 +5898,19 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 221,
           "name": "SAFARI_ZONE_CENTER_REST_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-221",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -5234,28 +5934,38 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 224,
           "name": "SAFARI_ZONE_EAST_REST_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-224",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 156,
           "name": "SAFARI_ZONE_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-156",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -5279,28 +5989,38 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 225,
           "name": "SAFARI_ZONE_NORTH_REST_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-225",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 222,
           "name": "SAFARI_ZONE_SECRET_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-222",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LAB"
         },
@@ -5324,14 +6044,19 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 223,
           "name": "SAFARI_ZONE_WEST_REST_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-223",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
@@ -5340,7 +6065,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 10,
           "name": "SAFFRON_CITY",
@@ -5349,63 +6074,88 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-10",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "SAFFRON",
           "tileset": "OVERWORLD"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 178,
           "name": "SAFFRON_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-178",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 180,
           "name": "SAFFRON_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-180",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 179,
           "name": "SAFFRON_PIDGEY_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-179",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 182,
           "name": "SAFFRON_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-182",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
@@ -5497,308 +6247,418 @@
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 234,
           "name": "SILPH_CO_10F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-234",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 235,
           "name": "SILPH_CO_11F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-235",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "INTERIOR"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 181,
           "name": "SILPH_CO_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-181",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 207,
           "name": "SILPH_CO_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-207",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 208,
           "name": "SILPH_CO_3F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-208",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 209,
           "name": "SILPH_CO_4F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-209",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 210,
           "name": "SILPH_CO_5F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-210",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 211,
           "name": "SILPH_CO_6F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-211",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 212,
           "name": "SILPH_CO_7F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-212",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 213,
           "name": "SILPH_CO_8F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-213",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 233,
           "name": "SILPH_CO_9F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-233",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "FACILITY"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 236,
           "name": "SILPH_CO_ELEVATOR",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-236",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LOBBY"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 95,
           "name": "SS_ANNE_1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-95",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 102,
           "name": "SS_ANNE_1F_ROOMS",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-102",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 96,
           "name": "SS_ANNE_2F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-96",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 103,
           "name": "SS_ANNE_2F_ROOMS",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-103",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 97,
           "name": "SS_ANNE_3F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-97",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 98,
           "name": "SS_ANNE_B1F",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-98",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 104,
           "name": "SS_ANNE_B1F_ROOMS",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-104",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 99,
           "name": "SS_ANNE_BOW",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-99",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 101,
           "name": "SS_ANNE_CAPTAINS_ROOM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-101",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 100,
           "name": "SS_ANNE_KITCHEN",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-100",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "SHIP"
         },
@@ -5822,112 +6682,152 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 239,
           "name": "TRADE_CENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-239",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "CLUB"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 119,
           "name": "UNDERGROUND_PATH_NORTH_SOUTH",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-119",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "UNDERGROUND"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 71,
           "name": "UNDERGROUND_PATH_ROUTE_5",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-71",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 74,
           "name": "UNDERGROUND_PATH_ROUTE_6",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-74",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 77,
           "name": "UNDERGROUND_PATH_ROUTE_7",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-77",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 78,
           "name": "UNDERGROUND_PATH_ROUTE_7_COPY",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-78",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 80,
           "name": "UNDERGROUND_PATH_ROUTE_8",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-80",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "GATE"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 121,
           "name": "UNDERGROUND_PATH_WEST_EAST",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-121",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "UNDERGROUND"
         },
@@ -5936,7 +6836,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 5,
           "name": "VERMILION_CITY",
@@ -5945,7 +6845,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-5",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "VERMILION",
           "tileset": "OVERWORLD"
         },
@@ -5969,84 +6874,114 @@
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 92,
           "name": "VERMILION_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-92",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 91,
           "name": "VERMILION_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-91",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 163,
           "name": "VERMILION_OLD_ROD_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-163",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 93,
           "name": "VERMILION_PIDGEY_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-93",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 89,
           "name": "VERMILION_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-89",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 196,
           "name": "VERMILION_TRADE_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-196",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
@@ -6106,7 +7041,7 @@
             "TILEANIM_WATER_FLOWER"
           ],
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 1,
           "name": "VIRIDIAN_CITY",
@@ -6115,7 +7050,12 @@
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#map-1",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          },
           "roof": "VIRIDIAN",
           "tileset": "OVERWORLD"
         },
@@ -6139,112 +7079,152 @@
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 47,
           "name": "VIRIDIAN_FOREST_NORTH_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-47",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "FOREST_GATE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 50,
           "name": "VIRIDIAN_FOREST_SOUTH_GATE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-50",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "FOREST_GATE"
         },
         {
           "animations": [],
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 45,
           "name": "VIRIDIAN_GYM",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#map-45",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          },
           "roof": null,
           "tileset": "GYM"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 42,
           "name": "VIRIDIAN_MART",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-42",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "MART"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 44,
           "name": "VIRIDIAN_NICKNAME_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-44",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 41,
           "name": "VIRIDIAN_POKECENTER",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-41",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "POKECENTER"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 43,
           "name": "VIRIDIAN_SCHOOL_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-43",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "HOUSE"
         },
         {
           "animations": [],
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "fallback_reason": null,
           "id": 155,
           "name": "WARDENS_HOUSE",
           "overrides": [],
           "presentation": "color",
           "replacements": [],
-          "review": null,
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#map-155",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          },
           "roof": null,
           "tileset": "LAB"
         }
@@ -6469,8 +7449,8 @@
           "roof": "VIRIDIAN"
         }
       ],
-      "sha256": "aa6661645084493f36c0903f11ed642d08653680d63400547ec6b297968b2bc3",
-      "tileset_identities_sha256": "3798fe029effa91a861487ebb8f2a137d638b1b57443de589c0a37c80921defc",
+      "sha256": "23864a365b35941d9e0ba3a964a9c93a452ad394dfaca9555ddad4fc36c52c8b",
+      "tileset_identities_sha256": "cc4fdc9d2720b4651aa47fa69b24eae41a445160b926fee7dbcf4e816ed05629",
       "tilesets": [
         {
           "animations": [
@@ -6478,36 +7458,51 @@
           ],
           "attribute_authority": "FullColorOverworldTileAttributes",
           "batch": "overworld",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 0,
           "name": "OVERWORLD",
           "palette_authority": "FullColorOverworldBGPalettes",
           "replacements": [
             "CUT_TREE"
           ],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/overworld.json#tileset-0",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-overworld-pallet-route1-viridian"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorRedsHouseTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 1,
           "name": "REDS_HOUSE_1",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-1",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorPokecenterTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 2,
           "name": "MART",
           "palette_authority": "FullColorIndoorPCBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-2",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
@@ -6524,111 +7519,161 @@
           "animations": [],
           "attribute_authority": "FullColorRedsHouseTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 4,
           "name": "REDS_HOUSE_2",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-4",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorGymTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 5,
           "name": "DOJO",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-5",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorPokecenterTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 6,
           "name": "POKECENTER",
           "palette_authority": "FullColorPokecenterBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-6",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorGymTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 7,
           "name": "GYM",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-7",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorHouseTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 8,
           "name": "HOUSE",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-8",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorGateTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 9,
           "name": "FOREST_GATE",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-9",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorGateTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 10,
           "name": "MUSEUM",
           "palette_authority": "FullColorIndoorAltTextBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-10",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorUndergroundTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 11,
           "name": "UNDERGROUND",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-11",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorGateTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 12,
           "name": "GATE",
           "palette_authority": "FullColorIndoorAltTextBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-12",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorShipTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 13,
           "name": "SHIP",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-13",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],
@@ -6645,23 +7690,33 @@
           "animations": [],
           "attribute_authority": "FullColorCemeteryTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 15,
           "name": "CEMETERY",
           "palette_authority": "FullColorCemeteryBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-15",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorInteriorTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 16,
           "name": "INTERIOR",
           "palette_authority": "FullColorIndoorPCBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-16",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],
@@ -6678,56 +7733,81 @@
           "animations": [],
           "attribute_authority": "FullColorLobbyTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 18,
           "name": "LOBBY",
           "palette_authority": "FullColorIndoorPCBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-18",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorMansionTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 19,
           "name": "MANSION",
           "palette_authority": "FullColorIndoorPCBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-19",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorLabTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 20,
           "name": "LAB",
           "palette_authority": "FullColorIndoorPCBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-20",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorClubTileAttributes",
           "batch": "residential-services",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 21,
           "name": "CLUB",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/residential-services.json#tileset-21",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-residential-bedroom-mart"
+          }
         },
         {
           "animations": [],
           "attribute_authority": "FullColorFacilityTileAttributes",
           "batch": "challenge-special-interiors",
-          "content_status": "fallback",
+          "content_status": "complete",
           "id": 22,
           "name": "FACILITY",
           "palette_authority": "FullColorIndoorBGPalettes",
           "replacements": [],
-          "review": null
+          "review": {
+            "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+            "authority": "specs/full-colors/evidence/map-background-reviews/challenge-special-interiors.json#tileset-22",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": "phase3-challenge-oaks-lab-dojo"
+          }
         },
         {
           "animations": [],

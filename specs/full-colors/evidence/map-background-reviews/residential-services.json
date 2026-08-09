@@ -1,0 +1,1994 @@
+{
+  "atlas": {
+    "artifacts": [
+      {
+        "path": "residential-services/maps/bike_shop.png",
+        "sha256": "20bf8d877fd29368c78ce92180499f0bbf3feab2c7abe365a1a9c06fd51fab1d"
+      },
+      {
+        "path": "residential-services/maps/blues_house.png",
+        "sha256": "d13bc05c3655c9e5e578f3e907b7bb8a9424e74cc49e5c83349c8da776296635"
+      },
+      {
+        "path": "residential-services/maps/celadon_diner.png",
+        "sha256": "22a946f40cfc1a6c30552d16bd962b9b4452c6dd7d9bfee3607ea00daec61748"
+      },
+      {
+        "path": "residential-services/maps/celadon_hotel.png",
+        "sha256": "4f0ae23f4ba50c5fc6cbe11b067f3eed999eaea1e4f376faed2bf09f801375bc"
+      },
+      {
+        "path": "residential-services/maps/celadon_mansion_roof_house.png",
+        "sha256": "9b2a1312b1ec63e443ca63ca3fca18d1c673111c0461fd49336cbb8a5ea880be"
+      },
+      {
+        "path": "residential-services/maps/celadon_mart_1f.png",
+        "sha256": "ce12a9f73b0074e018d35eea598e0f4b822946099ecf5ab7cf4b7d5a8230f945"
+      },
+      {
+        "path": "residential-services/maps/celadon_mart_2f.png",
+        "sha256": "7fdff680b91080c01501a5986815aeed42f03ed7e340acee4039c73af0678e5d"
+      },
+      {
+        "path": "residential-services/maps/celadon_mart_3f.png",
+        "sha256": "370ac3253eb4254312047b958051f2a275a2c78b3273625c9965175dbcef2855"
+      },
+      {
+        "path": "residential-services/maps/celadon_mart_4f.png",
+        "sha256": "5c10006c49875babb5ff65eaa970269c8d73dcd545da698c7d0efb268fdc5d48"
+      },
+      {
+        "path": "residential-services/maps/celadon_mart_5f.png",
+        "sha256": "74b7bb828056eef8bddc1035b59a8bd9580a1a982c19351a603c84362b229914"
+      },
+      {
+        "path": "residential-services/maps/celadon_mart_elevator.png",
+        "sha256": "42589a95afb482ad68ea693e8ce20b40628cc298ef5eaa8098329cc26688682f"
+      },
+      {
+        "path": "residential-services/maps/celadon_mart_roof.png",
+        "sha256": "47804e5e16b37ea40df4e807f2b81b8be56e5355bc2897812b103bc9d9f1a9d8"
+      },
+      {
+        "path": "residential-services/maps/celadon_pokecenter.png",
+        "sha256": "c3cb0369b890866c8ba0520bd71e8c8f32443201e9cb8adb55254028f3223a23"
+      },
+      {
+        "path": "residential-services/maps/cerulean_mart.png",
+        "sha256": "928215a07bdd4cb8d67832afa05ef6a31bc82b8c20503fa066a06c66d86873d5"
+      },
+      {
+        "path": "residential-services/maps/cerulean_melanies_house.png",
+        "sha256": "06cd12daa8181f248b93b8557d133b7e211139057e2dd18f736720bfd3a76962"
+      },
+      {
+        "path": "residential-services/maps/cerulean_pokecenter.png",
+        "sha256": "08f66a9a9029ea16aeb9c9b9afae2ab0b820b06d508a285390176377a4479e33"
+      },
+      {
+        "path": "residential-services/maps/cerulean_trashed_house.png",
+        "sha256": "7e05d9cb11c1faf806fa456e64dd9f6a3ba69ab11d636dc232415b33abd5f42c"
+      },
+      {
+        "path": "residential-services/maps/cinnabar_lab.png",
+        "sha256": "cc9370d7b9dffc05b12157f26895df6829c0372631f772e4983b807a543d6f8a"
+      },
+      {
+        "path": "residential-services/maps/cinnabar_lab_fossil_room.png",
+        "sha256": "0a01ec377b02ca7415a7f72b845a8a4c9a4cdc2b705c016aef09a9ef77ff387f"
+      },
+      {
+        "path": "residential-services/maps/cinnabar_lab_metronome_room.png",
+        "sha256": "98bc5d7d6aaade2de000b023b2b789d35369115305a253568d72ee047e1a2d34"
+      },
+      {
+        "path": "residential-services/maps/cinnabar_lab_trade_room.png",
+        "sha256": "343956912dc38ee28689e157f26477593572c3a3f8bf57bffaeb4c0243d80b9e"
+      },
+      {
+        "path": "residential-services/maps/cinnabar_mart.png",
+        "sha256": "554104a1af6f140c0d1dc68a437641b7db0ac1386945d19379c0ade9f5600493"
+      },
+      {
+        "path": "residential-services/maps/cinnabar_pokecenter.png",
+        "sha256": "f1647822c6a8f6f7cc23de0f6621b8e00b29a8b2cfea955c859352f74b9afb0e"
+      },
+      {
+        "path": "residential-services/maps/colosseum.png",
+        "sha256": "71d47281a5594de275f5a138f0fcf233169434c0dc4494255f0cc84c350e6b5c"
+      },
+      {
+        "path": "residential-services/maps/copycats_house_1f.png",
+        "sha256": "c7b941f78a2afd245657d28ac9292cf2738e157815df6583ad3791fc57eef6f7"
+      },
+      {
+        "path": "residential-services/maps/copycats_house_2f.png",
+        "sha256": "433d4866031386f28c774e26aff09de825d4dfa25df4b1bbf52f8ad7990be58c"
+      },
+      {
+        "path": "residential-services/maps/daycare.png",
+        "sha256": "35f845a9c1e8e319b2cfecd1fe9f28e837d8de4ecb8aa7c5af21ba8640ea38b5"
+      },
+      {
+        "path": "residential-services/maps/fuchsia_bills_grandpas_house.png",
+        "sha256": "a60b0fcadebcc56bc01b94f768479a9708d9701faf4a7d1438981c8794022fae"
+      },
+      {
+        "path": "residential-services/maps/fuchsia_mart.png",
+        "sha256": "8ba0d2cc6d73712a81db3675ec63e0b4abf928d067c5509c55f1816fdbf751c5"
+      },
+      {
+        "path": "residential-services/maps/fuchsia_meeting_room.png",
+        "sha256": "e97799239f635026832d131c320443f15cc3b1da8745a848f43bd8b2ad91be4e"
+      },
+      {
+        "path": "residential-services/maps/fuchsia_pokecenter.png",
+        "sha256": "a514886e6f8cf764d800432213c665976e53ab0bd6198a012807c973fe4edd85"
+      },
+      {
+        "path": "residential-services/maps/game_corner.png",
+        "sha256": "bc6a26219b7c692a3f2987df2e811346a32ce91ab0df2de40b0077aab8e0f608"
+      },
+      {
+        "path": "residential-services/maps/game_corner_prize_room.png",
+        "sha256": "edca55e0d185bf134d8aeca32c92036eda60e79fa6bc17378357839772cc5b73"
+      },
+      {
+        "path": "residential-services/maps/indigo_plateau_lobby.png",
+        "sha256": "5865de340111e82cdd16e2b4056fcbbb29ddeae6ccc555c7eb49a7096fc76ba2"
+      },
+      {
+        "path": "residential-services/maps/lavender_cubone_house.png",
+        "sha256": "60cec550fb31fb5b0bea03eb95f6de2164f2e169e006a69b0990bd5e91d71d39"
+      },
+      {
+        "path": "residential-services/maps/lavender_mart.png",
+        "sha256": "98ad55eedd41ed5e3922bf43aab08610880c68b3c3b4cb6c9c9609f2fb6dc246"
+      },
+      {
+        "path": "residential-services/maps/lavender_pokecenter.png",
+        "sha256": "6c6d5c803363d9838170e1a3bf6c95f7ecc5d8af5b5811cd1c5cbb7d36c67690"
+      },
+      {
+        "path": "residential-services/maps/mr_fujis_house.png",
+        "sha256": "1f7c95408604c7040b000e6bd8dff1878649391d274eabe8ddd0fa1e08ceda59"
+      },
+      {
+        "path": "residential-services/maps/mr_psychics_house.png",
+        "sha256": "290a56906b66009586d31f07feaecbf5e326d0745a2aff0a2eaf9f7c329b21f3"
+      },
+      {
+        "path": "residential-services/maps/mt_moon_pokecenter.png",
+        "sha256": "5432374bbef14d0b038e530a99d2f26b6e7444da674d52b3349742996e3d573a"
+      },
+      {
+        "path": "residential-services/maps/museum_1f.png",
+        "sha256": "c3d94cf5842cfe44df10c6e91f0c9363c80b686e4c28cc2a08ddc6802dc45648"
+      },
+      {
+        "path": "residential-services/maps/museum_2f.png",
+        "sha256": "3fd851bd2ed28610ea946c66bb7d5b4eb35b8254c1372dc983fce9269ffea1ec"
+      },
+      {
+        "path": "residential-services/maps/name_raters_house.png",
+        "sha256": "5aa56e3d6aafc512fbd4ee908b756394b61ef419a6602da86a16c698e035f713"
+      },
+      {
+        "path": "residential-services/maps/pewter_mart.png",
+        "sha256": "bad5679d5f3d1f5b8d1c3812adc196b7a902a1f616fa84fef9be6545f9f68d62"
+      },
+      {
+        "path": "residential-services/maps/pewter_nidoran_house.png",
+        "sha256": "867ee8d0cbc4e0ddd97307a84a4c997e1a0d741473ca05448b7a88357688ca02"
+      },
+      {
+        "path": "residential-services/maps/pewter_pokecenter.png",
+        "sha256": "ad4dbbc755c5f80857c0e70e171d1799a23e51cc42806fd6baa964ce57c22589"
+      },
+      {
+        "path": "residential-services/maps/pewter_speech_house.png",
+        "sha256": "6fd8b2bffa2f997e3336cf932fbd71a230bfbf1091f323048d747e9cc9b6023e"
+      },
+      {
+        "path": "residential-services/maps/reds_house_1f.png",
+        "sha256": "7f7db3b45f5e057325e62b582a09de4d485f15028673fdb82ce585960e4c70dc"
+      },
+      {
+        "path": "residential-services/maps/reds_house_2f.png",
+        "sha256": "11ef32fb82741bfa5dafff57bc46d7ed270a82dcd049e3bc00d7dc8a164d7ed3"
+      },
+      {
+        "path": "residential-services/maps/rock_tunnel_pokecenter.png",
+        "sha256": "de3654938a457f28fcaf9f02cd2a5d0682860b4c0dcd70f9f925c1310c5abc2f"
+      },
+      {
+        "path": "residential-services/maps/rocket_hideout_elevator.png",
+        "sha256": "1f317a6222894e7a6aad0070213f1d071e124b3852b13d21b5de776d131aa07c"
+      },
+      {
+        "path": "residential-services/maps/route_11_gate_1f.png",
+        "sha256": "13003d5ab1ac660752613fb4531e2861bccc50b29ea6924a4e7094cb5ffd8bab"
+      },
+      {
+        "path": "residential-services/maps/route_11_gate_2f.png",
+        "sha256": "73dc3c4f737b966aef2459f25d816a27c3728b9b6dc55c10991ac882ca1d29a2"
+      },
+      {
+        "path": "residential-services/maps/route_12_gate_1f.png",
+        "sha256": "5a190969ff98f32022834fac02a9e1bad7c9cfb4af850fdf222bda446926821d"
+      },
+      {
+        "path": "residential-services/maps/route_12_gate_2f.png",
+        "sha256": "523beb68341165f7a4565e54e65b9fcbcaf880251e392556449eb545ea0afee1"
+      },
+      {
+        "path": "residential-services/maps/route_12_super_rod_house.png",
+        "sha256": "49c8032153dadcb68dced6761f952f23c18fbc3cf3eab8ad1e0733b9ec3caeee"
+      },
+      {
+        "path": "residential-services/maps/route_15_gate_1f.png",
+        "sha256": "e983651139f35af297e77e943253236b144a2a40ffded93fa15e000445c1b3b4"
+      },
+      {
+        "path": "residential-services/maps/route_15_gate_2f.png",
+        "sha256": "4b7f446551e4f97c732770b9820c3b281d7a8e32d98b1a8f130f65e03a51a44b"
+      },
+      {
+        "path": "residential-services/maps/route_16_fly_house.png",
+        "sha256": "17e721077c7527bbe36f213731483644b186fef2fde00a527bae202d28b07fe5"
+      },
+      {
+        "path": "residential-services/maps/route_16_gate_1f.png",
+        "sha256": "be68c4abd2f1d23bc9dbe149594209cc39c2e67da2e97c3124cd4c2718748004"
+      },
+      {
+        "path": "residential-services/maps/route_16_gate_2f.png",
+        "sha256": "e5d677c25422d36657ae1dd40d2e1b926579a7dc31682b862b7c96e39e71acc2"
+      },
+      {
+        "path": "residential-services/maps/route_18_gate_1f.png",
+        "sha256": "8c5ac76c82ae73f5b29c9fe1e563fbbedd36edcdfd63b3854707228bc0565b6a"
+      },
+      {
+        "path": "residential-services/maps/route_18_gate_2f.png",
+        "sha256": "0622e94e0af82f50caac99db747a79de958fb1d14376d75183a6cf021168c8ee"
+      },
+      {
+        "path": "residential-services/maps/route_22_gate.png",
+        "sha256": "8d0d6068142b0cde7dda0972b84e709d0deaeb631fe68426c1fbd516fdaf9977"
+      },
+      {
+        "path": "residential-services/maps/route_2_gate.png",
+        "sha256": "7416d0cf27b0049cb934bae67603b44a35d9903a9c3f0836523451019e5e8698"
+      },
+      {
+        "path": "residential-services/maps/route_2_trade_house.png",
+        "sha256": "f509af95d051a247eb94d2fab8b786948028a58f6d3183d5eaf44f91064dba89"
+      },
+      {
+        "path": "residential-services/maps/route_5_gate.png",
+        "sha256": "c589a21ab49e16815712ae60afe39a52511a03d2302db34f3fd8daf4f94ddbcf"
+      },
+      {
+        "path": "residential-services/maps/route_6_gate.png",
+        "sha256": "bd968e3549732a38ba46c90e461bc198c5996f0ebe062b14654023c9566c4e1a"
+      },
+      {
+        "path": "residential-services/maps/route_7_gate.png",
+        "sha256": "5653850106a3c8bb82e85cf40b362331b101b833c6638f4b7900326d6058926b"
+      },
+      {
+        "path": "residential-services/maps/route_8_gate.png",
+        "sha256": "c422dc6c0838be48ddea33f1092986b0c0228ca099a1f597bc8c43aa3498f44a"
+      },
+      {
+        "path": "residential-services/maps/safari_zone_center_rest_house.png",
+        "sha256": "1c437d8245f490badc0ccea5b2d87d38ac79f310b2e022174e5897aaa0b13230"
+      },
+      {
+        "path": "residential-services/maps/safari_zone_east_rest_house.png",
+        "sha256": "7975ceffe280f18b6dab08a0dfe8f45d2ce06b3918119500cf8388caa92d90d7"
+      },
+      {
+        "path": "residential-services/maps/safari_zone_gate.png",
+        "sha256": "90bc0874392bbb07261caa4d9ad903c1ba625e32a0da9733c577163530b36229"
+      },
+      {
+        "path": "residential-services/maps/safari_zone_north_rest_house.png",
+        "sha256": "66e2335bc50231ab5f4e867b6113414d82616407acb3e7118e5fe9a75bef937d"
+      },
+      {
+        "path": "residential-services/maps/safari_zone_secret_house.png",
+        "sha256": "0140179e263bbe0818b235987c177bebc8656999cf3ae7c7ce66988bd56bad76"
+      },
+      {
+        "path": "residential-services/maps/safari_zone_west_rest_house.png",
+        "sha256": "e12fa41be3264b3231265f1e000017be7ad6d5e40cb64d4dcd43c2ea048b6c72"
+      },
+      {
+        "path": "residential-services/maps/saffron_mart.png",
+        "sha256": "2a4fd2583716eb07bab01f0923d0519fac806d84eea2bdbdb768c7a7d6b4d789"
+      },
+      {
+        "path": "residential-services/maps/saffron_pidgey_house.png",
+        "sha256": "6ba5ac64314f2785cd87fbefa9bd5f37c82f26a8870c57bf93f57889cf9b35ed"
+      },
+      {
+        "path": "residential-services/maps/saffron_pokecenter.png",
+        "sha256": "2ee8f1221f3de484e6daa23cdc7fab721d6e97e7b8ace02a2f904790e9784cee"
+      },
+      {
+        "path": "residential-services/maps/silph_co_elevator.png",
+        "sha256": "d5c60a6e2fab6cade5dcb3ad9ff1b704d8d2fae9f9772d3bc95e5f52c258f45b"
+      },
+      {
+        "path": "residential-services/maps/trade_center.png",
+        "sha256": "25ec3e0096e553380e085ca693315eed1f4c7b94b36c61e7d97f90b90b2d3537"
+      },
+      {
+        "path": "residential-services/maps/underground_path_route_5.png",
+        "sha256": "30c91f03167031fef7079d3477f83f07d966689bfd80545aefe2b8f65bf4ff69"
+      },
+      {
+        "path": "residential-services/maps/underground_path_route_6.png",
+        "sha256": "6d4aa53b50139a54e8b8ae45c2313a0b2b246d29fc12bd7774ca3e297511d13d"
+      },
+      {
+        "path": "residential-services/maps/underground_path_route_7.png",
+        "sha256": "a158ec49ed568472787029715958b160b450e35cbeea077690334d1d92bb2ff1"
+      },
+      {
+        "path": "residential-services/maps/underground_path_route_7_copy.png",
+        "sha256": "5bab56b8031d16b48475b510c7cec7a63a835d1d02f1a2c624aaea3ff1e00e04"
+      },
+      {
+        "path": "residential-services/maps/underground_path_route_8.png",
+        "sha256": "ba2a333f2576838043eff3b0510cf6ac0ce1aef1d793a6116ed8981bcfe3bcb3"
+      },
+      {
+        "path": "residential-services/maps/vermilion_mart.png",
+        "sha256": "2a76a70a01b5c530117c28e2b039ca1f4eb9aedf3617f191524b79b36ec660e1"
+      },
+      {
+        "path": "residential-services/maps/vermilion_old_rod_house.png",
+        "sha256": "15dcad0d8105d9d4812efcfe646e0460be78c731323f061d4f2b63fd056ea2b2"
+      },
+      {
+        "path": "residential-services/maps/vermilion_pidgey_house.png",
+        "sha256": "c0fb7f1110a58d3e9741dfad88592a16330e61606d12ed131b43db2fadcc9beb"
+      },
+      {
+        "path": "residential-services/maps/vermilion_pokecenter.png",
+        "sha256": "5000499393de2034b0a421925149a1606a0aa6aab5fa7486fc6fba23192200a1"
+      },
+      {
+        "path": "residential-services/maps/vermilion_trade_house.png",
+        "sha256": "47e9a467abf3e9495e1d1ca6522076f267606258fd415f422a21faf0c65526ba"
+      },
+      {
+        "path": "residential-services/maps/viridian_forest_north_gate.png",
+        "sha256": "52aa91cf2463564873992d2779574175a427ea8eea6dfbcfc3c08ef803ffa646"
+      },
+      {
+        "path": "residential-services/maps/viridian_forest_south_gate.png",
+        "sha256": "6e79e976328af23047cce872a31ef0fbade679b66f98b4bb75021aa13031386d"
+      },
+      {
+        "path": "residential-services/maps/viridian_mart.png",
+        "sha256": "a7a3b9cea8fbd379690c6e4242f460fd79101c4ec87d218784e66965d5510e6e"
+      },
+      {
+        "path": "residential-services/maps/viridian_nickname_house.png",
+        "sha256": "7e8e24944f7652ad710e811ef78678188677aa252aebdf059ff158d7fe70ad3a"
+      },
+      {
+        "path": "residential-services/maps/viridian_pokecenter.png",
+        "sha256": "c4f26254e572cd61b93106018fef511626195fa6559063e8ea4518bc7afdc407"
+      },
+      {
+        "path": "residential-services/maps/viridian_school_house.png",
+        "sha256": "86698776bd5edd597863bd54ef786ff43447d222d5e495b60d6e458cfb872ce1"
+      },
+      {
+        "path": "residential-services/maps/wardens_house.png",
+        "sha256": "4311aec77a2b9e4a055868a2a142027718a1dd792f5ba1aa2b397b465de81a79"
+      },
+      {
+        "path": "residential-services/tilesets/club.png",
+        "sha256": "6647c9d82b4321e2d775c126fadc1184927043f1239878c9b6b25d85a457b1a9"
+      },
+      {
+        "path": "residential-services/tilesets/forest_gate.png",
+        "sha256": "25ef5b9d7e7bcaded9670bd8dd5ddcea463a5c2038874a7d47ef50fc3ef547d4"
+      },
+      {
+        "path": "residential-services/tilesets/gate.png",
+        "sha256": "25ef5b9d7e7bcaded9670bd8dd5ddcea463a5c2038874a7d47ef50fc3ef547d4"
+      },
+      {
+        "path": "residential-services/tilesets/house.png",
+        "sha256": "03922f8d04cb1b68b8a74bd7b960788ee6ff15c584e881610a4cfcf186e447e3"
+      },
+      {
+        "path": "residential-services/tilesets/lab.png",
+        "sha256": "147c31902b843945374442de77c6697bc75a5fb22c8b34b986e06a22319894e4"
+      },
+      {
+        "path": "residential-services/tilesets/lobby.png",
+        "sha256": "f8e72e3561b92c3ca1b838d97df185e21f4a2b776772ae58c55d96515164da01"
+      },
+      {
+        "path": "residential-services/tilesets/mart.png",
+        "sha256": "6644bf28b338441355d4d86cd50a7a7a37b7055f75af550b7e87fdc671ab165b"
+      },
+      {
+        "path": "residential-services/tilesets/museum.png",
+        "sha256": "25ef5b9d7e7bcaded9670bd8dd5ddcea463a5c2038874a7d47ef50fc3ef547d4"
+      },
+      {
+        "path": "residential-services/tilesets/pokecenter.png",
+        "sha256": "0b2314d82a580334f3c7d4b0265baeb705d283619d8b227937eae04844ec355f"
+      },
+      {
+        "path": "residential-services/tilesets/reds_house_1.png",
+        "sha256": "19a52c2ab499b9c5e41e3593293e4c864723f6ac5a7f12987b6c447f10c4037b"
+      },
+      {
+        "path": "residential-services/tilesets/reds_house_2.png",
+        "sha256": "19a52c2ab499b9c5e41e3593293e4c864723f6ac5a7f12987b6c447f10c4037b"
+      }
+    ],
+    "content_sha256": "95390973ab3b6bbb31800fcd577bc3791873b0a6501a32536fd75b1881291741",
+    "manifest_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+    "path": "test-results/full-color-map-background-atlases/manifest.json"
+  },
+  "batch": "residential-services",
+  "content": {
+    "maps": [
+      {
+        "id": 66,
+        "name": "BIKE_SHOP",
+        "tileset": "CLUB"
+      },
+      {
+        "id": 39,
+        "name": "BLUES_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 138,
+        "name": "CELADON_DINER",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 140,
+        "name": "CELADON_HOTEL",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 132,
+        "name": "CELADON_MANSION_ROOF_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 122,
+        "name": "CELADON_MART_1F",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 123,
+        "name": "CELADON_MART_2F",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 124,
+        "name": "CELADON_MART_3F",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 125,
+        "name": "CELADON_MART_4F",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 136,
+        "name": "CELADON_MART_5F",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 127,
+        "name": "CELADON_MART_ELEVATOR",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 126,
+        "name": "CELADON_MART_ROOF",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 133,
+        "name": "CELADON_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 67,
+        "name": "CERULEAN_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 63,
+        "name": "CERULEAN_MELANIES_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 64,
+        "name": "CERULEAN_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 62,
+        "name": "CERULEAN_TRASHED_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 167,
+        "name": "CINNABAR_LAB",
+        "tileset": "LAB"
+      },
+      {
+        "id": 170,
+        "name": "CINNABAR_LAB_FOSSIL_ROOM",
+        "tileset": "LAB"
+      },
+      {
+        "id": 169,
+        "name": "CINNABAR_LAB_METRONOME_ROOM",
+        "tileset": "LAB"
+      },
+      {
+        "id": 168,
+        "name": "CINNABAR_LAB_TRADE_ROOM",
+        "tileset": "LAB"
+      },
+      {
+        "id": 172,
+        "name": "CINNABAR_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 171,
+        "name": "CINNABAR_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 240,
+        "name": "COLOSSEUM",
+        "tileset": "CLUB"
+      },
+      {
+        "id": 175,
+        "name": "COPYCATS_HOUSE_1F",
+        "tileset": "REDS_HOUSE_1"
+      },
+      {
+        "id": 176,
+        "name": "COPYCATS_HOUSE_2F",
+        "tileset": "REDS_HOUSE_2"
+      },
+      {
+        "id": 72,
+        "name": "DAYCARE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 153,
+        "name": "FUCHSIA_BILLS_GRANDPAS_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 152,
+        "name": "FUCHSIA_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 158,
+        "name": "FUCHSIA_MEETING_ROOM",
+        "tileset": "LAB"
+      },
+      {
+        "id": 154,
+        "name": "FUCHSIA_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 135,
+        "name": "GAME_CORNER",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 137,
+        "name": "GAME_CORNER_PRIZE_ROOM",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 174,
+        "name": "INDIGO_PLATEAU_LOBBY",
+        "tileset": "MART"
+      },
+      {
+        "id": 151,
+        "name": "LAVENDER_CUBONE_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 150,
+        "name": "LAVENDER_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 141,
+        "name": "LAVENDER_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 149,
+        "name": "MR_FUJIS_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 183,
+        "name": "MR_PSYCHICS_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 68,
+        "name": "MT_MOON_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 52,
+        "name": "MUSEUM_1F",
+        "tileset": "MUSEUM"
+      },
+      {
+        "id": 53,
+        "name": "MUSEUM_2F",
+        "tileset": "MUSEUM"
+      },
+      {
+        "id": 229,
+        "name": "NAME_RATERS_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 56,
+        "name": "PEWTER_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 55,
+        "name": "PEWTER_NIDORAN_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 58,
+        "name": "PEWTER_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 57,
+        "name": "PEWTER_SPEECH_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 37,
+        "name": "REDS_HOUSE_1F",
+        "tileset": "REDS_HOUSE_1"
+      },
+      {
+        "id": 38,
+        "name": "REDS_HOUSE_2F",
+        "tileset": "REDS_HOUSE_2"
+      },
+      {
+        "id": 203,
+        "name": "ROCKET_HIDEOUT_ELEVATOR",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 81,
+        "name": "ROCK_TUNNEL_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 84,
+        "name": "ROUTE_11_GATE_1F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 86,
+        "name": "ROUTE_11_GATE_2F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 87,
+        "name": "ROUTE_12_GATE_1F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 195,
+        "name": "ROUTE_12_GATE_2F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 189,
+        "name": "ROUTE_12_SUPER_ROD_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 184,
+        "name": "ROUTE_15_GATE_1F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 185,
+        "name": "ROUTE_15_GATE_2F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 188,
+        "name": "ROUTE_16_FLY_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 186,
+        "name": "ROUTE_16_GATE_1F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 187,
+        "name": "ROUTE_16_GATE_2F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 190,
+        "name": "ROUTE_18_GATE_1F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 191,
+        "name": "ROUTE_18_GATE_2F",
+        "tileset": "GATE"
+      },
+      {
+        "id": 193,
+        "name": "ROUTE_22_GATE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 49,
+        "name": "ROUTE_2_GATE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 48,
+        "name": "ROUTE_2_TRADE_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 70,
+        "name": "ROUTE_5_GATE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 73,
+        "name": "ROUTE_6_GATE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 76,
+        "name": "ROUTE_7_GATE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 79,
+        "name": "ROUTE_8_GATE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 221,
+        "name": "SAFARI_ZONE_CENTER_REST_HOUSE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 224,
+        "name": "SAFARI_ZONE_EAST_REST_HOUSE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 156,
+        "name": "SAFARI_ZONE_GATE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 225,
+        "name": "SAFARI_ZONE_NORTH_REST_HOUSE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 222,
+        "name": "SAFARI_ZONE_SECRET_HOUSE",
+        "tileset": "LAB"
+      },
+      {
+        "id": 223,
+        "name": "SAFARI_ZONE_WEST_REST_HOUSE",
+        "tileset": "GATE"
+      },
+      {
+        "id": 180,
+        "name": "SAFFRON_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 179,
+        "name": "SAFFRON_PIDGEY_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 182,
+        "name": "SAFFRON_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 236,
+        "name": "SILPH_CO_ELEVATOR",
+        "tileset": "LOBBY"
+      },
+      {
+        "id": 239,
+        "name": "TRADE_CENTER",
+        "tileset": "CLUB"
+      },
+      {
+        "id": 71,
+        "name": "UNDERGROUND_PATH_ROUTE_5",
+        "tileset": "GATE"
+      },
+      {
+        "id": 74,
+        "name": "UNDERGROUND_PATH_ROUTE_6",
+        "tileset": "GATE"
+      },
+      {
+        "id": 77,
+        "name": "UNDERGROUND_PATH_ROUTE_7",
+        "tileset": "GATE"
+      },
+      {
+        "id": 78,
+        "name": "UNDERGROUND_PATH_ROUTE_7_COPY",
+        "tileset": "GATE"
+      },
+      {
+        "id": 80,
+        "name": "UNDERGROUND_PATH_ROUTE_8",
+        "tileset": "GATE"
+      },
+      {
+        "id": 91,
+        "name": "VERMILION_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 163,
+        "name": "VERMILION_OLD_ROD_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 93,
+        "name": "VERMILION_PIDGEY_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 89,
+        "name": "VERMILION_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 196,
+        "name": "VERMILION_TRADE_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 47,
+        "name": "VIRIDIAN_FOREST_NORTH_GATE",
+        "tileset": "FOREST_GATE"
+      },
+      {
+        "id": 50,
+        "name": "VIRIDIAN_FOREST_SOUTH_GATE",
+        "tileset": "FOREST_GATE"
+      },
+      {
+        "id": 42,
+        "name": "VIRIDIAN_MART",
+        "tileset": "MART"
+      },
+      {
+        "id": 44,
+        "name": "VIRIDIAN_NICKNAME_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 41,
+        "name": "VIRIDIAN_POKECENTER",
+        "tileset": "POKECENTER"
+      },
+      {
+        "id": 43,
+        "name": "VIRIDIAN_SCHOOL_HOUSE",
+        "tileset": "HOUSE"
+      },
+      {
+        "id": 155,
+        "name": "WARDENS_HOUSE",
+        "tileset": "LAB"
+      }
+    ],
+    "tilesets": [
+      {
+        "id": 1,
+        "name": "REDS_HOUSE_1"
+      },
+      {
+        "id": 2,
+        "name": "MART"
+      },
+      {
+        "id": 4,
+        "name": "REDS_HOUSE_2"
+      },
+      {
+        "id": 6,
+        "name": "POKECENTER"
+      },
+      {
+        "id": 8,
+        "name": "HOUSE"
+      },
+      {
+        "id": 9,
+        "name": "FOREST_GATE"
+      },
+      {
+        "id": 10,
+        "name": "MUSEUM"
+      },
+      {
+        "id": 12,
+        "name": "GATE"
+      },
+      {
+        "id": 18,
+        "name": "LOBBY"
+      },
+      {
+        "id": 20,
+        "name": "LAB"
+      },
+      {
+        "id": 21,
+        "name": "CLUB"
+      }
+    ]
+  },
+  "retained_artifacts": [
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-color-f3fcaa3b/residential-services/bedroom/frame-strip.png",
+          "sha256": "bb6caa2c0c3b64757432459e9b5dd487bf425b0eb738f5f11de1f2ea7092aa5e"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-color-f3fcaa3b/residential-services/bedroom/screenshot.png",
+          "sha256": "4c8d60fe224061a0c6ed39e9aff8a1a6f145c06a761152f8314ed30149b3a150"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-color-f3fcaa3b/residential-services/viridian-mart/frame-strip.png",
+          "sha256": "f360be4ab1bd23852ef7b92b1e22ad8d074e60ebb9404e80bd4de7c2686af2af"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-color-f3fcaa3b/residential-services/viridian-mart/screenshot.png",
+          "sha256": "0e879e633ae94c236ce715c843993c7a1cc19505de6c744ca9eba40b220e2188"
+        }
+      ],
+      "manifest_path": "test-results/phase3-residential-bedroom-mart-pokeyellow-color-f3fcaa3b/retained-artifacts.json",
+      "manifest_sha256": "5078814ca737e287882ae743677453cf3fd42d537aa723057f50f4dec8a0596d",
+      "mode": "color",
+      "product": "pokeyellow"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-yellow-049c0f8b/residential-services/bedroom/frame-strip.png",
+          "sha256": "79bf9f40a5b040e23969ab742ecb2206f5c5b4657375f21573a295330ac20826"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-yellow-049c0f8b/residential-services/bedroom/screenshot.png",
+          "sha256": "731efaf7be9946cf32576589b2a9bbb68a8a58adbf7c54766c22a0e6dc44b4d2"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-yellow-049c0f8b/residential-services/viridian-mart/frame-strip.png",
+          "sha256": "be4301ba0932e030f2e4e1863defc504f2fb0f9e423b9f3678d29ecc0696215c"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow-yellow-049c0f8b/residential-services/viridian-mart/screenshot.png",
+          "sha256": "13554300feb846c49ee5d287fa82741b123fa4a5352a412db16a2367b553d33d"
+        }
+      ],
+      "manifest_path": "test-results/phase3-residential-bedroom-mart-pokeyellow-yellow-049c0f8b/retained-artifacts.json",
+      "manifest_sha256": "4072a2773c644074c1f7ef305c00df7ccba50b5d089dc1c6702724f117e6b425",
+      "mode": "yellow",
+      "product": "pokeyellow"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-color-d85766dc/residential-services/bedroom/frame-strip.png",
+          "sha256": "bb6caa2c0c3b64757432459e9b5dd487bf425b0eb738f5f11de1f2ea7092aa5e"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-color-d85766dc/residential-services/bedroom/screenshot.png",
+          "sha256": "4c8d60fe224061a0c6ed39e9aff8a1a6f145c06a761152f8314ed30149b3a150"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-color-d85766dc/residential-services/viridian-mart/frame-strip.png",
+          "sha256": "40f174d9d8db7bd171e0c08a52a2e2baaa34c3b3eed747b83fb390026a5a3bad"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-color-d85766dc/residential-services/viridian-mart/screenshot.png",
+          "sha256": "5ee948f7ce46d2e38173db75457c906bda41592871b2c70f876dafb75ce769ae"
+        }
+      ],
+      "manifest_path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-color-d85766dc/retained-artifacts.json",
+      "manifest_sha256": "03dde9dd88745c6c48cb9d3d835b4724a2edfea4edf625f4ed0c0891e831c65e",
+      "mode": "color",
+      "product": "pokeyellow_debug"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-yellow-9d051f86/residential-services/bedroom/frame-strip.png",
+          "sha256": "79bf9f40a5b040e23969ab742ecb2206f5c5b4657375f21573a295330ac20826"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-yellow-9d051f86/residential-services/bedroom/screenshot.png",
+          "sha256": "731efaf7be9946cf32576589b2a9bbb68a8a58adbf7c54766c22a0e6dc44b4d2"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-yellow-9d051f86/residential-services/viridian-mart/frame-strip.png",
+          "sha256": "a899a1339162009171eb21b424cb1f64b0d3c66a64a29d4270d06beec56bf549"
+        },
+        {
+          "path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-yellow-9d051f86/residential-services/viridian-mart/screenshot.png",
+          "sha256": "2e1066565e77723a0247685ff57f69a955ca08d84ae4b80d60c95bc90836830c"
+        }
+      ],
+      "manifest_path": "test-results/phase3-residential-bedroom-mart-pokeyellow_debug-yellow-9d051f86/retained-artifacts.json",
+      "manifest_sha256": "02cab880505552ff5b0431602a7a71c9a1093cef396cd8720f5ef33606c81369",
+      "mode": "yellow",
+      "product": "pokeyellow_debug"
+    }
+  ],
+  "review": {
+    "observations": [
+      "All 98 residential-services map sheets and all 11 tileset sheets retained coherent walls, floors, furniture, counters, doors, and service-area detail with no unexplained palette discontinuities.",
+      "Normal and debug Color route frames retained distinct bedroom furniture and Viridian Mart counter/shop detail; the paired Yellow frames retained the Yellow reference presentation."
+    ],
+    "products": [
+      {
+        "mode": "color",
+        "product": "pokeyellow"
+      },
+      {
+        "mode": "yellow",
+        "product": "pokeyellow"
+      },
+      {
+        "mode": "color",
+        "product": "pokeyellow_debug"
+      },
+      {
+        "mode": "yellow",
+        "product": "pokeyellow_debug"
+      }
+    ],
+    "result": "accepted",
+    "review_kind": "independent-ai-visual",
+    "reviewer": "Codex independent visual review (residential-services)",
+    "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+    "route": "phase3-residential-bedroom-mart"
+  },
+  "reviewed_candidate": {
+    "ledger_canonical_sha256": "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
+    "path": "test-results/full-color-proposals/map-background-content.proposal.json",
+    "sha256": "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
+    "source_semantic_sha256": "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c"
+  },
+  "reviews": {
+    "map-122": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 122,
+      "content_kind": "map",
+      "content_name": "CELADON_MART_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-123": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 123,
+      "content_kind": "map",
+      "content_name": "CELADON_MART_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-124": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 124,
+      "content_kind": "map",
+      "content_name": "CELADON_MART_3F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-125": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 125,
+      "content_kind": "map",
+      "content_name": "CELADON_MART_4F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-126": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 126,
+      "content_kind": "map",
+      "content_name": "CELADON_MART_ROOF",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-127": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 127,
+      "content_kind": "map",
+      "content_name": "CELADON_MART_ELEVATOR",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-132": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 132,
+      "content_kind": "map",
+      "content_name": "CELADON_MANSION_ROOF_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-133": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 133,
+      "content_kind": "map",
+      "content_name": "CELADON_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-135": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 135,
+      "content_kind": "map",
+      "content_name": "GAME_CORNER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-136": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 136,
+      "content_kind": "map",
+      "content_name": "CELADON_MART_5F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-137": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 137,
+      "content_kind": "map",
+      "content_name": "GAME_CORNER_PRIZE_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-138": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 138,
+      "content_kind": "map",
+      "content_name": "CELADON_DINER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-140": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 140,
+      "content_kind": "map",
+      "content_name": "CELADON_HOTEL",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-141": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 141,
+      "content_kind": "map",
+      "content_name": "LAVENDER_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-149": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 149,
+      "content_kind": "map",
+      "content_name": "MR_FUJIS_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-150": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 150,
+      "content_kind": "map",
+      "content_name": "LAVENDER_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-151": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 151,
+      "content_kind": "map",
+      "content_name": "LAVENDER_CUBONE_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-152": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 152,
+      "content_kind": "map",
+      "content_name": "FUCHSIA_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-153": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 153,
+      "content_kind": "map",
+      "content_name": "FUCHSIA_BILLS_GRANDPAS_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-154": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 154,
+      "content_kind": "map",
+      "content_name": "FUCHSIA_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-155": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 155,
+      "content_kind": "map",
+      "content_name": "WARDENS_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-156": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 156,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-158": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 158,
+      "content_kind": "map",
+      "content_name": "FUCHSIA_MEETING_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-163": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 163,
+      "content_kind": "map",
+      "content_name": "VERMILION_OLD_ROD_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-167": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 167,
+      "content_kind": "map",
+      "content_name": "CINNABAR_LAB",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-168": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 168,
+      "content_kind": "map",
+      "content_name": "CINNABAR_LAB_TRADE_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-169": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 169,
+      "content_kind": "map",
+      "content_name": "CINNABAR_LAB_METRONOME_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-170": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 170,
+      "content_kind": "map",
+      "content_name": "CINNABAR_LAB_FOSSIL_ROOM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-171": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 171,
+      "content_kind": "map",
+      "content_name": "CINNABAR_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-172": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 172,
+      "content_kind": "map",
+      "content_name": "CINNABAR_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-174": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 174,
+      "content_kind": "map",
+      "content_name": "INDIGO_PLATEAU_LOBBY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-175": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 175,
+      "content_kind": "map",
+      "content_name": "COPYCATS_HOUSE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-176": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 176,
+      "content_kind": "map",
+      "content_name": "COPYCATS_HOUSE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-179": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 179,
+      "content_kind": "map",
+      "content_name": "SAFFRON_PIDGEY_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-180": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 180,
+      "content_kind": "map",
+      "content_name": "SAFFRON_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-182": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 182,
+      "content_kind": "map",
+      "content_name": "SAFFRON_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-183": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 183,
+      "content_kind": "map",
+      "content_name": "MR_PSYCHICS_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-184": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 184,
+      "content_kind": "map",
+      "content_name": "ROUTE_15_GATE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-185": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 185,
+      "content_kind": "map",
+      "content_name": "ROUTE_15_GATE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-186": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 186,
+      "content_kind": "map",
+      "content_name": "ROUTE_16_GATE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-187": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 187,
+      "content_kind": "map",
+      "content_name": "ROUTE_16_GATE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-188": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 188,
+      "content_kind": "map",
+      "content_name": "ROUTE_16_FLY_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-189": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 189,
+      "content_kind": "map",
+      "content_name": "ROUTE_12_SUPER_ROD_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-190": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 190,
+      "content_kind": "map",
+      "content_name": "ROUTE_18_GATE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-191": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 191,
+      "content_kind": "map",
+      "content_name": "ROUTE_18_GATE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-193": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 193,
+      "content_kind": "map",
+      "content_name": "ROUTE_22_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-195": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 195,
+      "content_kind": "map",
+      "content_name": "ROUTE_12_GATE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-196": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 196,
+      "content_kind": "map",
+      "content_name": "VERMILION_TRADE_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-203": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 203,
+      "content_kind": "map",
+      "content_name": "ROCKET_HIDEOUT_ELEVATOR",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-221": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 221,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_CENTER_REST_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-222": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 222,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_SECRET_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-223": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 223,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_WEST_REST_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-224": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 224,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_EAST_REST_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-225": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 225,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_NORTH_REST_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-229": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 229,
+      "content_kind": "map",
+      "content_name": "NAME_RATERS_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-236": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 236,
+      "content_kind": "map",
+      "content_name": "SILPH_CO_ELEVATOR",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-239": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 239,
+      "content_kind": "map",
+      "content_name": "TRADE_CENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-240": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 240,
+      "content_kind": "map",
+      "content_name": "COLOSSEUM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-37": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 37,
+      "content_kind": "map",
+      "content_name": "REDS_HOUSE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-38": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 38,
+      "content_kind": "map",
+      "content_name": "REDS_HOUSE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-39": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 39,
+      "content_kind": "map",
+      "content_name": "BLUES_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-41": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 41,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-42": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 42,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-43": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 43,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_SCHOOL_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-44": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 44,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_NICKNAME_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-47": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 47,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_FOREST_NORTH_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-48": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 48,
+      "content_kind": "map",
+      "content_name": "ROUTE_2_TRADE_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-49": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 49,
+      "content_kind": "map",
+      "content_name": "ROUTE_2_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-50": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 50,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_FOREST_SOUTH_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-52": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 52,
+      "content_kind": "map",
+      "content_name": "MUSEUM_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-53": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 53,
+      "content_kind": "map",
+      "content_name": "MUSEUM_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-55": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 55,
+      "content_kind": "map",
+      "content_name": "PEWTER_NIDORAN_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-56": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 56,
+      "content_kind": "map",
+      "content_name": "PEWTER_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-57": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 57,
+      "content_kind": "map",
+      "content_name": "PEWTER_SPEECH_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-58": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 58,
+      "content_kind": "map",
+      "content_name": "PEWTER_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-62": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 62,
+      "content_kind": "map",
+      "content_name": "CERULEAN_TRASHED_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-63": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 63,
+      "content_kind": "map",
+      "content_name": "CERULEAN_MELANIES_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-64": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 64,
+      "content_kind": "map",
+      "content_name": "CERULEAN_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-66": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 66,
+      "content_kind": "map",
+      "content_name": "BIKE_SHOP",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-67": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 67,
+      "content_kind": "map",
+      "content_name": "CERULEAN_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-68": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 68,
+      "content_kind": "map",
+      "content_name": "MT_MOON_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-70": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 70,
+      "content_kind": "map",
+      "content_name": "ROUTE_5_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-71": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 71,
+      "content_kind": "map",
+      "content_name": "UNDERGROUND_PATH_ROUTE_5",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-72": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 72,
+      "content_kind": "map",
+      "content_name": "DAYCARE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-73": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 73,
+      "content_kind": "map",
+      "content_name": "ROUTE_6_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-74": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 74,
+      "content_kind": "map",
+      "content_name": "UNDERGROUND_PATH_ROUTE_6",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-76": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 76,
+      "content_kind": "map",
+      "content_name": "ROUTE_7_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-77": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 77,
+      "content_kind": "map",
+      "content_name": "UNDERGROUND_PATH_ROUTE_7",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-78": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 78,
+      "content_kind": "map",
+      "content_name": "UNDERGROUND_PATH_ROUTE_7_COPY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-79": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 79,
+      "content_kind": "map",
+      "content_name": "ROUTE_8_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-80": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 80,
+      "content_kind": "map",
+      "content_name": "UNDERGROUND_PATH_ROUTE_8",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-81": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 81,
+      "content_kind": "map",
+      "content_name": "ROCK_TUNNEL_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-84": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 84,
+      "content_kind": "map",
+      "content_name": "ROUTE_11_GATE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-86": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 86,
+      "content_kind": "map",
+      "content_name": "ROUTE_11_GATE_2F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-87": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 87,
+      "content_kind": "map",
+      "content_name": "ROUTE_12_GATE_1F",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-89": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 89,
+      "content_kind": "map",
+      "content_name": "VERMILION_POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-91": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 91,
+      "content_kind": "map",
+      "content_name": "VERMILION_MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "map-93": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 93,
+      "content_kind": "map",
+      "content_name": "VERMILION_PIDGEY_HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-1": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 1,
+      "content_kind": "tileset",
+      "content_name": "REDS_HOUSE_1",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-10": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 10,
+      "content_kind": "tileset",
+      "content_name": "MUSEUM",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-12": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 12,
+      "content_kind": "tileset",
+      "content_name": "GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-18": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 18,
+      "content_kind": "tileset",
+      "content_name": "LOBBY",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-2": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 2,
+      "content_kind": "tileset",
+      "content_name": "MART",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-20": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 20,
+      "content_kind": "tileset",
+      "content_name": "LAB",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-21": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 21,
+      "content_kind": "tileset",
+      "content_name": "CLUB",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-4": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 4,
+      "content_kind": "tileset",
+      "content_name": "REDS_HOUSE_2",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-6": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 6,
+      "content_kind": "tileset",
+      "content_name": "POKECENTER",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-8": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 8,
+      "content_kind": "tileset",
+      "content_name": "HOUSE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    },
+    "tileset-9": {
+      "atlas_sha256": "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110",
+      "content_id": 9,
+      "content_kind": "tileset",
+      "content_name": "FOREST_GATE",
+      "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+      "route": "phase3-residential-bedroom-mart"
+    }
+  },
+  "schema": "full-color-map-background-review-v2"
+}

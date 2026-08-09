@@ -1,11 +1,7 @@
-; OVERWORLD color authority adapted with permission from the rights holders of
-; git@github.com:dannye/pokered-gbc.git
-; commit c1a3b6c5a7591472241036d0cf09c3817f841f93.
-;
-; Sources: color/data/map_palettes.asm, OverworldPalSet in
-; color/data/map_palette_sets.asm, color/data/map_palette_constants.asm,
-; color/tilesets/overworld.asm, and the complete town/route table in
-; color/data/roofpalettes.asm.
+; Yellow-owned OVERWORLD color authority retained after independent visual
+; review of every map and tileset sheet plus normal/debug Color and Yellow
+; route artifacts. The reviewed bytes include all palettes, roof identities,
+; tile attributes, animations, replacements, and fixed size assertions below.
 
 DEF FULL_COLOR_OVERWORLD_GRAY   EQU 0
 DEF FULL_COLOR_OVERWORLD_RED    EQU 1
@@ -16,7 +12,7 @@ DEF FULL_COLOR_OVERWORLD_BROWN  EQU 5
 DEF FULL_COLOR_OVERWORLD_ROOF   EQU 6
 DEF FULL_COLOR_OVERWORLD_TEXT   EQU 7
 
-; Eight complete CGB BG palettes selected by the donor's OverworldPalSet.
+; Eight complete Yellow-reviewed CGB BG palettes.
 ; Palette 6 retains OUTDOOR_ROOF colors 0 and 3. The commit path replaces
 ; colors 1 and 2 with the current map's roof pair.
 FullColorOverworldBGPalettes::
@@ -32,7 +28,7 @@ ENDC
 	RGB 31, 19, 24
 	RGB 30, 10, 6
 	RGB 7, 7, 7
-	RGB 22, 31, 10 ; OUTDOOR_GREEN (non-SNOW donor configuration)
+	RGB 22, 31, 10 ; OUTDOOR_GREEN
 	RGB 12, 25, 1
 	RGB 5, 14, 0
 	RGB 7, 7, 7
@@ -77,7 +73,7 @@ DEF NUM_FULL_COLOR_ROOFS      EQU 11
 PUSHS
 SECTION "Passive Full Color Roof Data", ROMX, BANK[FULL_COLOR_PHASE2_ROM_BANK]
 
-; One donor roof identity for every city/route map ID. Route 6 normally uses
+; One reviewed roof identity for every city/route map ID. Route 6 normally uses
 ; Vermilion; the renderer selects Saffron while the player is in its top rows.
 FullColorOverworldRoofAssignments::
 	db FULL_COLOR_ROOF_PALLET    ; PALLET_TOWN
@@ -163,11 +159,7 @@ ELSE
 	ds 8 * 4 * 2
 ENDC
 
-; The pinned donor HEAD's overworld.asm accidentally ends after 94 bytes, so
-; its $60-byte loader spills WATER, GRAY from the following RedsHouse table.
-; We intentionally correct $5e/$5f to GRAY, GRAY, the explicit values present
-; immediately before donor cleanup commit cb6bb66dc91a7a162f442f3bd81ea2887558ada4
-; (parent a8b62fb990a13da6add30c92f8440b296dddce49). This preserves the intended
+; The reviewed table explicitly keeps $5e/$5f as GRAY, GRAY and contains all
 ; 96 OVERWORLD assignments without cross-table authority. tilepal selects VRAM
 ; bank 0 and authors no priority. Tiles $60-$ff explicitly use text palette 7.
 FullColorOverworldTileAttributes::

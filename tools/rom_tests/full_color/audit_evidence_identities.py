@@ -156,9 +156,7 @@ def _updated_assignments(
     baseline_hashes: dict[str, str],
     audit_hashes: dict[str, str],
 ) -> DiscoveryAssignmentAuthority:
-    baseline = tuple(
-        row for row in authority.rows if row.product == BASELINE_PRODUCT
-    )
+    baseline = tuple(row for row in authority.rows if row.product == BASELINE_PRODUCT)
     baseline_ids = frozenset(row.id for row in baseline)
     if baseline_ids != BASELINE_ASSIGNMENT_IDS or len(baseline) != len(
         BASELINE_ASSIGNMENT_IDS
@@ -172,8 +170,9 @@ def _updated_assignments(
         if row.product == BASELINE_PRODUCT:
             evidence = replace(row.evidence, **baseline_hashes)
         else:
-            # Phase 2's producer owns all product-specific slice assignments.
-            evidence = row.evidence
+            # A source-only transition does not alter the product-specific ROM,
+            # map, or symbol authorities owned by Phase 2.
+            evidence = replace(row.evidence, source_sha256=source_sha256)
         rows.append(replace(row, evidence=evidence))
     return DiscoveryAssignmentAuthority(tuple(rows))
 
@@ -182,7 +181,9 @@ def _assert_assignment_delta(
     before: DiscoveryAssignmentAuthority, after: DiscoveryAssignmentAuthority
 ) -> None:
     if len(before.rows) != len(after.rows):
-        raise AuditEvidenceIdentityError("assignment row count changed during rebinding")
+        raise AuditEvidenceIdentityError(
+            "assignment row count changed during rebinding"
+        )
     for old, new in zip(before.rows, after.rows, strict=True):
         old_dict = old.to_dict()
         new_dict = new.to_dict()
@@ -226,8 +227,62 @@ def _updated_document(
         if row.get("id") in baseline_ids:
             evidence.update(baseline_hashes)
             continue
-        # Phase 2 rows are refreshed by phase2_measurements for all products.
+        evidence["source_sha256"] = source_sha256
     return raw
+
+
+def apply_reviewed_proposal(
+    root: Path, transition_proposal: Path, proposal_path: Path
+) -> None:
+    """Apply one canonically recomputed, explicitly reviewed hash-only proposal."""
+    supplied = json.loads(proposal_path.read_text(encoding="utf-8"))
+    expected = propose(root, transition_proposal)
+    if supplied != expected:
+        raise AuditEvidenceIdentityError(
+            "reviewed audit-evidence proposal does not match canonical recomputation"
+        )
+    for relative_text, document in supplied["documents"].items():
+        relative = Path(relative_text)
+        if relative not in DOCUMENTS:
+            raise AuditEvidenceIdentityError(
+                f"proposal names an unauthorized inventory: {relative}"
+            )
+        path = root / relative
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        by_id = {row["id"]: row for row in raw["rows"]}
+        for change in document["changes"]:
+            row = by_id.get(change["id"])
+            if row is None:
+                raise AuditEvidenceIdentityError(
+                    f"proposal names an unknown row: {relative}:{change['id']}"
+                )
+            current = _evidence_hashes(row.get("evidence", {}))
+            if current != change["current"]:
+                raise AuditEvidenceIdentityError(
+                    f"proposal preimage changed: {relative}:{change['id']}"
+                )
+            changed_fields = {
+                field
+                for field in HASH_FIELDS
+                if change["current"][field] != change["proposed"][field]
+            }
+            if changed_fields - {
+                "source_sha256",
+                "rom_sha256",
+                "map_sha256",
+                "sym_sha256",
+            }:
+                raise AuditEvidenceIdentityError(
+                    f"proposal changes non-identity evidence: {relative}:{change['id']}"
+                )
+            row["evidence"].update(change["proposed"])
+        document_type = DOCUMENTS[relative]
+        checked = (
+            DiscoveryAssignmentAuthority.from_dict(raw)
+            if relative.name == "assignments.json"
+            else document_type.from_dict(raw)
+        )
+        path.write_text(checked.to_json(), encoding="utf-8")
 
 
 def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
@@ -251,15 +306,19 @@ def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
     ):
         raise AuditEvidenceIdentityError("source-transition proposal is malformed")
     transition = envelope["proposal"]
-    if set(transition) != {
-        "schema",
-        "reviewed_source_sha256",
-        "current_source_sha256",
-        "baseline_manifest_sha256",
-        "reviewed_delta_paths",
-        "subject_rebindings",
-        "rom_subject_rebindings",
-    } or transition["schema"] != source_transition.SCHEMA:
+    if (
+        set(transition)
+        != {
+            "schema",
+            "reviewed_source_sha256",
+            "current_source_sha256",
+            "baseline_manifest_sha256",
+            "reviewed_delta_paths",
+            "subject_rebindings",
+            "rom_subject_rebindings",
+        }
+        or transition["schema"] != source_transition.SCHEMA
+    ):
         raise AuditEvidenceIdentityError("source-transition authority is malformed")
     source_sha256 = transition["current_source_sha256"]
     if (
@@ -293,9 +352,7 @@ def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
     for relative, document_type in DOCUMENTS.items():
         path = root / relative
         raw = json.loads(path.read_text(encoding="utf-8"))
-        before_by_id = {
-            row["id"]: json.loads(json.dumps(row)) for row in raw["rows"]
-        }
+        before_by_id = {row["id"]: json.loads(json.dumps(row)) for row in raw["rows"]}
         if relative.name == "assignments.json":
             before = DiscoveryAssignmentAuthority.from_dict(raw)
             document = _updated_assignments(
@@ -335,15 +392,32 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--transition-proposal", type=Path, required=True)
-    parser.add_argument("--proposal-output", type=Path, required=True)
+    outputs = parser.add_mutually_exclusive_group(required=True)
+    outputs.add_argument("--proposal-output", type=Path)
+    outputs.add_argument("--apply-proposal", type=Path)
+    parser.add_argument("--authority-reviewed", action="store_true")
     args = parser.parse_args(argv)
     try:
-        proposal = propose(args.root, args.transition_proposal)
-        args.proposal_output.parent.mkdir(parents=True, exist_ok=True)
-        args.proposal_output.write_text(
-            json.dumps(proposal, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
+        if args.apply_proposal is not None:
+            if not args.authority_reviewed:
+                raise AuditEvidenceIdentityError(
+                    "applying checked-in identity changes requires --authority-reviewed"
+                )
+            apply_reviewed_proposal(
+                args.root, args.transition_proposal, args.apply_proposal
+            )
+        else:
+            if args.authority_reviewed:
+                raise AuditEvidenceIdentityError(
+                    "--authority-reviewed applies only to a reviewed proposal"
+                )
+            proposal = propose(args.root, args.transition_proposal)
+            assert args.proposal_output is not None
+            args.proposal_output.parent.mkdir(parents=True, exist_ok=True)
+            args.proposal_output.write_text(
+                json.dumps(proposal, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
     except (OSError, ValueError, AuditEvidenceIdentityError) as exc:
         parser.error(str(exc))
     return 0

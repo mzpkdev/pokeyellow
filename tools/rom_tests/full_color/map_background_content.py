@@ -12,11 +12,23 @@ from typing import Any
 
 
 SCHEMA = "full-color-map-background-content-v1"
-REVIEW_SCHEMA = "full-color-map-background-review-v1"
+REVIEW_SCHEMA = "full-color-map-background-review-v2"
 LEDGER_PATH = Path("specs/full-colors/inventory/map-background-content.json")
-# This source-controlled allowlist is intentionally empty until a later phase adds
-# an independently reviewed record and its canonical JSON digest deliberately.
-REVIEW_RECORD_SHA256_ALLOWLIST: dict[str, str] = {}
+# Each independently reviewed record is pinned by the canonical JSON digest of
+# the complete document. A plausible record copied beside the ledger therefore
+# cannot grant itself promotion authority.
+REVIEW_RECORD_SHA256_ALLOWLIST: dict[str, str] = {
+    "specs/full-colors/evidence/map-background-reviews/overworld.json": (
+        "c01ad4f35ac50992d125b6681f7d352b2dd67e9c90b231cfcbd1aa449ffa7772"
+    ),
+    "specs/full-colors/evidence/map-background-reviews/residential-services.json": (
+        "17203709f3713f41bb54faee83cd2e60bf186f9a41f7fdd90d9beb7871b90f28"
+    ),
+    "specs/full-colors/evidence/map-background-reviews/"
+    "challenge-special-interiors.json": (
+        "ad32754b0f0e28d4ffa4067679a78b8c2e246cdac1cca11f12bfa2dc3eeb585a"
+    ),
+}
 # Yellow's source has one historical concrete-copy header whose internal block-data
 # constant names its original map. Keep the exception exact across every identity
 # axis so it cannot authorize another mismatch.
@@ -1617,6 +1629,9 @@ def _review_finding(
     content_kind: str,
     content_id: int,
     content_name: str,
+    batch: str,
+    batch_tilesets: tuple[dict[str, object], ...],
+    batch_maps: tuple[dict[str, object], ...],
     review: Review,
 ) -> str | None:
     authority_path, separator, record_id = review.authority.partition("#")
@@ -1646,14 +1661,217 @@ def _review_finding(
             raise MapBackgroundContentError(
                 f"{path}: canonical SHA-256 does not match independent allowlist"
             )
-        document = _object(raw, path=str(path), fields={"schema", "reviews"})
+        document = _object(
+            raw,
+            path=str(path),
+            fields={
+                "schema",
+                "batch",
+                "review",
+                "atlas",
+                "reviewed_candidate",
+                "content",
+                "retained_artifacts",
+                "reviews",
+            },
+        )
         if document["schema"] != REVIEW_SCHEMA:
             raise MapBackgroundContentError(
                 f"{path}.schema: expected {REVIEW_SCHEMA!r}"
             )
+        if document["batch"] != batch:
+            raise MapBackgroundContentError(f"{path}.batch: wrong batch identity")
+        review_summary = _object(
+            document["review"],
+            path=f"{path}.review",
+            fields={
+                "review_kind",
+                "reviewer",
+                "result",
+                "revision",
+                "route",
+                "products",
+                "observations",
+            },
+        )
+        if review_summary["review_kind"] != "independent-ai-visual":
+            raise MapBackgroundContentError(
+                f"{path}.review.review_kind: independent AI review required"
+            )
+        if review_summary["result"] != "accepted":
+            raise MapBackgroundContentError(
+                f"{path}.review.result: review not accepted"
+            )
+        _string(review_summary["reviewer"], path=f"{path}.review.reviewer")
+        if review_summary["revision"] != review.revision:
+            raise MapBackgroundContentError(
+                f"{path}.review.revision: identity mismatch"
+            )
+        if review_summary["route"] != review.route:
+            raise MapBackgroundContentError(f"{path}.review.route: identity mismatch")
+        products = review_summary["products"]
+        expected_products = [
+            {"product": product, "mode": mode}
+            for product in ("pokeyellow", "pokeyellow_debug")
+            for mode in ("color", "yellow")
+        ]
+        if products != expected_products:
+            raise MapBackgroundContentError(
+                f"{path}.review.products: exact normal/debug Color+Yellow set required"
+            )
+        observations = review_summary["observations"]
+        if (
+            not isinstance(observations, list)
+            or len(observations) < 2
+            or any(
+                not isinstance(value, str) or not value.strip()
+                for value in observations
+            )
+        ):
+            raise MapBackgroundContentError(
+                f"{path}.review.observations: concrete observations required"
+            )
+        atlas = _object(
+            document["atlas"],
+            path=f"{path}.atlas",
+            fields={"path", "manifest_sha256", "content_sha256", "artifacts"},
+        )
+        if (
+            atlas["path"]
+            != "test-results/full-color-map-background-atlases/manifest.json"
+        ):
+            raise MapBackgroundContentError(f"{path}.atlas.path: wrong producer path")
+        if atlas["manifest_sha256"] != review.atlas_sha256:
+            raise MapBackgroundContentError(
+                f"{path}.atlas.manifest_sha256: identity mismatch"
+            )
+        _string(
+            atlas["content_sha256"],
+            path=f"{path}.atlas.content_sha256",
+            pattern=_SHA256_RE,
+        )
+        atlas_artifacts = atlas["artifacts"]
+        if not isinstance(atlas_artifacts, list) or not atlas_artifacts:
+            raise MapBackgroundContentError(f"{path}.atlas.artifacts: expected array")
+        for index, artifact in enumerate(atlas_artifacts):
+            artifact_row = _object(
+                artifact,
+                path=f"{path}.atlas.artifacts[{index}]",
+                fields={"path", "sha256"},
+            )
+            artifact_path = _string(
+                artifact_row["path"], path=f"{path}.atlas.artifacts[{index}].path"
+            )
+            if not artifact_path.startswith(f"{batch}/"):
+                raise MapBackgroundContentError(
+                    f"{path}.atlas.artifacts[{index}].path: outside batch"
+                )
+            _string(
+                artifact_row["sha256"],
+                path=f"{path}.atlas.artifacts[{index}].sha256",
+                pattern=_SHA256_RE,
+            )
+        candidate = _object(
+            document["reviewed_candidate"],
+            path=f"{path}.reviewed_candidate",
+            fields={
+                "path",
+                "sha256",
+                "ledger_canonical_sha256",
+                "source_semantic_sha256",
+            },
+        )
+        if (
+            candidate["path"]
+            != "test-results/full-color-proposals/map-background-content.proposal.json"
+        ):
+            raise MapBackgroundContentError(
+                f"{path}.reviewed_candidate.path: wrong proposal path"
+            )
+        for field in ("sha256", "ledger_canonical_sha256", "source_semantic_sha256"):
+            _string(
+                candidate[field],
+                path=f"{path}.reviewed_candidate.{field}",
+                pattern=_SHA256_RE,
+            )
+        content = _object(
+            document["content"],
+            path=f"{path}.content",
+            fields={"tilesets", "maps"},
+        )
+        if content["tilesets"] != list(batch_tilesets) or content["maps"] != list(
+            batch_maps
+        ):
+            raise MapBackgroundContentError(
+                f"{path}.content: exact promoted batch membership required"
+            )
+        retained = document["retained_artifacts"]
+        if not isinstance(retained, list) or len(retained) != 4:
+            raise MapBackgroundContentError(
+                f"{path}.retained_artifacts: exact four product/mode manifests required"
+            )
+        retained_products: list[dict[str, str]] = []
+        for index, retained_raw in enumerate(retained):
+            retained_row = _object(
+                retained_raw,
+                path=f"{path}.retained_artifacts[{index}]",
+                fields={
+                    "manifest_path",
+                    "manifest_sha256",
+                    "product",
+                    "mode",
+                    "artifacts",
+                },
+            )
+            product = _string(
+                retained_row["product"],
+                path=f"{path}.retained_artifacts[{index}].product",
+            )
+            mode = _string(
+                retained_row["mode"],
+                path=f"{path}.retained_artifacts[{index}].mode",
+            )
+            retained_products.append({"product": product, "mode": mode})
+            _string(
+                retained_row["manifest_sha256"],
+                path=f"{path}.retained_artifacts[{index}].manifest_sha256",
+                pattern=_SHA256_RE,
+            )
+            artifact_rows = retained_row["artifacts"]
+            if not isinstance(artifact_rows, list) or not artifact_rows:
+                raise MapBackgroundContentError(
+                    f"{path}.retained_artifacts[{index}].artifacts: expected array"
+                )
+            for artifact_index, artifact in enumerate(artifact_rows):
+                frame = _object(
+                    artifact,
+                    path=f"{path}.retained_artifacts[{index}].artifacts[{artifact_index}]",
+                    fields={"path", "sha256"},
+                )
+                _string(
+                    frame["path"],
+                    path=f"{path}.retained_artifacts[{index}].artifacts[{artifact_index}].path",
+                )
+                _string(
+                    frame["sha256"],
+                    path=f"{path}.retained_artifacts[{index}].artifacts[{artifact_index}].sha256",
+                    pattern=_SHA256_RE,
+                )
+        if retained_products != expected_products:
+            raise MapBackgroundContentError(
+                f"{path}.retained_artifacts: product/mode order or membership drifted"
+            )
         records = document["reviews"]
         if not isinstance(records, dict):
             raise MapBackgroundContentError(f"{path}.reviews: expected object")
+        expected_record_ids = {
+            *(f"tileset-{row['id']}" for row in batch_tilesets),
+            *(f"map-{row['id']}" for row in batch_maps),
+        }
+        if set(records) != expected_record_ids:
+            raise MapBackgroundContentError(
+                f"{path}.reviews: exact promoted identities required"
+            )
         record = _object(
             records.get(record_id),
             path=f"{path}#{record_id}",
@@ -1811,6 +2029,21 @@ class MapBackgroundAuthority:
                     content_kind="tileset",
                     content_id=row.id,
                     content_name=row.name,
+                    batch=row.batch,
+                    batch_tilesets=tuple(
+                        {"id": candidate.id, "name": candidate.name}
+                        for candidate in self.tilesets
+                        if candidate.batch == row.batch
+                    ),
+                    batch_maps=tuple(
+                        {
+                            "id": candidate.id,
+                            "name": candidate.name,
+                            "tileset": candidate.tileset,
+                        }
+                        for candidate in self.maps
+                        if candidate.batch == row.batch
+                    ),
                     review=row.review,
                 )
                 if finding is not None:
@@ -1884,6 +2117,21 @@ class MapBackgroundAuthority:
                     content_kind="map",
                     content_id=row.id,
                     content_name=row.name,
+                    batch=row.batch,
+                    batch_tilesets=tuple(
+                        {"id": candidate.id, "name": candidate.name}
+                        for candidate in self.tilesets
+                        if candidate.batch == row.batch
+                    ),
+                    batch_maps=tuple(
+                        {
+                            "id": candidate.id,
+                            "name": candidate.name,
+                            "tileset": candidate.tileset,
+                        }
+                        for candidate in self.maps
+                        if candidate.batch == row.batch
+                    ),
                     review=row.review,
                 )
                 if finding is not None:

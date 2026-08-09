@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -21,6 +22,27 @@ from tools.rom_tests.full_color.map_background_content import (
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[5]
 LEDGER = REPOSITORY_ROOT / "specs/full-colors/inventory/map-background-content.json"
+REVIEW_DIRECTORY = REPOSITORY_ROOT / "specs/full-colors/evidence/map-background-reviews"
+REVIEW_BATCHES = {
+    "overworld": (
+        "phase3-overworld-pallet-route1-viridian",
+        "Codex independent visual review (overworld)",
+        1,
+        34,
+    ),
+    "residential-services": (
+        "phase3-residential-bedroom-mart",
+        "Codex independent visual review (residential-services)",
+        11,
+        98,
+    ),
+    "challenge-special-interiors": (
+        "phase3-challenge-oaks-lab-dojo",
+        "Codex independent visual review (challenge-special-interiors)",
+        8,
+        64,
+    ),
+}
 
 
 def raw_ledger() -> dict[str, object]:
@@ -86,6 +108,10 @@ def copy_map_source_universe(target_root: Path) -> None:
         REPOSITORY_ROOT / "data/maps/headers",
         target_root / "data/maps/headers",
     )
+    shutil.copytree(
+        REPOSITORY_ROOT / "specs/full-colors/evidence/map-background-reviews",
+        target_root / "specs/full-colors/evidence/map-background-reviews",
+    )
 
 
 def test_reviewed_authority_covers_exact_yellow_map_and_tileset_universe() -> None:
@@ -95,11 +121,11 @@ def test_reviewed_authority_covers_exact_yellow_map_and_tileset_universe() -> No
     assert authority.reconcile(REPOSITORY_ROOT) == ()
 
 
-def test_seed_records_current_content_and_presentation_as_independent_axes() -> None:
+def test_reviewed_batches_record_content_and_presentation_as_independent_axes() -> None:
     authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
     assert [row.id for row in authority.tilesets] == list(range(25))
     assert {row.content_status for row in authority.tilesets} == {
-        ContentStatus.FALLBACK,
+        ContentStatus.COMPLETE,
         ContentStatus.MISSING,
     }
     assert (
@@ -109,8 +135,19 @@ def test_seed_records_current_content_and_presentation_as_independent_axes() -> 
     assert (
         sum(row.content_status is ContentStatus.MISSING for row in authority.maps) == 28
     )
+    assert (
+        sum(row.content_status is ContentStatus.COMPLETE for row in authority.tilesets)
+        == 20
+    )
+    assert (
+        sum(row.content_status is ContentStatus.COMPLETE for row in authority.maps)
+        == 196
+    )
     assert sum(row.presentation is Presentation.COLOR for row in authority.maps) == 196
-    assert all(row.review is None for row in (*authority.tilesets, *authority.maps))
+    assert all(
+        (row.review is not None) == (row.content_status is ContentStatus.COMPLETE)
+        for row in (*authority.tilesets, *authority.maps)
+    )
     assert {
         row.name
         for row in authority.tilesets
@@ -125,6 +162,108 @@ def test_seed_records_current_content_and_presentation_as_independent_axes() -> 
         "CELADON_MART_1F": ("CELADON_MART_1F_TILES_07_08_17_18_YELLOW",),
         "CELADON_MART_ROOF": ("CELADON_MART_ROOF_TILES_4B_TO_4F_BLUE",),
     }
+
+
+def test_exact_accepted_batch_membership_and_review_identity_are_durable() -> None:
+    authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    for batch, (route, reviewer, tileset_count, map_count) in REVIEW_BATCHES.items():
+        record = json.loads((REVIEW_DIRECTORY / f"{batch}.json").read_text())
+        tilesets = [
+            {"id": row.id, "name": row.name}
+            for row in authority.tilesets
+            if row.batch == batch
+        ]
+        maps = [
+            {"id": row.id, "name": row.name, "tileset": row.tileset}
+            for row in authority.maps
+            if row.batch == batch
+        ]
+        assert len(tilesets) == tileset_count
+        assert len(maps) == map_count
+        assert record["content"] == {"tilesets": tilesets, "maps": maps}
+        assert record["review"] == {
+            "review_kind": "independent-ai-visual",
+            "reviewer": reviewer,
+            "result": "accepted",
+            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "route": route,
+            "products": [
+                {"product": product, "mode": mode}
+                for product in ("pokeyellow", "pokeyellow_debug")
+                for mode in ("color", "yellow")
+            ],
+            "observations": record["review"]["observations"],
+        }
+        assert len(record["review"]["observations"]) >= 2
+        assert set(record["reviews"]) == {
+            *(f"tileset-{row['id']}" for row in tilesets),
+            *(f"map-{row['id']}" for row in maps),
+        }
+
+
+def test_review_records_match_current_generated_manifests_and_frames_when_present() -> (
+    None
+):
+    atlas_manifest = (
+        REPOSITORY_ROOT / "test-results/full-color-map-background-atlases/manifest.json"
+    )
+    for batch in REVIEW_BATCHES:
+        record = json.loads((REVIEW_DIRECTORY / f"{batch}.json").read_text())
+        assert record["atlas"]["manifest_sha256"] == (
+            "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110"
+        )
+        assert record["atlas"]["content_sha256"] == (
+            "95390973ab3b6bbb31800fcd577bc3791873b0a6501a32536fd75b1881291741"
+        )
+        if atlas_manifest.is_file():
+            assert (
+                hashlib.sha256(atlas_manifest.read_bytes()).hexdigest()
+                == record["atlas"]["manifest_sha256"]
+            )
+            generated = json.loads(atlas_manifest.read_text())
+            expected = [
+                {"path": row["path"], "sha256": row["sha256"]}
+                for row in generated["artifacts"]
+                if row["path"].startswith(f"{batch}/")
+            ]
+            assert record["atlas"]["artifacts"] == expected
+        for retained in record["retained_artifacts"]:
+            manifest_path = REPOSITORY_ROOT / retained["manifest_path"]
+            if not manifest_path.is_file():
+                continue
+            assert (
+                hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+                == retained["manifest_sha256"]
+            )
+            manifest = json.loads(manifest_path.read_text())
+            expected_frames = [
+                {
+                    "path": (manifest_path.parent / row["path"])
+                    .relative_to(REPOSITORY_ROOT)
+                    .as_posix(),
+                    "sha256": row["sha256"],
+                }
+                for row in manifest["artifacts"]
+            ]
+            assert retained["artifacts"] == expected_frames
+            for frame in retained["artifacts"]:
+                frame_path = REPOSITORY_ROOT / frame["path"]
+                assert (
+                    hashlib.sha256(frame_path.read_bytes()).hexdigest()
+                    == frame["sha256"]
+                )
+
+
+def test_promoted_sources_make_no_donor_only_authority_claim() -> None:
+    sources = "\n".join(
+        (REPOSITORY_ROOT / relative).read_text(encoding="utf-8")
+        for relative in (
+            "data/tilesets/full_color_overworld.asm",
+            "data/tilesets/full_color_interiors.asm",
+        )
+    ).lower()
+    assert "donor" not in sources
+    assert "pokered-gbc" not in sources
 
 
 def test_production_override_exact_values_are_closed_source_authority(
@@ -271,7 +410,7 @@ def test_map_identity_mutations_fail_closed(mutation: str) -> None:
 
 
 def test_map_to_tileset_and_status_mismatches_fail_reconciliation() -> None:
-    for field, value in (("tileset", "GYM"), ("content_status", "complete")):
+    for field, value in (("tileset", "GYM"), ("content_status", "missing")):
         raw = raw_ledger()
         rows = raw["maps"]
         assert isinstance(rows, list)
@@ -1337,7 +1476,7 @@ def test_complete_rows_require_typed_review_metadata_not_a_coherent_rehash() -> 
     row = raw["maps"][0]
     row["content_status"] = "complete"
     # Rehashing the altered canonical JSON is merely a self-consistent proposal;
-    # it cannot stand in for a durable human review record.
+    # it cannot stand in for a durable independent visual review record.
     raw["identity_sha256"] = "0" * 64
     with pytest.raises(MapBackgroundContentError):
         parse(raw)
