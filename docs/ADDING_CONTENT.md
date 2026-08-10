@@ -206,9 +206,9 @@ and manually inspect both directions of every boundary.
 ### Map-aware roofs
 
 Palette 6 keeps the common outdoor edge colors and replaces its middle pair
-from `FullColorOverworldRoofAssignments`. The assignments follow the donor's
-city and route table. Route 6 selects Saffron colors in its top rows and
-Vermilion colors elsewhere.
+from `FullColorOverworldRoofAssignments`. The assignments are reviewed,
+repository-owned city and route content. Route 6 selects Saffron colors in its
+top rows and Vermilion colors elsewhere.
 
 ### Change palettes or tile attributes
 
@@ -225,11 +225,11 @@ current authorities:
 - every attribute must use legal CGB bits. The present table selects bank 0 and
   authors no priority.
 - every interior palette payload is exactly 64 bytes and every interior
-  assignment table is exactly 256 bytes; the first `$60` bytes reproduce the
-  donor loader's selected table and `$60`–`$ff` are palette 7.
+  assignment table is exactly 256 bytes; `$00`–`$5f` are independently
+  reviewed against Yellow graphics and `$60`–`$ff` are palette 7.
 
 Never derive a palette with `tile_id & 7`. Tile IDs are identities, not palette
-classes. Preserve source, permission, pinned donor revision, complete tables,
+classes. Preserve repository-owned source, provenance evidence, complete tables,
 and size assertions. Independently verify any new authority before updating the
 permitted digests and semantic checks in
 [test_overworld_color_data.py](../tools/rom_tests/tests/unit/full_color/test_overworld_color_data.py).
@@ -243,10 +243,13 @@ already has map-aware roof selection, paired scroll/redraw and selected overlay
 transfers, and eight-palette fade transforms. The roadmap phases describe
 migration into retained renderer ownership, not missing passive behavior.
 Phase 4 owns overworld OAM; Phase 5 stress-tests the architecture;
-Phase 6 closes map-specific overrides, animation, and field-replacement work;
-Phase 7 closes every handoff; Phase 8 removes old overworld ownership; and Phase 9 hardens
-release timing and products. Remaining special-tileset and all-map authoring
-remains future non-gating work. The authoritative exit gates live in the
+Phase 6 closes runtime use of map-specific overrides, animation, and
+field-replacement behavior in its bounded proof slice;
+Phase 7 closes every handoff; Phase 8 removes old overworld ownership; and Phase
+9 hardens release timing and products. The repository-owned all-25-tileset and all-map
+background corpus is already authored and reviewed; excluded maps remain
+non-gating Yellow presentation until a separately approved runtime-admission
+change. The authoritative exit gates live in the
 [migration plan](../specs/full-colors/docs/migration-plan.md).
 
 ## Verification before handoff

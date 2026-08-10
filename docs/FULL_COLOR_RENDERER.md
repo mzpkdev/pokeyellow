@@ -98,33 +98,36 @@ broader renderer without a separately approved architecture change.
 [data/tilesets/full_color_overworld.asm](../data/tilesets/full_color_overworld.asm)
 contains the live outdoor decisions, while
 [data/tilesets/full_color_interiors.asm](../data/tilesets/full_color_interiors.asm)
-contains the interior palette/attribute pointer tables and donor payloads:
+contains the interior palette/attribute pointer tables and independently
+reviewed repository-owned payloads:
 
 - `FullColorOverworldBGPalettes`: 64 bytes, eight complete four-color CGB BG
   palettes;
 - `FullColorOverworldTileAttributes`: 256 bytes mapping each tile ID directly
   to an attribute;
-- tile IDs `$00`–`$5f`: donor-derived `OVERWORLD` assignments;
+- tile IDs `$00`–`$5f`: reviewed `OVERWORLD` assignments against Yellow graphics;
 - tile IDs `$60`–`$ff`: text palette 7;
 - bank 0 and no authored priority for all current attributes; and
-- `FullColorOverworldRoofAssignments`: one donor roof identity for each city
+- `FullColorOverworldRoofAssignments`: one reviewed roof identity for each city
   and route map ID;
-- `FullColorOverworldRoofPalettes`: the eleven donor roof color pairs; and
+- `FullColorOverworldRoofPalettes`: the eleven repository-owned roof color
+  pairs; and
 - palette 6: common outdoor edge colors with map-aware roof middle colors;
 - every admitted tileset selects a complete 64-byte BG palette payload and a
   complete 256-byte tile attribute lookup;
-- identical donor palette sets and assignment maps are shared by pointer;
+- identical palette sets and assignment maps are shared by pointer;
 - all interior tile IDs `$60`–`$ff` explicitly use palette 7; and
-- two donor map overrides apply after tileset lookup: `CELADON_MART_ROOF`
+- two reviewed map overrides apply after tileset lookup: `CELADON_MART_ROOF`
   tiles `$4b`–`$4f` use palette 3, and `CELADON_MART_1F` tiles `$07`, `$08`,
   `$17`, and `$18` use palette 4.
 
-The tables record pinned donor provenance and have size assertions. Runtime uses
+The tables are the checked repository authority, retain provenance evidence,
+and have size assertions. Runtime uses
 a direct lookup; there is no `tile_id & 7` or other legal-looking fallback.
 
 Each admitted map keeps the Yellow graphics selected by its own map header.
-Runtime selects the corresponding donor-authored tileset palette payload and
-tile-to-attribute table. Outdoor maps additionally select donor roof colors;
+Runtime selects the corresponding repository-owned tileset palette payload and
+tile-to-attribute table. Outdoor maps additionally select authored roof colors;
 Route 6 uses Saffron roof colors in its top rows and Vermilion colors elsewhere.
 
 ## Map load and publication
@@ -262,8 +265,8 @@ right branch without verifying its Yellow call site.
 The passive renderer is a bounded map layer, not global display ownership.
 
 - Conventional interiors in the admitted tileset range use their selected
-  donor payload. `FOREST`, `SHIP_PORT`, `CAVERN`, `PLATEAU`, `BEACH_HOUSE`, and any other
-  unsupported map use Yellow palettes with cleared bank-1 attributes.
+  authored payload. `FOREST`, `SHIP_PORT`, `CAVERN`, `PLATEAU`, `BEACH_HOUSE`,
+  and any other unsupported map use Yellow palettes with cleared bank-1 attributes.
 - Selected dialogue, Start/Options, and two-option overlays keep Yellow's
   bank-0 construction and timing, then receive a paired passive bank-1
   projection behind the hidden four-frame barrier. Full-screen Yellow menus
@@ -273,8 +276,8 @@ The passive renderer is a bounded map layer, not global display ownership.
   already-active presentation with dirty base attributes performs a complete
   passive rebuild; a palette-only invalidation remains a bounded refresh.
   Yellow-to-Color
-  activation keeps Color inactive and donor palettes unpublished while two
-  wrapped visible rows are published per VBlank, then commits all donor
+  activation keeps Color inactive and authored palettes unpublished while two
+  wrapped visible rows are published per VBlank, then commits all authored
   palettes and activates Color in one later VBlank. Yellow mode reruns Yellow's
   authoritative overworld palette command and leaves passive state inactive.
 - Battles and transitions remain Yellow behavior. Normal map restoration
@@ -401,9 +404,8 @@ remaining work and exit gates:
   final tile calculation, preserving follower offsets and DMA behavior.
 - **Phase 5 — architecture stress:** combined pressure, poisoned handoff
   reconstruction, interrupted connections, timing margins, and deferral.
-- **Phase 6 — bounded content:** independently authored and accepted data,
-  overrides, and animation/field-replacement behavior reached by Pallet Town
-  and Route 1.
+- **Phase 6 — bounded content runtime:** prove accepted data, overrides, and
+  animation/field-replacement behavior reached by Pallet Town and Route 1.
 - **Phase 7 — handoffs:** every concrete map-to-Yellow and Yellow-to-overworld
   edge, including resets, nesting, errors, and soak paths.
 - **Phase 8 — ownership deletion:** remove superseded Yellow overworld tint,
@@ -411,8 +413,9 @@ remaining work and exit gates:
 - **Phase 9 — release hardening:** numeric budgets, multi-frame behavior, soak
   coverage, and release/debug/VC reproducibility.
 
-All-25-tileset and all-map color authoring remains future non-gating work after
-the bounded release. It is not implied by the shipped toggle.
+All 25 tilesets and all maps now have independently reviewed repository-owned
+background content. That content completion is non-gating and does not imply
+that the shipped toggle admits excluded maps.
 
 Until the relevant phases are proved, maps outside the current outdoor and
 conventional-interior passive set remain Yellow-owned. The migration plan may

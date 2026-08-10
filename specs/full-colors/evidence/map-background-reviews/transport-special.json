@@ -1,0 +1,322 @@
+{
+  "atlas": {
+    "artifacts": [
+      {
+        "path": "transport-special/animations/plateau-water-rotation-0.png",
+        "sha256": "f8e9cbef8b182dd2ab0d786e8bca952fae1775decbfa09571c585b7d436f0ed1"
+      },
+      {
+        "path": "transport-special/animations/plateau-water-rotation-1.png",
+        "sha256": "b56d31263a3573dfc0074a94da49679c5df03bef8cf54675849ec70ec163137c"
+      },
+      {
+        "path": "transport-special/animations/plateau-water-rotation-2.png",
+        "sha256": "739a121f3c65a10dda6e57900f4b86c35fb136b9b08247f0c766ad73645c9aff"
+      },
+      {
+        "path": "transport-special/animations/plateau-water-rotation-3.png",
+        "sha256": "b56d31263a3573dfc0074a94da49679c5df03bef8cf54675849ec70ec163137c"
+      },
+      {
+        "path": "transport-special/animations/plateau-water-rotation-4.png",
+        "sha256": "f8e9cbef8b182dd2ab0d786e8bca952fae1775decbfa09571c585b7d436f0ed1"
+      },
+      {
+        "path": "transport-special/animations/plateau-water-rotation-5.png",
+        "sha256": "97e1936388cfd63a7ea1f59756bd1f1bd1794bab1149df8da4e3940034147367"
+      },
+      {
+        "path": "transport-special/animations/plateau-water-rotation-6.png",
+        "sha256": "7983ee402be9184705add70c029d49d98c4065e1662bac8d18f6d9e9b8b43318"
+      },
+      {
+        "path": "transport-special/animations/plateau-water-rotation-7.png",
+        "sha256": "97e1936388cfd63a7ea1f59756bd1f1bd1794bab1149df8da4e3940034147367"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-0.png",
+        "sha256": "6eb97585c4e46835472a0ccfff680ab09b9d07e1d77b8c49dd516046c48dd424"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-1.png",
+        "sha256": "a9686dd9b8ba35d43baf6b51e53aea20f27db5dc3672e8fdc39c668f9541c7d6"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-2.png",
+        "sha256": "0311070d4bb817e2df3597c01f1f822b700c19632ad5e84f41e3eb1dbfc6a794"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-3.png",
+        "sha256": "a9686dd9b8ba35d43baf6b51e53aea20f27db5dc3672e8fdc39c668f9541c7d6"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-4.png",
+        "sha256": "6eb97585c4e46835472a0ccfff680ab09b9d07e1d77b8c49dd516046c48dd424"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-5.png",
+        "sha256": "569bc48a65c4d5883a1efff03a414ce214bd454f94c0c7c3db9b4ef638607437"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-6.png",
+        "sha256": "38e0c01241c19d1c57794232675cf48ddb0d24057c496efa83a36db1dd3c043c"
+      },
+      {
+        "path": "transport-special/animations/ship_port-water-rotation-7.png",
+        "sha256": "569bc48a65c4d5883a1efff03a414ce214bd454f94c0c7c3db9b4ef638607437"
+      },
+      {
+        "path": "transport-special/maps/indigo_plateau.png",
+        "sha256": "6a6b11d702bea4681bc1860a7da0dbf4bcc8308f62b425b15e999159cebd8d22"
+      },
+      {
+        "path": "transport-special/maps/route_23.png",
+        "sha256": "7395c6b8735afcebd7b31475958fcf7bf1efafb2661c364a2b731ee8ea5610e9"
+      },
+      {
+        "path": "transport-special/maps/summer_beach_house.png",
+        "sha256": "b45cf9b26e39df275d877a001068795708a4b90d5c49b75324827fe684479555"
+      },
+      {
+        "path": "transport-special/maps/vermilion_dock.png",
+        "sha256": "edb52f6b1ebfa961b6101d383527aca21e946168da59cedf3d62b64d71ca60e6"
+      },
+      {
+        "path": "transport-special/tilesets/beach_house.png",
+        "sha256": "8e000b17aed0b9d661e46cc5b91ba7a34a51ccb4fe5cd0fda91cae7656f9798b"
+      },
+      {
+        "path": "transport-special/tilesets/plateau.png",
+        "sha256": "90a3b83c7061a60bd08d26b8be037c9341925fa5c2294e61f074425002d40584"
+      },
+      {
+        "path": "transport-special/tilesets/ship_port.png",
+        "sha256": "74a148b928317da6e9e5c1a2261c12872dd243240e8799686db4730c5f870455"
+      }
+    ],
+    "content_sha256": "6024178ee0eff83495574141e9b9f70ef34cab6bf8a2b4dcf544841490f9a26b",
+    "manifest_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+    "path": "reviewer-local/transport-special/manifest.json"
+  },
+  "batch": "transport-special",
+  "content": {
+    "maps": [
+      {
+        "id": 9,
+        "name": "INDIGO_PLATEAU",
+        "tileset": "PLATEAU"
+      },
+      {
+        "id": 34,
+        "name": "ROUTE_23",
+        "tileset": "PLATEAU"
+      },
+      {
+        "id": 248,
+        "name": "SUMMER_BEACH_HOUSE",
+        "tileset": "BEACH_HOUSE"
+      },
+      {
+        "id": 94,
+        "name": "VERMILION_DOCK",
+        "tileset": "SHIP_PORT"
+      }
+    ],
+    "tilesets": [
+      {
+        "id": 14,
+        "name": "SHIP_PORT"
+      },
+      {
+        "id": 23,
+        "name": "PLATEAU"
+      },
+      {
+        "id": 24,
+        "name": "BEACH_HOUSE"
+      }
+    ]
+  },
+  "retained_artifacts": [
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow.gbc",
+          "sha256": "339161361c3bdce12cda32f5c32b7a05fd3127a689b36cab9db6ba331686ed4e"
+        },
+        {
+          "path": "pokeyellow.map",
+          "sha256": "648457cab39d622f49c9bf7481b0128fcaeca82ace735a791360eea47824af1a"
+        },
+        {
+          "path": "pokeyellow.sym",
+          "sha256": "22aa7d219684e3841c01244a0fe259125a5fb028230d2c095ab11a1d04d21859"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow_debug.gbc",
+          "sha256": "785e8f73d59d64b98cd1438f4b65288a03ea2583831b3c5079c81dcd610fff77"
+        },
+        {
+          "path": "pokeyellow_debug.map",
+          "sha256": "90ceb4c028c9f9016aa7539c67f5c3bdf2611d49324379f5fc9bf9e356cc7922"
+        },
+        {
+          "path": "pokeyellow_debug.sym",
+          "sha256": "a3e4d11543640b4a9ca29a0f5262f20ec0f699d4bf579cd54af202d403a24762"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow_debug",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow_vc.gbc",
+          "sha256": "d3a7e035f0ed9dc4fa93834a61d4e5c9534da5400ab27e8a1e344abcf08fd64b"
+        },
+        {
+          "path": "pokeyellow_vc.map",
+          "sha256": "4b837e629e586905d42f7ef4d6f86627201ca26761031755510b55335e85f1f2"
+        },
+        {
+          "path": "pokeyellow_vc.sym",
+          "sha256": "794f76c4ff78df91fbde99c571c4c813d4470b833a8c878a38e3bc3f8ac77857"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow_vc",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow_phase2_audit.gbc",
+          "sha256": "2a8f692ca9b1a9d4b741bcb6de77007bc99870cf540ba26cf5ae331662c15512"
+        },
+        {
+          "path": "pokeyellow_phase2_audit.map",
+          "sha256": "5e4e00b6333a5491035042df9df9ab925995fa91c9d4a6c9c6f5e71ee93d5f91"
+        },
+        {
+          "path": "pokeyellow_phase2_audit.sym",
+          "sha256": "729d2e2ee5386c8208832b51d5d8617dd56fcd526b9706f2f8e725c4a9f84ac6"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow_phase2_audit",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    }
+  ],
+  "review": {
+    "observations": [
+      "All three SHIP_PORT, PLATEAU, and BEACH_HOUSE 256-tile atlases, all four batch maps, and the sixteen SHIP_PORT/PLATEAU TILEANIM_WATER rotation frames were visually reviewed with the $60-$ff text reservation intact.",
+      "The animation evidence binds each tileset's source tile $14 and UpdateMovingBgTiles counter/direction semantics; reviewed palette and attribute bytes have exact linked parity across normal, debug, VC, and Phase 2 audit products.",
+      "This is artifact-only content acceptance. Vermilion Dock, Route 23, Indigo Plateau, and Summer Beach House remain Yellow-presented behind the architecture-boundary fallback; no Color runtime admission is claimed."
+    ],
+    "products": [
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow"
+      },
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow_debug"
+      },
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow_vc"
+      },
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow_phase2_audit"
+      }
+    ],
+    "purpose": "artifact-only-atlas-and-linked-product-parity",
+    "result": "accepted",
+    "review_kind": "independent-ai-visual",
+    "reviewer": "Codex independent visual review (transport-special)",
+    "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+    "route": "phase4-transport-special-artifact-review"
+  },
+  "reviewed_candidate": {
+    "ledger_canonical_sha256": "57dcaf95fd2fdbeb1e206a0bdd64589a3bb7e4843dc2d1d137f1bcb21d645450",
+    "path": "test-results/full-color-proposals/map-background-content.proposal.json",
+    "sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+    "source_semantic_sha256": "7f8b5fd33c900c409137a293f2007003f61b6db120ac82613f06220288349c3f"
+  },
+  "reviews": {
+    "map-248": {
+      "atlas_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+      "content_id": 248,
+      "content_kind": "map",
+      "content_name": "SUMMER_BEACH_HOUSE",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-transport-special-artifact-review"
+    },
+    "map-34": {
+      "atlas_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+      "content_id": 34,
+      "content_kind": "map",
+      "content_name": "ROUTE_23",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-transport-special-artifact-review"
+    },
+    "map-9": {
+      "atlas_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+      "content_id": 9,
+      "content_kind": "map",
+      "content_name": "INDIGO_PLATEAU",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-transport-special-artifact-review"
+    },
+    "map-94": {
+      "atlas_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+      "content_id": 94,
+      "content_kind": "map",
+      "content_name": "VERMILION_DOCK",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-transport-special-artifact-review"
+    },
+    "tileset-14": {
+      "atlas_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+      "content_id": 14,
+      "content_kind": "tileset",
+      "content_name": "SHIP_PORT",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-transport-special-artifact-review"
+    },
+    "tileset-23": {
+      "atlas_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+      "content_id": 23,
+      "content_kind": "tileset",
+      "content_name": "PLATEAU",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-transport-special-artifact-review"
+    },
+    "tileset-24": {
+      "atlas_sha256": "f62b3bc77244ed728641c05875200ae2b21a9fff5eee791ed7f9e5d67bf884a7",
+      "content_id": 24,
+      "content_kind": "tileset",
+      "content_name": "BEACH_HOUSE",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-transport-special-artifact-review"
+    }
+  },
+  "schema": "full-color-map-background-review-v2"
+}

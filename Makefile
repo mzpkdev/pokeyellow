@@ -65,10 +65,15 @@ RGBGFXFLAGS  ?= -Weverything
 	measure-full-color-source-transition \
 	measure-full-color-audit-evidence-identities \
 	measure-full-color-phase2-audit \
+	measure-full-color-map-backgrounds \
+	render-full-color-map-background-atlases \
+	promote-full-color-map-backgrounds-reviewed \
 	_rom-test-debug-products \
 	_rom-test-gameplay-products \
 	_rom-test-all-products \
 	test-unit \
+	test-full-color-content-contract \
+	test-full-color-map-backgrounds \
 	test-full-color-donor-contract \
 	test-full-color-harness-contracts \
 	test-full-color-evidence \
@@ -132,6 +137,7 @@ FULL_COLOR_RENDERER_CONTRACT_RESULTS ?= test-results/full-color-renderer-contrac
 FULL_COLOR_RUNTIME_RESULTS ?= test-results/full-color-renderer-runtime
 FULL_COLOR_HARNESS_RESULTS ?= test-results/full-color-harness
 FULL_COLOR_PROPOSALS ?= test-results/full-color-proposals
+FULL_COLOR_MAP_BACKGROUND_ATLASES ?= test-results/full-color-map-background-atlases
 ROM_TEST_PREBUILT_PRODUCTS ?= 0
 
 ROM_TEST_DEBUG_PRODUCTS := \
@@ -184,6 +190,19 @@ measure-full-color-audit-evidence-identities: measure-full-color-source-transiti
 measure-full-color-phase2-audit: measure-full-color-audit-evidence-identities
 	$(PYTHON) -m tools.rom_tests.full_color.phase2_measurements --root . --proposal-output "$(FULL_COLOR_PROPOSALS)/phase2-subjects.proposal.json"
 
+measure-full-color-map-backgrounds: _rom-test-all-products
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --proposal-output "$(FULL_COLOR_PROPOSALS)/map-background-content.proposal.json"
+
+# Review proposal only: generated pictures and hashes do not accept content or
+# update the source-controlled review ledger.
+render-full-color-map-background-atlases: yellow
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_atlas --root . --output "$(FULL_COLOR_MAP_BACKGROUND_ATLASES)"
+
+# This target is deliberately named as a reviewed promotion and is never a
+# dependency of ordinary build, verification, or certification targets.
+promote-full-color-map-backgrounds-reviewed: _rom-test-all-products
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --output specs/full-colors/evidence/map-background-content.json --authority-reviewed
+
 test-full-color-setup:
 	python3 -m venv .venv
 	.venv/bin/python -m pip install -r tools/rom_tests/requirements.txt
@@ -191,6 +210,13 @@ test-full-color-setup:
 test-unit: _rom-test-all-products
 	$(PYTHON) -m pytest tools/rom_tests/tests/unit \
 		--ignore=tools/rom_tests/tests/unit/full_color/test_overworld_color_data_donor.py -q
+
+test-full-color-content-contract:
+	$(PYTHON) -m pytest \
+		tools/rom_tests/tests/unit/full_color/test_map_background_content.py -q
+
+test-full-color-map-backgrounds: _rom-test-all-products
+	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --verify specs/full-colors/evidence/map-background-content.json
 
 test-full-color-donor-contract:
 	@test -n "$(POKERED_GBC_ROOT)" || \

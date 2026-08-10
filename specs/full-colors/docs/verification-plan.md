@@ -29,7 +29,7 @@ authority is activated.
 - **CHK-ROM-01:** Method: inspect source, link maps, and donor adaptations for prohibited banks and MBC1 assumptions; tier: fast/full; evidence: placement decision record, link-map ranges, far-call audit, and negative source/disassembly findings.
 - **CHK-PALETTE-01:** Method: compare base, transformed, and hardware BG/OBJ palettes through every remap/effect and owner-dispatched wrapper; tier: focused/full; evidence: palette snapshots, wrapper trace, complete-payload commit record, and visual checkpoints.
 - **CHK-TRANSFER-01:** Method: exercise every concrete paired-transfer mutation and destination from the closed baseline and atomically extended inventories; tier: focused/full; evidence: concrete mutation/writer IDs, renewed source/ROM closure, tile/attribute byte pairs, serialization trace, and five-frame boundary captures.
-- **CHK-TILESET-01:** Future/non-gating method: audit and exercise all 25 tilesets, table assertions, graphics, roofs, overrides, animations, and native Beach House data; tier: full; evidence: table lengths, assignment audit, semantic atlas, animation captures, and reviewed visual atlas. Bounded-release use includes the admitted outdoor/conventional-interior tables but does not claim all-25 closure or harness coverage for the expanded interiors.
+- **CHK-TILESET-01:** Completed, non-gating content method: audit all 25 tilesets, table assertions, graphics, roofs, overrides, animations, and native Beach House data; tier: full; evidence: table lengths, assignment audit, semantic atlas, animation captures, and reviewed visual atlas. The all-25 corpus is authored and reviewed. Runtime exercise and admission remain limited to the bounded outdoor/conventional-interior presentation predicate and do not follow from content closure.
 - **CHK-HANDOFF-01:** Method: execute every concrete changed-owner edge in both directions plus reset and soft reset from Color, and every same-owner edge; tier: focused/full; evidence: close/cancel/generation/select/reconstruct/barrier/reopen ordering, destination-resource unknown/poison ledger, complete fresh destination reconstruction ledger, exactly one generation and barrier per changed owner, admission reopening only afterward, zero generation for same owner, bank/interrupt restoration, hidden-display proof where used, normal-boot re-entry after soft reset, and first-writer trace.
 - **CHK-OAM-02:** Method: exercise player, follower, every mapped object class, maximum population, shadow construction, sort/copy, invalidation, and one hardware DMA; tier: focused/full; evidence: concrete writer/mutation IDs, final-picture mapping, shadow/hardware OAM snapshots, DMA trace, and frame strip.
 - **CHK-VISUAL-01:** Method: inspect named screenshots, bounded frame strips, annotated contact sheets, and localized image diffs beside semantic state; tier: fast/focused/full; evidence: versioned manifest, reviewer result, image diffs, snapshots, and linked traces.
@@ -401,8 +401,9 @@ The bounded production content matrix is specified for all 34 supported
 including first entry, each actual Yellow-to-Color return, both scroll axes,
 connections where present, and reload. Dialogue and menus remain Yellow
 baseline cases with complete departure/return evidence. Execution of this
-expanded harness matrix is deferred and is not claimed by the current slice;
-authoring for the remaining tilesets also remains future work.
+expanded runtime harness matrix is deferred and is not claimed by the current
+slice. The separately reviewed all-25 content corpus is complete; that content
+result does not activate excluded maps.
 
 The full OAM matrix covers player walking, running, biking, surfing, fishing,
 and ledge states; follower Pikachu in every direction and animation state;

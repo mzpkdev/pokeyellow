@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import replace
 import hashlib
 import json
+import os
+import secrets
+import stat
+from collections.abc import Sequence
+from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from . import source_transition
 from .baseline_discovery import discover_baseline_sources
@@ -18,7 +22,6 @@ from .discovery_assignment import (
 )
 from .inventory import MutationInventory, SceneInventory, WriterInventory
 from .rom_discovery import load_map
-
 
 HASH_FIELDS = ("source_sha256", "rom_sha256", "map_sha256", "sym_sha256")
 REVIEWED_AUDIT_HASHES = {
@@ -100,6 +103,321 @@ class AuditEvidenceIdentityError(RuntimeError):
     pass
 
 
+def _canonical(value: object) -> str:
+    return json.dumps(value, indent=2, sort_keys=True) + "\n"
+
+
+def _contained_path(root: Path, path: Path, *, label: str) -> Path:
+    root = root.resolve()
+    candidate = path if path.is_absolute() else root / path
+    resolved = candidate.resolve(strict=False)
+    if resolved == root or root not in resolved.parents:
+        raise AuditEvidenceIdentityError(f"{label} escapes repository root")
+    return resolved
+
+
+@dataclass(frozen=True)
+class _FileIdentity:
+    device: int
+    inode: int
+    mode: int
+    size: int
+    mtime_ns: int
+    ctime_ns: int
+    links: int
+
+
+@dataclass
+class _PinnedTarget:
+    path: Path
+    directory_fd: int
+    directory_identity: tuple[int, int]
+    identity: _FileIdentity
+    original: bytes
+
+
+@dataclass(frozen=True)
+class _Publication:
+    target: _PinnedTarget
+    identity: _FileIdentity
+
+
+def _identity(metadata: os.stat_result) -> _FileIdentity:
+    return _FileIdentity(
+        metadata.st_dev,
+        metadata.st_ino,
+        metadata.st_mode,
+        metadata.st_size,
+        metadata.st_mtime_ns,
+        metadata.st_ctime_ns,
+        metadata.st_nlink,
+    )
+
+
+def _validate_directory(target: _PinnedTarget) -> None:
+    try:
+        current = os.stat(target.path.parent, follow_symlinks=False)
+        pinned = os.fstat(target.directory_fd)
+    except OSError as exc:
+        raise AuditEvidenceIdentityError(
+            f"reviewed target directory is unavailable: {target.path.parent}"
+        ) from exc
+    if (
+        not stat.S_ISDIR(current.st_mode)
+        or (current.st_dev, current.st_ino) != target.directory_identity
+        or (pinned.st_dev, pinned.st_ino) != target.directory_identity
+    ):
+        raise AuditEvidenceIdentityError(
+            f"reviewed target directory changed during publication: {target.path.parent}"
+        )
+
+
+def _target_identity_at(target: _PinnedTarget, expected: _FileIdentity) -> None:
+    try:
+        current = os.stat(
+            target.path.name,
+            dir_fd=target.directory_fd,
+            follow_symlinks=False,
+        )
+    except OSError as exc:
+        raise AuditEvidenceIdentityError(
+            f"reviewed target is unavailable: {target.path}"
+        ) from exc
+    if not stat.S_ISREG(current.st_mode) or _identity(current) != expected:
+        raise AuditEvidenceIdentityError(
+            f"reviewed target changed during publication: {target.path}"
+        )
+
+
+def _same_staged_file(actual: _FileIdentity, staged: _FileIdentity) -> bool:
+    """Ignore ctime, which the directory rename itself is allowed to advance."""
+    return (
+        actual.device,
+        actual.inode,
+        actual.mode,
+        actual.size,
+        actual.mtime_ns,
+        actual.links,
+    ) == (
+        staged.device,
+        staged.inode,
+        staged.mode,
+        staged.size,
+        staged.mtime_ns,
+        staged.links,
+    )
+
+
+def _open_directory_without_symlinks(directory: Path) -> int:
+    absolute = Path(os.path.abspath(directory))
+    flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(absolute.anchor, flags)
+    try:
+        for component in absolute.parts[1:]:
+            next_descriptor = os.open(component, flags, dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = next_descriptor
+        return descriptor
+    except Exception:
+        os.close(descriptor)
+        raise
+
+
+def _pin_target(root: Path, relative: Path) -> _PinnedTarget:
+    root = Path(os.path.abspath(root))
+    if relative.is_absolute() or ".." in relative.parts or relative == Path("."):
+        raise AuditEvidenceIdentityError(
+            f"reviewed target is not canonical: {relative}"
+        )
+    path = root / relative
+    try:
+        directory_fd = _open_directory_without_symlinks(path.parent)
+    except OSError as exc:
+        raise AuditEvidenceIdentityError(
+            f"reviewed target directory is unavailable: {path.parent}"
+        ) from exc
+    try:
+        directory = os.fstat(directory_fd)
+        target = _PinnedTarget(
+            path=path,
+            directory_fd=directory_fd,
+            directory_identity=(directory.st_dev, directory.st_ino),
+            identity=_FileIdentity(0, 0, 0, 0, 0, 0, 0),
+            original=b"",
+        )
+        _validate_directory(target)
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        descriptor = os.open(path.name, flags, dir_fd=directory_fd)
+        with os.fdopen(descriptor, "rb") as stream:
+            metadata = os.fstat(stream.fileno())
+            if not stat.S_ISREG(metadata.st_mode):
+                raise AuditEvidenceIdentityError(
+                    f"reviewed target is not a regular file: {relative}"
+                )
+            target.identity = _identity(metadata)
+            target.original = stream.read()
+        _target_identity_at(target, target.identity)
+        return target
+    except Exception:
+        os.close(directory_fd)
+        raise
+
+
+def _allocate_temporary(target: _PinnedTarget) -> tuple[int, str]:
+    for _ in range(128):
+        name = f".{target.path.name}.{secrets.token_hex(12)}.tmp"
+        try:
+            descriptor = os.open(
+                name,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+                0o600,
+                dir_fd=target.directory_fd,
+            )
+            return descriptor, name
+        except FileExistsError:
+            pass
+    raise AuditEvidenceIdentityError(
+        f"cannot allocate reviewed authority temporary file: {target.path}"
+    )
+
+
+def _atomic_replace(
+    target: _PinnedTarget,
+    contents: bytes,
+    expected: _FileIdentity,
+    ledger: list[_Publication],
+) -> _FileIdentity:
+    temporary_name: str | None = None
+    try:
+        _validate_directory(target)
+        _target_identity_at(target, expected)
+        descriptor, temporary_name = _allocate_temporary(target)
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(contents)
+            handle.flush()
+            os.fsync(handle.fileno())
+        staged = _identity(
+            os.stat(temporary_name, dir_fd=target.directory_fd, follow_symlinks=False)
+        )
+        _validate_directory(target)
+        _target_identity_at(target, expected)
+        os.replace(
+            temporary_name,
+            target.path.name,
+            src_dir_fd=target.directory_fd,
+            dst_dir_fd=target.directory_fd,
+        )
+        temporary_name = None
+        # Record the replacement before any fallible post-publication check so
+        # every path that may already contain new bytes is eligible for rollback.
+        ledger.append(_Publication(target, staged))
+        published = _identity(
+            os.stat(
+                target.path.name,
+                dir_fd=target.directory_fd,
+                follow_symlinks=False,
+            )
+        )
+        if not _same_staged_file(published, staged):
+            raise AuditEvidenceIdentityError(
+                f"reviewed authority publication was redirected: {target.path}"
+            )
+        publication = _Publication(target, published)
+        ledger[-1] = publication
+        _target_identity_at(target, published)
+        _validate_directory(target)
+        os.fsync(target.directory_fd)
+        return published
+    finally:
+        if temporary_name is not None:
+            try:
+                os.unlink(temporary_name, dir_fd=target.directory_fd)
+            except FileNotFoundError:
+                pass
+
+
+def _validate_publication(publication: _Publication) -> None:
+    """Prove the pinned publication is still installed at its public path."""
+    _validate_directory(publication.target)
+    _target_identity_at(publication.target, publication.identity)
+
+
+def _restore_publication(publication: _Publication) -> None:
+    """Restore original bytes in the pinned parent, even if its path moved."""
+    temporary_name: str | None = None
+    try:
+        _target_identity_at(publication.target, publication.identity)
+        descriptor, temporary_name = _allocate_temporary(publication.target)
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(publication.target.original)
+            handle.flush()
+            os.fsync(handle.fileno())
+        staged = _identity(
+            os.stat(
+                temporary_name,
+                dir_fd=publication.target.directory_fd,
+                follow_symlinks=False,
+            )
+        )
+        os.replace(
+            temporary_name,
+            publication.target.path.name,
+            src_dir_fd=publication.target.directory_fd,
+            dst_dir_fd=publication.target.directory_fd,
+        )
+        temporary_name = None
+        restored = _identity(
+            os.stat(
+                publication.target.path.name,
+                dir_fd=publication.target.directory_fd,
+                follow_symlinks=False,
+            )
+        )
+        if not _same_staged_file(restored, staged):
+            raise AuditEvidenceIdentityError(
+                "restored reviewed authority was redirected in its pinned parent: "
+                f"{publication.target.path}"
+            )
+        _target_identity_at(publication.target, restored)
+        os.fsync(publication.target.directory_fd)
+    finally:
+        if temporary_name is not None:
+            try:
+                os.unlink(temporary_name, dir_fd=publication.target.directory_fd)
+            except FileNotFoundError:
+                pass
+
+
+def _transactional_write(updates: Sequence[tuple[_PinnedTarget, bytes]]) -> None:
+    written: list[_Publication] = []
+    try:
+        for target, contents in updates:
+            _atomic_replace(target, contents, target.identity, written)
+        # Individual replaces use pinned parent descriptors.  Reconnect every
+        # resulting inode to the public path before the transaction may report
+        # success; a displaced parent containing correct bytes is not public
+        # authority.
+        for publication in written:
+            _validate_publication(publication)
+    except (OSError, AuditEvidenceIdentityError) as exc:
+        rollback_errors = []
+        for publication in reversed(written):
+            try:
+                _restore_publication(publication)
+            except (OSError, AuditEvidenceIdentityError) as rollback_exc:
+                rollback_errors.append(f"{publication.target.path}: {rollback_exc}")
+        detail = (
+            f"; rollback failed: {', '.join(rollback_errors)}"
+            if rollback_errors
+            else ""
+        )
+        raise AuditEvidenceIdentityError(
+            f"reviewed authority transaction failed: {exc}{detail}; "
+            "original authorities restored in their pinned parents; the public "
+            "namespace remains refused"
+        ) from exc
+
+
 def _sha256(path: Path) -> str:
     if not path.is_file():
         raise AuditEvidenceIdentityError(f"required build artifact is missing: {path}")
@@ -156,9 +474,7 @@ def _updated_assignments(
     baseline_hashes: dict[str, str],
     audit_hashes: dict[str, str],
 ) -> DiscoveryAssignmentAuthority:
-    baseline = tuple(
-        row for row in authority.rows if row.product == BASELINE_PRODUCT
-    )
+    baseline = tuple(row for row in authority.rows if row.product == BASELINE_PRODUCT)
     baseline_ids = frozenset(row.id for row in baseline)
     if baseline_ids != BASELINE_ASSIGNMENT_IDS or len(baseline) != len(
         BASELINE_ASSIGNMENT_IDS
@@ -172,8 +488,9 @@ def _updated_assignments(
         if row.product == BASELINE_PRODUCT:
             evidence = replace(row.evidence, **baseline_hashes)
         else:
-            # Phase 2's producer owns all product-specific slice assignments.
-            evidence = row.evidence
+            # A source-only transition does not alter the product-specific ROM,
+            # map, or symbol authorities owned by Phase 2.
+            evidence = replace(row.evidence, source_sha256=source_sha256)
         rows.append(replace(row, evidence=evidence))
     return DiscoveryAssignmentAuthority(tuple(rows))
 
@@ -182,7 +499,9 @@ def _assert_assignment_delta(
     before: DiscoveryAssignmentAuthority, after: DiscoveryAssignmentAuthority
 ) -> None:
     if len(before.rows) != len(after.rows):
-        raise AuditEvidenceIdentityError("assignment row count changed during rebinding")
+        raise AuditEvidenceIdentityError(
+            "assignment row count changed during rebinding"
+        )
     for old, new in zip(before.rows, after.rows, strict=True):
         old_dict = old.to_dict()
         new_dict = new.to_dict()
@@ -226,8 +545,98 @@ def _updated_document(
         if row.get("id") in baseline_ids:
             evidence.update(baseline_hashes)
             continue
-        # Phase 2 rows are refreshed by phase2_measurements for all products.
+        evidence["source_sha256"] = source_sha256
     return raw
+
+
+def apply_reviewed_proposal(
+    root: Path, transition_proposal: Path, proposal_path: Path
+) -> None:
+    """Apply one canonically recomputed, explicitly reviewed hash-only proposal."""
+    root = root.resolve()
+    transition_proposal_argument = transition_proposal
+    transition_proposal = _contained_path(
+        root, transition_proposal_argument, label="source-transition proposal"
+    )
+    proposal_path = _contained_path(root, proposal_path, label="audit proposal")
+    supplied_text = proposal_path.read_text(encoding="utf-8")
+    supplied = json.loads(supplied_text)
+    if supplied_text != _canonical(supplied):
+        raise AuditEvidenceIdentityError(
+            "reviewed audit-evidence proposal is not canonical JSON"
+        )
+    expected = propose(root, transition_proposal_argument)
+    if supplied != expected:
+        raise AuditEvidenceIdentityError(
+            "reviewed audit-evidence proposal does not match canonical recomputation"
+        )
+    transition_envelope_text = transition_proposal.read_text(encoding="utf-8")
+    transition_envelope = json.loads(transition_envelope_text)
+    if transition_envelope_text != _canonical(transition_envelope):
+        raise AuditEvidenceIdentityError(
+            "reviewed source-transition proposal is not canonical JSON"
+        )
+    if transition_envelope.get("authority_path") != str(TRANSITION_PATH):
+        raise AuditEvidenceIdentityError(
+            "source-transition proposal does not name the canonical authority"
+        )
+    transition = transition_envelope.get("proposal")
+    if not isinstance(transition, dict):
+        raise AuditEvidenceIdentityError("source-transition proposal is malformed")
+
+    pinned: list[_PinnedTarget] = []
+    updates: list[tuple[_PinnedTarget, bytes]] = []
+    try:
+        transition_target = _pin_target(root, TRANSITION_PATH)
+        pinned.append(transition_target)
+        updates.append((transition_target, _canonical(transition).encode()))
+        for relative_text, document in supplied["documents"].items():
+            relative = Path(relative_text)
+            if relative not in DOCUMENTS:
+                raise AuditEvidenceIdentityError(
+                    f"proposal names an unauthorized inventory: {relative}"
+                )
+            target = _pin_target(root, relative)
+            pinned.append(target)
+            raw = json.loads(target.original.decode("utf-8"))
+            by_id = {row["id"]: row for row in raw["rows"]}
+            for change in document["changes"]:
+                row = by_id.get(change["id"])
+                if row is None:
+                    raise AuditEvidenceIdentityError(
+                        f"proposal names an unknown row: {relative}:{change['id']}"
+                    )
+                current = _evidence_hashes(row.get("evidence", {}))
+                if current != change["current"]:
+                    raise AuditEvidenceIdentityError(
+                        f"proposal preimage changed: {relative}:{change['id']}"
+                    )
+                changed_fields = {
+                    field
+                    for field in HASH_FIELDS
+                    if change["current"][field] != change["proposed"][field]
+                }
+                if changed_fields - {
+                    "source_sha256",
+                    "rom_sha256",
+                    "map_sha256",
+                    "sym_sha256",
+                }:
+                    raise AuditEvidenceIdentityError(
+                        f"proposal changes non-identity evidence: {relative}:{change['id']}"
+                    )
+                row["evidence"].update(change["proposed"])
+            document_type = DOCUMENTS[relative]
+            checked = (
+                DiscoveryAssignmentAuthority.from_dict(raw)
+                if relative.name == "assignments.json"
+                else document_type.from_dict(raw)
+            )
+            updates.append((target, checked.to_json().encode()))
+        _transactional_write(updates)
+    finally:
+        for target in pinned:
+            os.close(target.directory_fd)
 
 
 def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
@@ -251,15 +660,19 @@ def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
     ):
         raise AuditEvidenceIdentityError("source-transition proposal is malformed")
     transition = envelope["proposal"]
-    if set(transition) != {
-        "schema",
-        "reviewed_source_sha256",
-        "current_source_sha256",
-        "baseline_manifest_sha256",
-        "reviewed_delta_paths",
-        "subject_rebindings",
-        "rom_subject_rebindings",
-    } or transition["schema"] != source_transition.SCHEMA:
+    if (
+        set(transition)
+        != {
+            "schema",
+            "reviewed_source_sha256",
+            "current_source_sha256",
+            "baseline_manifest_sha256",
+            "reviewed_delta_paths",
+            "subject_rebindings",
+            "rom_subject_rebindings",
+        }
+        or transition["schema"] != source_transition.SCHEMA
+    ):
         raise AuditEvidenceIdentityError("source-transition authority is malformed")
     source_sha256 = transition["current_source_sha256"]
     if (
@@ -293,9 +706,7 @@ def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
     for relative, document_type in DOCUMENTS.items():
         path = root / relative
         raw = json.loads(path.read_text(encoding="utf-8"))
-        before_by_id = {
-            row["id"]: json.loads(json.dumps(row)) for row in raw["rows"]
-        }
+        before_by_id = {row["id"]: json.loads(json.dumps(row)) for row in raw["rows"]}
         if relative.name == "assignments.json":
             before = DiscoveryAssignmentAuthority.from_dict(raw)
             document = _updated_assignments(
@@ -335,15 +746,32 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--transition-proposal", type=Path, required=True)
-    parser.add_argument("--proposal-output", type=Path, required=True)
+    outputs = parser.add_mutually_exclusive_group(required=True)
+    outputs.add_argument("--proposal-output", type=Path)
+    outputs.add_argument("--apply-proposal", type=Path)
+    parser.add_argument("--authority-reviewed", action="store_true")
     args = parser.parse_args(argv)
     try:
-        proposal = propose(args.root, args.transition_proposal)
-        args.proposal_output.parent.mkdir(parents=True, exist_ok=True)
-        args.proposal_output.write_text(
-            json.dumps(proposal, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
+        if args.apply_proposal is not None:
+            if not args.authority_reviewed:
+                raise AuditEvidenceIdentityError(
+                    "applying checked-in identity changes requires --authority-reviewed"
+                )
+            apply_reviewed_proposal(
+                args.root, args.transition_proposal, args.apply_proposal
+            )
+        else:
+            if args.authority_reviewed:
+                raise AuditEvidenceIdentityError(
+                    "--authority-reviewed applies only to a reviewed proposal"
+                )
+            proposal = propose(args.root, args.transition_proposal)
+            assert args.proposal_output is not None
+            args.proposal_output.parent.mkdir(parents=True, exist_ok=True)
+            args.proposal_output.write_text(
+                json.dumps(proposal, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
     except (OSError, ValueError, AuditEvidenceIdentityError) as exc:
         parser.error(str(exc))
     return 0
