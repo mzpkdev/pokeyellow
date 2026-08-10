@@ -719,18 +719,7 @@ def test_reviewed_phase4_transition_authority_is_hash_bound(
     tmp_path, monkeypatch
 ) -> None:
     root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
-    for relative in (
-        "specs/full-colors/inventory/assignments.json",
-        phase2_measurements.PLANNED_SUBJECTS_PATH,
-    ):
-        (root / relative).write_bytes(
-            subprocess.run(
-                ["git", "show", f"HEAD:{relative}"],
-                cwd=ROOT,
-                check=True,
-                capture_output=True,
-            ).stdout
-        )
+    _activate_phase4_transition(root)
     transition = root / phase2_measurements.REVIEWED_TRANSITION_PATH
     transition.write_bytes(transition.read_bytes() + b" ")
 

@@ -119,7 +119,8 @@
       "fa38988e7a36e3f75cf1eecf45e999aecedbcb99a0f4e14006b15c951f209c86",
       "2a9a528b7acdf60b2ff4697f8e15a24d47c5246564be9f6b6349f41fed1a4787",
       "b3c0f371ccf30a80b0139c2a60eaf3aacf8dc4925de7618f9ef7399774cc1348",
-      "0d6104ec15755610bafded4580ff32a50129a41f87efd0d895f5ed885daa5939"
+      "0d6104ec15755610bafded4580ff32a50129a41f87efd0d895f5ed885daa5939",
+      "52982b249415c83ff938af0205aea76088d9a303d9ec65a9ef5d0d1cc1bdb186"
     ],
     "tools/rom_tests/tests/unit/full_color/test_production_color_mode_linkage_rom.py": [
       "7a1897c1b731242e988292c7c3b79b27bca3c40bf83cd94558d4c84e8fd17792"
