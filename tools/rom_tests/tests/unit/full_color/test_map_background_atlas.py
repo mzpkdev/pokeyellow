@@ -1496,10 +1496,12 @@ def test_converter_source_mutation_during_compile_fails_closed(
     assert mutated
 
 
-def _write_fake_graphics_toolchain(root: Path) -> tuple[Path, Path]:
+def _write_fake_graphics_toolchain(
+    root: Path, *, rgbds_version: str = "0.0.0", rgbgfx_version: str | None = None
+) -> tuple[Path, Path]:
     (root / "tools").mkdir(parents=True)
     (root / "gfx/tilesets").mkdir(parents=True)
-    (root / ".rgbds-version").write_text("0.0\n")
+    (root / ".rgbds-version").write_text(f"{rgbds_version}\n")
     (root / "tools/common.h").write_text("/* test */\n")
     (root / "tools/gfx.c").write_text("/* test */\n")
     (root / "gfx/tilesets/forest.png").write_bytes(b"png snapshot")
@@ -1531,7 +1533,9 @@ output.write_bytes(pathlib.Path(sys.argv[-1]).read_bytes())
 import pathlib
 import sys
 if "--version" in sys.argv:
-    print("rgbgfx v0.0")
+    print("""
+        + repr(rgbgfx_version or f"rgbgfx v{rgbds_version}")
+        + """)
 else:
     pathlib.Path(sys.argv[sys.argv.index("-o") + 1]).write_bytes(b"rgbgfx-original")
 """,
@@ -1540,6 +1544,44 @@ else:
     compiler.chmod(0o500)
     rgbgfx.chmod(0o500)
     return compiler, rgbgfx
+
+
+@pytest.mark.parametrize(
+    ("version_output", "accepted"),
+    (
+        ("rgbgfx v1.0.2+hotfix", True),
+        ("rgbgfx v1.0.2", True),
+        ("rgbgfx v1.0.3", False),
+        ("rgbgfx version 1.0.2", False),
+        ("rgbasm v1.0.2", False),
+        ("rgbgfx v1.0.2+local", False),
+    ),
+)
+def test_rgbgfx_version_matches_pinned_semantic_release_and_authorized_tag(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    version_output: str,
+    accepted: bool,
+) -> None:
+    root = tmp_path / "root"
+    compiler, rgbgfx = _write_fake_graphics_toolchain(
+        root, rgbds_version="1.0.2", rgbgfx_version=version_output
+    )
+    monkeypatch.setattr(
+        map_background_atlas.shutil,
+        "which",
+        lambda command: str(compiler if command == "cc" else rgbgfx),
+    )
+
+    if accepted:
+        toolchain = map_background_atlas.graphics_toolchain(root)
+        assert toolchain["rgbgfx"]["version"] == version_output
+    else:
+        with pytest.raises(
+            map_background_atlas.MapBackgroundAtlasError,
+            match="rgbgfx version disagrees",
+        ):
+            map_background_atlas.graphics_toolchain(root)
 
 
 def _replace_tool_during_run(
@@ -1638,6 +1680,39 @@ def test_rgbgfx_swap_immediately_before_exec_cannot_change_accepted_output(
     result = source_2bpp(root, Path("gfx/tilesets/forest.2bpp"))
 
     assert result == b"rgbgfx-original"
+    assert executions == [rgbgfx_digest]
+    assert hashlib.sha256(rgbgfx.read_bytes()).hexdigest() == rgbgfx_digest
+
+
+def test_rgbgfx_swap_before_version_exec_uses_identified_binary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "root"
+    compiler, rgbgfx = _write_fake_graphics_toolchain(root)
+    rgbgfx_digest = hashlib.sha256(rgbgfx.read_bytes()).hexdigest()
+    replacement = (
+        rgbgfx.read_text().replace("'rgbgfx v0.0.0'", "'rgbgfx v9.9.9'").encode()
+    )
+    assert replacement != rgbgfx.read_bytes()
+    monkeypatch.setattr(
+        map_background_atlas.shutil,
+        "which",
+        lambda command: str(compiler if command == "cc" else rgbgfx),
+    )
+    executions = _replace_tool_during_run(
+        monkeypatch,
+        target=rgbgfx,
+        replacement=replacement,
+        command_marker="--version",
+    )
+
+    toolchain = map_background_atlas.graphics_toolchain(root)
+
+    assert toolchain["rgbgfx"] == {
+        "command": "rgbgfx",
+        "binary_sha256": rgbgfx_digest,
+        "version": "rgbgfx v0.0.0",
+    }
     assert executions == [rgbgfx_digest]
     assert hashlib.sha256(rgbgfx.read_bytes()).hexdigest() == rgbgfx_digest
 

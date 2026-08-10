@@ -101,7 +101,7 @@ REVIEWED_TRANSITION_PROPOSAL_SCHEMA = (
     "full-color-phase2-reviewed-transition-rebind-proposal-v1"
 )
 REVIEWED_TRANSITION_SHA256 = (
-    "6f9423f6d47c88bf67630f7a65239ec052f37ed6fae3560f85b96a4aad630b90"
+    "b8d2881fd32a30a11c29aaa3cc46307c985b2ebd02d4624c7da00e8efd98f774"
 )
 VERIFIER_PATH = "tools/rom_tests/full_color/phase2_measurements.py"
 _TRANSITION_DIGEST_CARRIER = re.compile(

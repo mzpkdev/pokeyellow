@@ -101,6 +101,15 @@ _SOURCE_STEM = {
     "BEACH_HOUSE": "beach_house",
 }
 
+_RGBDS_SEMANTIC_VERSION = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+_RGBGFX_VERSION = re.compile(
+    r"rgbgfx v(?P<semantic>[0-9]+\.[0-9]+\.[0-9]+)(?P<suffix>\+hotfix)?"
+)
+# RGBDS built from this repository's pinned upstream tag reports the tag's
+# qualifier verbatim. Keep qualifiers closed and tied to the exact release
+# whose source is selected by .github/actions/setup-build/action.yml.
+_AUTHORIZED_RGBGFX_SUFFIXES = {("1.0.2", "+hotfix")}
+
 _LINKED_STEM = {
     "OVERWORLD": "Overworld",
     "REDS_HOUSE_1": "RedsHouse1",
@@ -355,7 +364,20 @@ def _graphics_toolchain_cached(
                     .stdout.splitlines()[0]
                     .strip()
                 )
-                if rgbgfx_version != f"rgbgfx v{expected_rgbds}":
+                version_match = _RGBGFX_VERSION.fullmatch(rgbgfx_version)
+                if (
+                    _RGBDS_SEMANTIC_VERSION.fullmatch(expected_rgbds) is None
+                    or version_match is None
+                    or version_match.group("semantic") != expected_rgbds
+                    or (
+                        version_match.group("suffix") is not None
+                        and (
+                            expected_rgbds,
+                            version_match.group("suffix"),
+                        )
+                        not in _AUTHORIZED_RGBGFX_SUFFIXES
+                    )
+                ):
                     raise MapBackgroundAtlasError(
                         "rgbgfx version disagrees with the checked-in .rgbds-version"
                     )
