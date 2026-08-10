@@ -16,6 +16,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import shutil
 import stat
 import subprocess
 import tempfile
@@ -58,28 +59,6 @@ FIXED_PAYLOADS = (
     ("roof_palettes", "FullColorOverworldRoofPalettes", 44),
     ("map_overrides", "PassiveFullColorResolveAttributeForIdentity", 84),
 )
-_LINK_OBJECTS = (
-    "audio.o",
-    "home.o",
-    "maps.o",
-    "ram.o",
-    "text.o",
-    "gfx/pics.o",
-    "gfx/pikachu.o",
-    "gfx/sprites.o",
-    "gfx/surfing_pikachu.o",
-    "gfx/tilesets.o",
-)
-_PRODUCT_BUILD = {
-    "pokeyellow": ((), "", "0x00"),
-    "pokeyellow_debug": (("-D", "_DEBUG"), "_debug", "0xff"),
-    "pokeyellow_vc": (("-D", "_YELLOW_VC"), "_vc", "0x00"),
-    "pokeyellow_phase2_audit": (
-        ("-D", "_DEBUG", "-D", "PHASE2_AUDIT"),
-        "_phase2_audit",
-        "0xff",
-    ),
-}
 
 
 class MapBackgroundSnapshotError(ValueError):
@@ -397,13 +376,13 @@ def _product_snapshot(
     for kind, name, end in POINTER_TABLES:
         expected = [
             row.palette_authority if kind == "palettes" else row.attribute_authority
-            for row in authority.tilesets[:23]
+            for row in authority.tilesets
         ]
         raw, record = _read(rom, symbols, name, len(expected) * 2, end=end)
         source_bank = _symbol(symbols, name).bank
         rows: list[dict[str, object]] = []
         for index, (tileset, expected_name) in enumerate(
-            zip(authority.tilesets[:23], expected, strict=True)
+            zip(authority.tilesets, expected, strict=True)
         ):
             pointer = int.from_bytes(raw[index * 2 : index * 2 + 2], "little")
             aliases = _pointer_target(symbols, pointer, source_bank)
@@ -500,15 +479,51 @@ def _source_fingerprint(root: Path) -> tuple[tuple[str, str], ...]:
     fingerprint = [
         (path.as_posix(), _sha((root / path).read_bytes())) for path in paths
     ]
-    linked_inputs = {Path("layout.link")}
-    for _, suffix, _ in _PRODUCT_BUILD.values():
-        linked_inputs.update(
-            Path(path.replace(".o", f"{suffix}.o")) for path in _LINK_OBJECTS
-        )
-    for path in sorted(linked_inputs):
-        stat = (root / path).stat()
-        fingerprint.append((path.as_posix(), f"{stat.st_size}:{stat.st_mtime_ns}"))
+    for path in (Path("layout.link"), Path("Makefile")):
+        fingerprint.append((path.as_posix(), _sha((root / path).read_bytes())))
     return tuple(fingerprint)
+
+
+def _build_products_from_source(root: Path, output: Path) -> Path:
+    """Build all products in a private checkout copy and return its root."""
+    output.mkdir(parents=True, exist_ok=True)
+    build_root = output / "repository"
+    shutil.copytree(
+        root,
+        build_root,
+        symlinks=False,
+        ignore=shutil.ignore_patterns(
+            ".git",
+            ".venv",
+            ".references",
+            ".preemdeck",
+            "test-results",
+            "*.o",
+            "*.gbc",
+            "*.sym",
+            "*.map",
+            "*.patch",
+            "*.2bpp",
+            "*.1bpp",
+            "*.pic",
+            "*.pcm",
+        ),
+    )
+    subprocess.run(
+        [
+            "make",
+            "-j2",
+            "yellow",
+            "yellow_debug",
+            "yellow_vc",
+            "yellow_phase2_audit",
+        ],
+        cwd=build_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return build_root
 
 
 @lru_cache(maxsize=8)
@@ -522,59 +537,13 @@ def _fresh_source_view_cached(
             output = Path(temporary)
             authority = MapBackgroundAuthority.load(root)
             override_rules = production_map_override_rules(root)
+            build_root = _build_products_from_source(root, output)
             views: dict[str, object] = {}
             for product_name in PRODUCTS:
-                defines, suffix, pad = _PRODUCT_BUILD[product_name]
-                main_object = output / f"main{suffix}.o"
-                subprocess.run(
-                    [
-                        "rgbasm",
-                        "-Weverything",
-                        "-Wtruncation=1",
-                        "-Q8",
-                        "-P",
-                        "includes.asm",
-                        *defines,
-                        "-o",
-                        str(main_object),
-                        "main.asm",
-                    ],
-                    cwd=root,
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
-                other_objects = [
-                    str(root / path.replace(".o", f"{suffix}.o"))
-                    for path in _LINK_OBJECTS
-                ]
-                subprocess.run(
-                    [
-                        "rgblink",
-                        "-Weverything",
-                        "-Wtruncation=1",
-                        "-p",
-                        pad,
-                        "-l",
-                        "layout.link",
-                        "-m",
-                        str(output / f"{product_name}.map"),
-                        "-n",
-                        str(output / f"{product_name}.sym"),
-                        "-o",
-                        str(output / f"{product_name}.gbc"),
-                        other_objects[0],
-                        other_objects[1],
-                        str(main_object),
-                        *other_objects[2:],
-                    ],
-                    cwd=root,
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
                 views[product_name] = _parity_view(
-                    _product_snapshot(output, product_name, authority, override_rules)
+                    _product_snapshot(
+                        build_root, product_name, authority, override_rules
+                    )
                 )
             return views
     except (OSError, subprocess.CalledProcessError) as exc:

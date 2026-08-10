@@ -25,7 +25,7 @@ behavior and vocabulary remain defined in [requirements.md](requirements.md).
 
 ## Overworld
 
-- **AC-OW-01:** Future and non-gating for the bounded release: all 25 tilesets use independently authored and Yellow-validated palette/attribute content with expected full-byte assignments and build-time table integrity. Direct requirements: R5.1, R6.1, R6.2, R6.3, R8.1, R8.2, R8.3, R8.4.
+- **AC-OW-01:** Complete and non-gating for the bounded release: all 25 tilesets use independently authored and Yellow-validated palette/attribute content with expected full-byte assignments and build-time table integrity. This content result does not activate excluded maps in the runtime presentation predicate. Direct requirements: R5.1, R6.1, R6.2, R6.3, R8.1, R8.2, R8.3, R8.4.
 - **AC-OW-02:** Initial entry, reload, horizontal and vertical scrolling, and all four connections preserve paired color state at every visible boundary. Direct requirements: R2.5, R7.1, R7.3, R10.5.
 - **AC-OW-03:** Dialogue, text boxes, and transient map overlays remain Yellow-owned and baseline-equivalent, return to eligible Color presentation only through a complete handoff, and never make `OVERWORLD_OVERLAY` reachable. Direct requirements: R2.6, R6.13, R7.1, R12.1.
 - **AC-OW-04:** Roofs, world-coordinate overrides, animated tiles, and field replacements produce their declared tiles, attributes, and tile-data dependencies. Direct requirements: R6.9, R7.1, R8.5, R8.6.

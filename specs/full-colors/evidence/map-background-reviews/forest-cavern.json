@@ -1,0 +1,646 @@
+{
+  "atlas": {
+    "artifacts": [
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-0.png",
+        "sha256": "f8e9cbef8b182dd2ab0d786e8bca952fae1775decbfa09571c585b7d436f0ed1"
+      },
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-1.png",
+        "sha256": "b56d31263a3573dfc0074a94da49679c5df03bef8cf54675849ec70ec163137c"
+      },
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-2.png",
+        "sha256": "739a121f3c65a10dda6e57900f4b86c35fb136b9b08247f0c766ad73645c9aff"
+      },
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-3.png",
+        "sha256": "b56d31263a3573dfc0074a94da49679c5df03bef8cf54675849ec70ec163137c"
+      },
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-4.png",
+        "sha256": "f8e9cbef8b182dd2ab0d786e8bca952fae1775decbfa09571c585b7d436f0ed1"
+      },
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-5.png",
+        "sha256": "97e1936388cfd63a7ea1f59756bd1f1bd1794bab1149df8da4e3940034147367"
+      },
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-6.png",
+        "sha256": "7983ee402be9184705add70c029d49d98c4065e1662bac8d18f6d9e9b8b43318"
+      },
+      {
+        "path": "forest-cavern/animations/cavern-water-rotation-7.png",
+        "sha256": "97e1936388cfd63a7ea1f59756bd1f1bd1794bab1149df8da4e3940034147367"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-0.png",
+        "sha256": "3d05705bd179b7b0c875b6cc6bdc3e6705317272296ebff0351012f58d5191a9"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-1.png",
+        "sha256": "5962748efe0aed2ced820c0d7ce80c8ff68d6dee1931cdcc5dc610e3eab831b7"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-2.png",
+        "sha256": "60522fb99e4ada938d356ccd22f427dec4a8fea3d00e2d7c1baf7fdc234780f5"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-3.png",
+        "sha256": "5962748efe0aed2ced820c0d7ce80c8ff68d6dee1931cdcc5dc610e3eab831b7"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-4.png",
+        "sha256": "3d05705bd179b7b0c875b6cc6bdc3e6705317272296ebff0351012f58d5191a9"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-5.png",
+        "sha256": "e057ddc7eaf45fa79f9e9109b24c279395b62cccb8f80ec20cc21c9ed7b8dca4"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-6.png",
+        "sha256": "d0eacb37ac5f860214faa648cd6b4b8d602fd56fe86064cc09affc6d60235f53"
+      },
+      {
+        "path": "forest-cavern/animations/forest-water-rotation-7.png",
+        "sha256": "e057ddc7eaf45fa79f9e9109b24c279395b62cccb8f80ec20cc21c9ed7b8dca4"
+      },
+      {
+        "path": "forest-cavern/maps/cerulean_cave_1f.png",
+        "sha256": "3f05c5daaf8a2a0c3cdc90c6946bc045f4325f3a8daef76acf913fe2bcb8f11d"
+      },
+      {
+        "path": "forest-cavern/maps/cerulean_cave_2f.png",
+        "sha256": "ba1077a30364cf470e316b887f113522d6cc85e70e49e329348597ad410ec41e"
+      },
+      {
+        "path": "forest-cavern/maps/cerulean_cave_b1f.png",
+        "sha256": "b60e951c6d1e15daec12a5137f25f018a5eb9c868ab00ad25c97827ea105b53e"
+      },
+      {
+        "path": "forest-cavern/maps/digletts_cave.png",
+        "sha256": "aecd0ff6d81a4c87265536b553dd04d7dbec42a08989e55fa05df1ea433f277b"
+      },
+      {
+        "path": "forest-cavern/maps/digletts_cave_route_11.png",
+        "sha256": "5451a08bdcb32c50c868c2018aaf4e87854207705893e15021d2d8ce0f305f73"
+      },
+      {
+        "path": "forest-cavern/maps/digletts_cave_route_2.png",
+        "sha256": "46b2df7d0998c849671d9f4f05301fc82ba961a5f9ed781416cd33a08f02764d"
+      },
+      {
+        "path": "forest-cavern/maps/mt_moon_1f.png",
+        "sha256": "727d38334877553316d25617e96522e9330ed87c19899cfe5013c7ee5b001708"
+      },
+      {
+        "path": "forest-cavern/maps/mt_moon_b1f.png",
+        "sha256": "fe287236a4d3a25bdcfc6a6206aa72e821af129cd7fd933ec8812689aec942d3"
+      },
+      {
+        "path": "forest-cavern/maps/mt_moon_b2f.png",
+        "sha256": "83834122baa928d3ae0dc951e2728ed9e1d77035a12907227d4f5e387dd3808d"
+      },
+      {
+        "path": "forest-cavern/maps/rock_tunnel_1f.png",
+        "sha256": "70a68a133ff18c044c4c67a1e358b2ba6ba2e265c7b81ebf9698f9ae8039f15d"
+      },
+      {
+        "path": "forest-cavern/maps/rock_tunnel_b1f.png",
+        "sha256": "cc7c9c104c0129fc85917d196ad517f05aff3350f67971bae855e441b1d2793f"
+      },
+      {
+        "path": "forest-cavern/maps/safari_zone_center.png",
+        "sha256": "1a9dd2820ec0b53cc58f8173637ac42695aad1476a5cf914b5d0c83249f24fc7"
+      },
+      {
+        "path": "forest-cavern/maps/safari_zone_east.png",
+        "sha256": "c7413081b08379066f0dff03e2512431a2fb5d1f3262a89053be9275f38cbc0a"
+      },
+      {
+        "path": "forest-cavern/maps/safari_zone_north.png",
+        "sha256": "f00f5aaab735d94a48b6b0d09776e6111271006b88bea15d9787b7d8b5f5ff54"
+      },
+      {
+        "path": "forest-cavern/maps/safari_zone_west.png",
+        "sha256": "57ec7fc835887c95214fdb871ae179fea47d17a03d6efd561dc68822e9d27741"
+      },
+      {
+        "path": "forest-cavern/maps/seafoam_islands_1f.png",
+        "sha256": "6068ce62697051c654d6182bea123e70f24512b47e0169af081983e06e96f016"
+      },
+      {
+        "path": "forest-cavern/maps/seafoam_islands_b1f.png",
+        "sha256": "d0fdd43c811fa1ee944fa4e0eb2751e2f879cf483850883267309ed20046d80b"
+      },
+      {
+        "path": "forest-cavern/maps/seafoam_islands_b2f.png",
+        "sha256": "72e01679974d9827f31cb3d075d492f321e23dc709c0a396a9f77d38773fb99d"
+      },
+      {
+        "path": "forest-cavern/maps/seafoam_islands_b3f.png",
+        "sha256": "1586c749473f8d35aa1ceb80d51951d38b76d430ae9f52f32ce38cbf23bf49b9"
+      },
+      {
+        "path": "forest-cavern/maps/seafoam_islands_b4f.png",
+        "sha256": "8e1229ac23a82a8c9aa4faf62baa9079a2051cde3677b1829bffa7e83593e8e0"
+      },
+      {
+        "path": "forest-cavern/maps/victory_road_1f.png",
+        "sha256": "4fa400dba68fa750340992ee6ab52019efc82fd042b11d7bb807660a777e7a1a"
+      },
+      {
+        "path": "forest-cavern/maps/victory_road_2f.png",
+        "sha256": "32fc1f05ad179bd98286ac0bd62a4ee57ea760a1ddb4246b89322ef2eab2696b"
+      },
+      {
+        "path": "forest-cavern/maps/victory_road_3f.png",
+        "sha256": "7f48395ae358f14dcabf4f06705e6804aed1e4c95098b8237114a143f7fbd4ff"
+      },
+      {
+        "path": "forest-cavern/maps/viridian_forest.png",
+        "sha256": "9fa9dd72110171ac9c1bfeccea669eaea1a0b4b0a22bfc8bb89a3f8245407813"
+      },
+      {
+        "path": "forest-cavern/tilesets/cavern.png",
+        "sha256": "cbac8030f09aaf0e50f32a2fb5912b04775651382af33b14dbff56ca0b53f7f0"
+      },
+      {
+        "path": "forest-cavern/tilesets/forest.png",
+        "sha256": "201470d1fd584f26acdeeff20dd9f9c61a07209f90e4fa5410062aba4416171f"
+      }
+    ],
+    "content_sha256": "7aa6f0e2a703c813d15c8dbbfa394b898abf2aa25c4098a05311841b2c644f52",
+    "manifest_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+    "path": "reviewer-local/forest-cavern/manifest.json"
+  },
+  "batch": "forest-cavern",
+  "content": {
+    "maps": [
+      {
+        "id": 228,
+        "name": "CERULEAN_CAVE_1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 226,
+        "name": "CERULEAN_CAVE_2F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 227,
+        "name": "CERULEAN_CAVE_B1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 197,
+        "name": "DIGLETTS_CAVE",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 85,
+        "name": "DIGLETTS_CAVE_ROUTE_11",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 46,
+        "name": "DIGLETTS_CAVE_ROUTE_2",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 59,
+        "name": "MT_MOON_1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 60,
+        "name": "MT_MOON_B1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 61,
+        "name": "MT_MOON_B2F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 82,
+        "name": "ROCK_TUNNEL_1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 232,
+        "name": "ROCK_TUNNEL_B1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 220,
+        "name": "SAFARI_ZONE_CENTER",
+        "tileset": "FOREST"
+      },
+      {
+        "id": 217,
+        "name": "SAFARI_ZONE_EAST",
+        "tileset": "FOREST"
+      },
+      {
+        "id": 218,
+        "name": "SAFARI_ZONE_NORTH",
+        "tileset": "FOREST"
+      },
+      {
+        "id": 219,
+        "name": "SAFARI_ZONE_WEST",
+        "tileset": "FOREST"
+      },
+      {
+        "id": 192,
+        "name": "SEAFOAM_ISLANDS_1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 159,
+        "name": "SEAFOAM_ISLANDS_B1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 160,
+        "name": "SEAFOAM_ISLANDS_B2F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 161,
+        "name": "SEAFOAM_ISLANDS_B3F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 162,
+        "name": "SEAFOAM_ISLANDS_B4F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 108,
+        "name": "VICTORY_ROAD_1F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 194,
+        "name": "VICTORY_ROAD_2F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 198,
+        "name": "VICTORY_ROAD_3F",
+        "tileset": "CAVERN"
+      },
+      {
+        "id": 51,
+        "name": "VIRIDIAN_FOREST",
+        "tileset": "FOREST"
+      }
+    ],
+    "tilesets": [
+      {
+        "id": 3,
+        "name": "FOREST"
+      },
+      {
+        "id": 17,
+        "name": "CAVERN"
+      }
+    ]
+  },
+  "retained_artifacts": [
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow.gbc",
+          "sha256": "339161361c3bdce12cda32f5c32b7a05fd3127a689b36cab9db6ba331686ed4e"
+        },
+        {
+          "path": "pokeyellow.map",
+          "sha256": "648457cab39d622f49c9bf7481b0128fcaeca82ace735a791360eea47824af1a"
+        },
+        {
+          "path": "pokeyellow.sym",
+          "sha256": "22aa7d219684e3841c01244a0fe259125a5fb028230d2c095ab11a1d04d21859"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow_debug.gbc",
+          "sha256": "785e8f73d59d64b98cd1438f4b65288a03ea2583831b3c5079c81dcd610fff77"
+        },
+        {
+          "path": "pokeyellow_debug.map",
+          "sha256": "90ceb4c028c9f9016aa7539c67f5c3bdf2611d49324379f5fc9bf9e356cc7922"
+        },
+        {
+          "path": "pokeyellow_debug.sym",
+          "sha256": "a3e4d11543640b4a9ca29a0f5262f20ec0f699d4bf579cd54af202d403a24762"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow_debug",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow_vc.gbc",
+          "sha256": "d3a7e035f0ed9dc4fa93834a61d4e5c9534da5400ab27e8a1e344abcf08fd64b"
+        },
+        {
+          "path": "pokeyellow_vc.map",
+          "sha256": "4b837e629e586905d42f7ef4d6f86627201ca26761031755510b55335e85f1f2"
+        },
+        {
+          "path": "pokeyellow_vc.sym",
+          "sha256": "794f76c4ff78df91fbde99c571c4c813d4470b833a8c878a38e3bc3f8ac77857"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow_vc",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    },
+    {
+      "artifacts": [
+        {
+          "path": "pokeyellow_phase2_audit.gbc",
+          "sha256": "2a8f692ca9b1a9d4b741bcb6de77007bc99870cf540ba26cf5ae331662c15512"
+        },
+        {
+          "path": "pokeyellow_phase2_audit.map",
+          "sha256": "5e4e00b6333a5491035042df9df9ab925995fa91c9d4a6c9c6f5e71ee93d5f91"
+        },
+        {
+          "path": "pokeyellow_phase2_audit.sym",
+          "sha256": "729d2e2ee5386c8208832b51d5d8617dd56fcd526b9706f2f8e725c4a9f84ac6"
+        }
+      ],
+      "manifest_path": "test-results/full-color-proposals/map-background-content.proposal.json",
+      "manifest_sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+      "mode": "artifact-only",
+      "product": "pokeyellow_phase2_audit",
+      "purpose": "artifact-only-atlas-and-linked-product-parity"
+    }
+  ],
+  "review": {
+    "observations": [
+      "Both 256-tile FOREST and CAVERN atlases, all 24 batch maps, and the sixteen TILEANIM_WATER rotation frames were visually reviewed; tiles $60-$ff remain text-reserved and the reviewed sheets contain no stray text-palette regions.",
+      "FOREST and CAVERN bind source-owned TILEANIM_WATER tile $14 plus UpdateMovingBgTiles counter/direction semantics, while all four linked products contain byte-identical palette and attribute payloads.",
+      "This is artifact-only content acceptance. Every reviewed map remains Yellow-presented behind the architecture-boundary fallback; no Color runtime admission is claimed."
+    ],
+    "products": [
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow"
+      },
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow_debug"
+      },
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow_vc"
+      },
+      {
+        "claim": "linked-artifact-parity",
+        "product": "pokeyellow_phase2_audit"
+      }
+    ],
+    "purpose": "artifact-only-atlas-and-linked-product-parity",
+    "result": "accepted",
+    "review_kind": "independent-ai-visual",
+    "reviewer": "Codex independent visual review (forest-cavern)",
+    "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+    "route": "phase4-forest-cavern-artifact-review"
+  },
+  "reviewed_candidate": {
+    "ledger_canonical_sha256": "57dcaf95fd2fdbeb1e206a0bdd64589a3bb7e4843dc2d1d137f1bcb21d645450",
+    "path": "test-results/full-color-proposals/map-background-content.proposal.json",
+    "sha256": "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+    "source_semantic_sha256": "7f8b5fd33c900c409137a293f2007003f61b6db120ac82613f06220288349c3f"
+  },
+  "reviews": {
+    "map-108": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 108,
+      "content_kind": "map",
+      "content_name": "VICTORY_ROAD_1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-159": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 159,
+      "content_kind": "map",
+      "content_name": "SEAFOAM_ISLANDS_B1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-160": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 160,
+      "content_kind": "map",
+      "content_name": "SEAFOAM_ISLANDS_B2F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-161": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 161,
+      "content_kind": "map",
+      "content_name": "SEAFOAM_ISLANDS_B3F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-162": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 162,
+      "content_kind": "map",
+      "content_name": "SEAFOAM_ISLANDS_B4F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-192": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 192,
+      "content_kind": "map",
+      "content_name": "SEAFOAM_ISLANDS_1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-194": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 194,
+      "content_kind": "map",
+      "content_name": "VICTORY_ROAD_2F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-197": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 197,
+      "content_kind": "map",
+      "content_name": "DIGLETTS_CAVE",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-198": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 198,
+      "content_kind": "map",
+      "content_name": "VICTORY_ROAD_3F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-217": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 217,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_EAST",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-218": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 218,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_NORTH",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-219": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 219,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_WEST",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-220": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 220,
+      "content_kind": "map",
+      "content_name": "SAFARI_ZONE_CENTER",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-226": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 226,
+      "content_kind": "map",
+      "content_name": "CERULEAN_CAVE_2F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-227": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 227,
+      "content_kind": "map",
+      "content_name": "CERULEAN_CAVE_B1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-228": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 228,
+      "content_kind": "map",
+      "content_name": "CERULEAN_CAVE_1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-232": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 232,
+      "content_kind": "map",
+      "content_name": "ROCK_TUNNEL_B1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-46": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 46,
+      "content_kind": "map",
+      "content_name": "DIGLETTS_CAVE_ROUTE_2",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-51": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 51,
+      "content_kind": "map",
+      "content_name": "VIRIDIAN_FOREST",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-59": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 59,
+      "content_kind": "map",
+      "content_name": "MT_MOON_1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-60": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 60,
+      "content_kind": "map",
+      "content_name": "MT_MOON_B1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-61": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 61,
+      "content_kind": "map",
+      "content_name": "MT_MOON_B2F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-82": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 82,
+      "content_kind": "map",
+      "content_name": "ROCK_TUNNEL_1F",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "map-85": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 85,
+      "content_kind": "map",
+      "content_name": "DIGLETTS_CAVE_ROUTE_11",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "tileset-17": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 17,
+      "content_kind": "tileset",
+      "content_name": "CAVERN",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    },
+    "tileset-3": {
+      "atlas_sha256": "ee6ea7ee9ff909a773ec0f9f5836daa6b105c5e4aca39f45136357d1f6810245",
+      "content_id": 3,
+      "content_kind": "tileset",
+      "content_name": "FOREST",
+      "revision": "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+      "route": "phase4-forest-cavern-artifact-review"
+    }
+  },
+  "schema": "full-color-map-background-review-v2"
+}

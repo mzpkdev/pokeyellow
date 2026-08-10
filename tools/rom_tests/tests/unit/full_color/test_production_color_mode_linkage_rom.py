@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
 
 import pytest
@@ -102,6 +103,95 @@ VBLANK_INTERRUPT = 1
 WRAM_PROGRAM = 0xD100
 RETURN_PROBE = 0x0100
 HARNESS_LOOP = 0xFF80
+CANDIDATE_PAYLOADS = {
+    "FOREST": {
+        "tileset_id": 3,
+        "palette": "FullColorForestBGPalettes",
+        "attribute": "FullColorForestTileAttributes",
+        "palette_sha256": "f1fa3daec8ba0bf9d385e2e921549598e796a09e9bf5a831a46e2eb40d953e83",
+        "attribute_sha256": "41eb8b85d5c053eef50ccb754d170ce7c4fd261c91c5b952b6fe4c6a87a51be1",
+        "semantic": {
+            0x04: 1,
+            0x14: 2,
+            0x20: 0,
+            0x21: 6,
+            0x24: 5,
+            0x25: 3,
+            0x28: 4,
+            0x41: 2,
+        },
+    },
+    "CAVERN": {
+        "tileset_id": 17,
+        "palette": "FullColorCavernBGPalettes",
+        "attribute": "FullColorCavernTileAttributes",
+        "palette_sha256": "f7dbc493aacdae230d5ace471193e09e689965f0d1a82a40db79813d9b631612",
+        "attribute_sha256": "c05d2d1b10cb9e59b824cba300b87d62271e3545e2115700d70e2ac024e6e525",
+        "semantic": {
+            0x04: 5,
+            0x05: 1,
+            0x0A: 4,
+            0x0C: 6,
+            0x14: 2,
+            0x18: 4,
+            0x1A: 4,
+            0x21: 6,
+            0x22: 6,
+            0x3C: 6,
+        },
+    },
+    "SHIP_PORT": {
+        "tileset_id": 14,
+        "palette": "FullColorShipPortBGPalettes",
+        "attribute": "FullColorShipPortTileAttributes",
+        "palette_sha256": "e5d73e4a81fd2d8422a34d4192dae5d1326a55db6a855c65b1a9f50937e4bbfd",
+        "attribute_sha256": "28804901a15fc193ac711de512b18cbfb6d415a551bd4ff654701ef5dc51c877",
+        "semantic": {
+            0x0A: 0,
+            0x14: 0,
+            0x20: 4,
+            0x31: 1,
+            0x3A: 1,
+            0x42: 6,
+            0x50: 5,
+            0x56: 5,
+        },
+    },
+    "PLATEAU": {
+        "tileset_id": 23,
+        "palette": "FullColorPlateauBGPalettes",
+        "attribute": "FullColorPlateauTileAttributes",
+        "palette_sha256": "3342e7c381d46541556bc16b9924197c7709777fb0e390af5cd32c0f3fe65c0b",
+        "attribute_sha256": "39c4b7beffd8f910a7ec092cfd75622ab46ba182ef7338692cdbf81743bfbda4",
+        "semantic": {
+            0x07: 5,
+            0x14: 2,
+            0x19: 6,
+            0x23: 0,
+            0x2D: 6,
+            0x34: 1,
+            0x3D: 4,
+            0x45: 1,
+        },
+    },
+    "BEACH_HOUSE": {
+        "tileset_id": 24,
+        "palette": "FullColorBeachHouseBGPalettes",
+        "attribute": "FullColorBeachHouseTileAttributes",
+        "palette_sha256": "3e7f9eae1b29dbaaaee5cb4ce049c0673cb3c9ff576504f02d141060a805f941",
+        "attribute_sha256": "0521973117cff482695c2ed425ee32fb91cf4489d8a4a3973dff47060ee8d23e",
+        "semantic": {
+            0x01: 0,
+            0x06: 4,
+            0x08: 3,
+            0x11: 1,
+            0x27: 1,
+            0x40: 5,
+            0x42: 2,
+            0x44: 3,
+        },
+    },
+}
 
 
 def _symbols(
@@ -120,6 +210,59 @@ def _symbols(
         if "." not in match.group(3):
             by_address.setdefault(location, set()).add(match.group(3))
     return by_name, by_address
+
+
+def _linked_payload(product: str, start: str, size: int) -> bytes:
+    symbols, _ = _symbols(product)
+    bank, address = symbols[start]
+    offset = address if bank == 0 else bank * 0x4000 + address - 0x4000
+    payload = (REPOSITORY_ROOT / f"{product}.gbc").read_bytes()[offset : offset + size]
+    assert len(payload) == size
+    return payload
+
+
+@pytest.mark.parametrize("product", PRODUCTS)
+def test_phase4_candidates_link_exact_complete_payloads_without_admission(
+    product: str,
+) -> None:
+    symbols, _ = _symbols(product)
+    palette_pointers = _linked_payload(product, "FullColorBGPalettePointers", 50)
+    attribute_pointers = _linked_payload(product, "FullColorTileAttributePointers", 50)
+    for candidate in CANDIDATE_PAYLOADS.values():
+        palette_name = str(candidate["palette"])
+        attribute_name = str(candidate["attribute"])
+        palette = _linked_payload(product, palette_name, 64)
+        attributes = _linked_payload(product, attribute_name, 256)
+        tileset_id = int(candidate["tileset_id"])
+        assert symbols[f"{palette_name}End"][1] - symbols[palette_name][1] == 64
+        assert symbols[f"{attribute_name}End"][1] - symbols[attribute_name][1] == 256
+        assert hashlib.sha256(palette).hexdigest() == candidate["palette_sha256"]
+        assert hashlib.sha256(attributes).hexdigest() == candidate["attribute_sha256"]
+        assert (
+            int.from_bytes(
+                palette_pointers[tileset_id * 2 : tileset_id * 2 + 2], "little"
+            )
+            == symbols[palette_name][1]
+        )
+        assert (
+            int.from_bytes(
+                attribute_pointers[tileset_id * 2 : tileset_id * 2 + 2], "little"
+            )
+            == symbols[attribute_name][1]
+        )
+        assert all(value < 8 for value in attributes)
+        assert attributes[0x60:] == bytes((7,)) * 0xA0
+        assert {
+            tile_id: attributes[tile_id] for tile_id in candidate["semantic"]
+        } == candidate["semantic"]
+
+    assert all(
+        palette_pointers[index : index + 2] != b"\x00\x00" for index in range(0, 50, 2)
+    )
+    assert all(
+        attribute_pointers[index : index + 2] != b"\x00\x00"
+        for index in range(0, 50, 2)
+    )
 
 
 @pytest.mark.parametrize("product", PRODUCTS)
@@ -383,6 +526,10 @@ def test_audit_adds_diagnostics_without_changing_renderer_payload() -> None:
         "OptionsMenu_ColorMode",
         "FullColorOverworldBGPalettes",
         "FullColorOverworldTileAttributes",
+        "FullColorForestBGPalettes",
+        "FullColorForestTileAttributes",
+        "FullColorCavernBGPalettes",
+        "FullColorCavernTileAttributes",
     } <= audit.keys()
     audit_rom = (REPOSITORY_ROOT / "pokeyellow_phase2_audit.gbc").read_bytes()
     for product in PRODUCTS:
@@ -391,6 +538,10 @@ def test_audit_adds_diagnostics_without_changing_renderer_payload() -> None:
         for start, end in (
             ("FullColorOverworldBGPalettes", "FullColorOverworldBGPalettesEnd"),
             ("FullColorOverworldTileAttributes", "FullColorOverworldTileAttributesEnd"),
+            ("FullColorForestBGPalettes", "FullColorForestBGPalettesEnd"),
+            ("FullColorForestTileAttributes", "FullColorForestTileAttributesEnd"),
+            ("FullColorCavernBGPalettes", "FullColorCavernBGPalettesEnd"),
+            ("FullColorCavernTileAttributes", "FullColorCavernTileAttributesEnd"),
         ):
             audit_offset = audit[start][0] * 0x4000 + audit[start][1] - 0x4000
             product_offset = symbols[start][0] * 0x4000 + symbols[start][1] - 0x4000
@@ -414,3 +565,6 @@ def test_reviewed_map_background_evidence_covers_production_and_audit_products()
     for product in manifest["products"]:
         assert product["payloads"]["FullColorOverworldBGPalettes"]["size"] == 64
         assert product["payloads"]["FullColorOverworldTileAttributes"]["size"] == 256
+        for candidate in CANDIDATE_PAYLOADS.values():
+            assert product["payloads"][candidate["palette"]]["size"] == 64
+            assert product["payloads"][candidate["attribute"]]["size"] == 256

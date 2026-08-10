@@ -7,7 +7,6 @@ import json
 import os
 from pathlib import Path
 import shutil
-import subprocess
 import tempfile
 
 import pytest
@@ -89,9 +88,9 @@ def test_source_and_all_four_products_have_exact_payload_parity() -> None:
     assert len(snapshot["source"]["authorities"]) == 6
     views = []
     for product in snapshot["products"]:
-        assert len(product["payloads"]) == 21
-        assert len(product["pointer_tables"]["palettes"]["rows"]) == 23
-        assert len(product["pointer_tables"]["attributes"]["rows"]) == 23
+        assert len(product["payloads"]) == 31
+        assert len(product["pointer_tables"]["palettes"]["rows"]) == 25
+        assert len(product["pointer_tables"]["attributes"]["rows"]) == 25
         views.append(
             {
                 name: (row["size"], row["sha256"], row["bytes"])
@@ -106,7 +105,10 @@ def test_exact_sizes_roofs_semantics_and_legal_attribute_bits_are_retained() -> 
     product = snapshot["products"][0]
     assert product["roof_assignments"]["size"] == 37
     assert product["roof_palettes"]["size"] == 44
-    assert snapshot["source"]["semantic"]["animations"] == ["TILEANIM_WATER_FLOWER"]
+    assert snapshot["source"]["semantic"]["animations"] == [
+        "TILEANIM_WATER",
+        "TILEANIM_WATER_FLOWER",
+    ]
     assert snapshot["source"]["semantic"]["replacements"] == ["CUT_TREE"]
     assert snapshot["source"]["semantic"]["overrides"] == [
         {
@@ -147,19 +149,30 @@ def test_exact_sizes_roofs_semantics_and_legal_attribute_bits_are_retained() -> 
             assert all(value < 8 for value in bytes.fromhex(row["bytes"]))
 
 
-def test_linked_byte_mutation_is_observed(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "symbol",
+    (
+        "FullColorOverworldBGPalettes",
+        "FullColorForestBGPalettes",
+        "FullColorForestTileAttributes",
+        "FullColorCavernBGPalettes",
+        "FullColorCavernTileAttributes",
+        "FullColorShipPortBGPalettes",
+        "FullColorShipPortTileAttributes",
+        "FullColorPlateauBGPalettes",
+        "FullColorPlateauTileAttributes",
+        "FullColorBeachHouseBGPalettes",
+        "FullColorBeachHouseTileAttributes",
+    ),
+)
+def test_linked_byte_mutation_is_observed(tmp_path: Path, symbol: str) -> None:
     _copy_product(tmp_path)
     authority = MapBackgroundAuthority.load(ROOT)
     before = _snapshot_product(tmp_path, "pokeyellow", authority)
-    original = bytes.fromhex(
-        before["payloads"]["FullColorOverworldBGPalettes"]["bytes"]
-    )[0]
-    _mutate_symbol_payload(tmp_path, "FullColorOverworldBGPalettes", value=original ^ 1)
+    original = bytes.fromhex(before["payloads"][symbol]["bytes"])[0]
+    _mutate_symbol_payload(tmp_path, symbol, value=original ^ 1)
     after = _snapshot_product(tmp_path, "pokeyellow", authority)
-    assert (
-        after["payloads"]["FullColorOverworldBGPalettes"]["sha256"]
-        != before["payloads"]["FullColorOverworldBGPalettes"]["sha256"]
-    )
+    assert after["payloads"][symbol]["sha256"] != before["payloads"][symbol]["sha256"]
 
 
 @pytest.mark.parametrize(
@@ -203,6 +216,38 @@ def test_pointer_alias_cannot_replace_the_ledger_authority(tmp_path: Path) -> No
     rom = bytearray(rom_path.read_bytes())
     rom[table.rom_offset : table.rom_offset + 2] = wrong.address.to_bytes(2, "little")
     rom_path.write_bytes(rom)
+    with pytest.raises(MapBackgroundSnapshotError, match="does not bind"):
+        _snapshot_product(tmp_path, "pokeyellow", authority)
+
+
+@pytest.mark.parametrize(
+    ("table_name", "tileset_id"),
+    (
+        ("FullColorBGPalettePointers", 3),
+        ("FullColorTileAttributePointers", 3),
+        ("FullColorBGPalettePointers", 17),
+        ("FullColorTileAttributePointers", 17),
+        ("FullColorBGPalettePointers", 14),
+        ("FullColorTileAttributePointers", 14),
+        ("FullColorBGPalettePointers", 23),
+        ("FullColorTileAttributePointers", 23),
+        ("FullColorBGPalettePointers", 24),
+        ("FullColorTileAttributePointers", 24),
+    ),
+)
+def test_phase4_candidate_pointer_mutations_fail_closed(
+    tmp_path: Path, table_name: str, tileset_id: int
+) -> None:
+    _copy_product(tmp_path)
+    authority = MapBackgroundAuthority.load(ROOT)
+    symbols = load_sym(tmp_path / "pokeyellow.sym")
+    table = symbols.by_name[table_name]
+    rom_path = tmp_path / "pokeyellow.gbc"
+    rom = bytearray(rom_path.read_bytes())
+    pointer_offset = table.rom_offset + tileset_id * 2
+    rom[pointer_offset : pointer_offset + 2] = b"\x00\x00"
+    rom_path.write_bytes(rom)
+
     with pytest.raises(MapBackgroundSnapshotError, match="does not bind"):
         _snapshot_product(tmp_path, "pokeyellow", authority)
 
@@ -415,60 +460,13 @@ def test_macro_redefinition_changes_all_fresh_products_but_semantics_fail_closed
     ):
         generate(root)
 
-    for product_name in PRODUCTS:
-        defines, suffix, pad = snapshot_module._PRODUCT_BUILD[product_name]
-        main_object = tmp_path / f"main{suffix}.o"
-        subprocess.run(
-            [
-                "rgbasm",
-                "-Weverything",
-                "-Wtruncation=1",
-                "-Q8",
-                "-P",
-                "includes.asm",
-                *defines,
-                "-o",
-                str(main_object),
-                "main.asm",
-            ],
-            cwd=root,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        subprocess.run(
-            [
-                "rgblink",
-                "-Weverything",
-                "-Wtruncation=1",
-                "-p",
-                pad,
-                "-l",
-                "layout.link",
-                "-m",
-                str(tmp_path / f"{product_name}.map"),
-                "-n",
-                str(tmp_path / f"{product_name}.sym"),
-                "-o",
-                str(tmp_path / f"{product_name}.gbc"),
-                *[
-                    str(root / object_path.replace(".o", f"{suffix}.o"))
-                    for object_path in snapshot_module._LINK_OBJECTS[:2]
-                ],
-                str(main_object),
-                *[
-                    str(root / object_path.replace(".o", f"{suffix}.o"))
-                    for object_path in snapshot_module._LINK_OBJECTS[2:]
-                ],
-            ],
-            cwd=root,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
+    isolated_root = snapshot_module._build_products_from_source(
+        root, tmp_path / "isolated"
+    )
 
+    for product_name in PRODUCTS:
         baseline_symbols = load_sym(ROOT / f"{product_name}.sym")
-        mutated_symbols = load_sym(tmp_path / f"{product_name}.sym")
+        mutated_symbols = load_sym(isolated_root / f"{product_name}.sym")
         baseline_symbol = baseline_symbols.by_name[
             "PassiveFullColorResolveAttributeForIdentity"
         ]
@@ -478,7 +476,7 @@ def test_macro_redefinition_changes_all_fresh_products_but_semantics_fail_closed
         baseline = (ROOT / f"{product_name}.gbc").read_bytes()[
             baseline_symbol.rom_offset : baseline_symbol.rom_offset + 63
         ]
-        mutated = (tmp_path / f"{product_name}.gbc").read_bytes()[
+        mutated = (isolated_root / f"{product_name}.gbc").read_bytes()[
             mutated_symbol.rom_offset : mutated_symbol.rom_offset + 63
         ]
         differences = [
@@ -491,7 +489,7 @@ def test_macro_redefinition_changes_all_fresh_products_but_semantics_fail_closed
             MapBackgroundSnapshotError,
             match="linked map override routine contradicts semantic rules",
         ):
-            _product_snapshot(tmp_path, product_name, authority, rules)
+            _product_snapshot(isolated_root, product_name, authority, rules)
 
 
 def test_promotion_refuses_without_explicit_review(

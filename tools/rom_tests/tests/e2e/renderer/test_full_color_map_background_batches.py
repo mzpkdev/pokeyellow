@@ -16,6 +16,8 @@ import pytest
 
 from tools.rom_tests.emulator import Emulator
 from tools.rom_tests.scenarios.map_background_routes import (
+    ARTIFACT_ONLY_PURPOSE,
+    ARTIFACT_REVIEW_ROUTES,
     BATCH_ROUTES,
     MAP_IDENTITIES,
     MODES,
@@ -24,6 +26,7 @@ from tools.rom_tests.scenarios.map_background_routes import (
     ROUTES_BY_BATCH,
     BatchRoute,
     RouteCheckpoint,
+    validate_artifact_review_route,
 )
 from tools.rom_tests.scenarios.new_game import reach_bedroom_overworld
 from tools.rom_tests.scenarios.oaks_lab import (
@@ -506,3 +509,22 @@ def test_natural_batch_route_preserves_yellow_gameplay_and_current_presentation(
         assert baseline.passive_active == 0
         assert baseline.attributes == bytes(len(baseline.attributes))
         assert candidate.palettes != baseline.palettes
+
+
+@pytest.mark.parametrize("route", ARTIFACT_REVIEW_ROUTES, ids=lambda row: row.batch)
+def test_phase4_review_routes_are_explicitly_artifact_only(route: object) -> None:
+    validate_artifact_review_route(route)
+    assert route.purpose == ARTIFACT_ONLY_PURPOSE
+    assert route.batch not in ROUTES_BY_BATCH
+    assert route.products == (
+        "pokeyellow",
+        "pokeyellow_debug",
+        "pokeyellow_vc",
+        "pokeyellow_phase2_audit",
+    )
+    assert all(
+        checkpoint.expected_presentation == "yellow"
+        and checkpoint.fallback_authority
+        == "engine/full_color/passive_overworld.asm#PassiveFullColorIsPresentedSliceMap"
+        for checkpoint in route.checkpoints
+    )

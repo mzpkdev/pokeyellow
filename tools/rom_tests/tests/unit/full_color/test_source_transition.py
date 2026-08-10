@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import json
+import os
+import shutil
 from copy import deepcopy
 from dataclasses import replace
-import json
-import shutil
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -386,7 +388,14 @@ def test_reviewed_identity_apply_requires_exact_canonical_proposal(
         "documents": {},
     }
     proposal_path = tmp_path / "proposal.json"
-    proposal_path.write_text(json.dumps(proposal), encoding="utf-8")
+    proposal_path.write_text(
+        audit_evidence_identities._canonical(proposal), encoding="utf-8"
+    )
+    transition_path = tmp_path / "transition.json"
+    transition_path.write_text(
+        audit_evidence_identities._canonical(_proposal_envelope({"identity": "x"})),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(
         audit_evidence_identities,
         "propose",
@@ -397,8 +406,312 @@ def test_reviewed_identity_apply_requires_exact_canonical_proposal(
         match="does not match canonical recomputation",
     ):
         audit_evidence_identities.apply_reviewed_proposal(
-            tmp_path, tmp_path / "transition.json", proposal_path
+            tmp_path, transition_path, proposal_path
         )
+
+
+def test_reviewed_apply_installs_exact_canonical_transition(
+    tmp_path, monkeypatch
+) -> None:
+    target = tmp_path / audit_evidence_identities.TRANSITION_PATH
+    target.parent.mkdir(parents=True)
+    target.write_text("{}\n", encoding="utf-8")
+    transition = {
+        "schema": source_transition.SCHEMA,
+        "reviewed_source_sha256": "a" * 64,
+        "current_source_sha256": "b" * 64,
+        "baseline_manifest_sha256": "c" * 64,
+        "reviewed_delta_paths": {},
+        "subject_rebindings": {},
+        "rom_subject_rebindings": {},
+    }
+    transition_proposal = tmp_path / "transition.proposal.json"
+    transition_proposal.write_text(
+        audit_evidence_identities._canonical(_proposal_envelope(transition)),
+        encoding="utf-8",
+    )
+    proposal = {
+        "schema": audit_evidence_identities.PROPOSAL_SCHEMA,
+        "reviewed": False,
+        "source_transition_proposal": str(transition_proposal),
+        "documents": {},
+    }
+    proposal_path = tmp_path / "audit.proposal.json"
+    proposal_path.write_text(
+        audit_evidence_identities._canonical(proposal), encoding="utf-8"
+    )
+    monkeypatch.setattr(
+        audit_evidence_identities,
+        "propose",
+        lambda root, path: proposal,
+    )
+
+    audit_evidence_identities.apply_reviewed_proposal(
+        tmp_path, transition_proposal, proposal_path
+    )
+
+    assert target.read_text(encoding="utf-8") == (
+        audit_evidence_identities._canonical(transition)
+    )
+
+
+def test_reviewed_apply_rejects_noncanonical_json_and_noncanonical_target(
+    tmp_path, monkeypatch
+) -> None:
+    target = tmp_path / audit_evidence_identities.TRANSITION_PATH
+    target.parent.mkdir(parents=True)
+    target.write_text("{}\n", encoding="utf-8")
+    transition = _proposal_envelope({"identity": "x"})
+    transition_proposal = tmp_path / "transition.proposal.json"
+    transition_proposal.write_text(
+        audit_evidence_identities._canonical(transition), encoding="utf-8"
+    )
+    proposal = {
+        "schema": audit_evidence_identities.PROPOSAL_SCHEMA,
+        "reviewed": False,
+        "source_transition_proposal": str(transition_proposal),
+        "documents": {},
+    }
+    proposal_path = tmp_path / "audit.proposal.json"
+    proposal_path.write_text(json.dumps(proposal), encoding="utf-8")
+    monkeypatch.setattr(
+        audit_evidence_identities,
+        "propose",
+        lambda root, path: proposal,
+    )
+    with pytest.raises(
+        audit_evidence_identities.AuditEvidenceIdentityError,
+        match="not canonical JSON",
+    ):
+        audit_evidence_identities.apply_reviewed_proposal(
+            tmp_path, transition_proposal, proposal_path
+        )
+
+    proposal_path.write_text(
+        audit_evidence_identities._canonical(proposal), encoding="utf-8"
+    )
+    transition["authority_path"] = "specs/full-colors/definitions/forged.json"
+    transition_proposal.write_text(
+        audit_evidence_identities._canonical(transition), encoding="utf-8"
+    )
+    with pytest.raises(
+        audit_evidence_identities.AuditEvidenceIdentityError,
+        match="canonical authority",
+    ):
+        audit_evidence_identities.apply_reviewed_proposal(
+            tmp_path, transition_proposal, proposal_path
+        )
+
+
+def test_reviewed_apply_paths_are_contained_and_require_explicit_review(
+    tmp_path, capsys
+) -> None:
+    outside = tmp_path.parent / "outside.proposal.json"
+    outside.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(
+        audit_evidence_identities.AuditEvidenceIdentityError,
+        match="escapes repository root",
+    ):
+        audit_evidence_identities.apply_reviewed_proposal(tmp_path, outside, outside)
+    with pytest.raises(SystemExit) as raised:
+        audit_evidence_identities.main(
+            [
+                "--root",
+                str(tmp_path),
+                "--transition-proposal",
+                "transition.json",
+                "--apply-proposal",
+                "proposal.json",
+            ]
+        )
+    assert raised.value.code == 2
+    assert "requires --authority-reviewed" in capsys.readouterr().err
+
+
+def test_reviewed_authority_transaction_rolls_back_every_written_file(
+    tmp_path, monkeypatch
+) -> None:
+    first = tmp_path / "first.json"
+    second = tmp_path / "second.json"
+    first.write_bytes(b"first-before")
+    second.write_bytes(b"second-before")
+    original_replace = audit_evidence_identities._atomic_replace
+    failed = False
+
+    first_target = audit_evidence_identities._pin_target(
+        tmp_path, first.relative_to(tmp_path)
+    )
+    second_target = audit_evidence_identities._pin_target(
+        tmp_path, second.relative_to(tmp_path)
+    )
+
+    def fail_once(target, contents, expected, ledger):
+        nonlocal failed
+        if target.path == second and not failed:
+            failed = True
+            raise OSError("injected write failure")
+        return original_replace(target, contents, expected, ledger)
+
+    monkeypatch.setattr(audit_evidence_identities, "_atomic_replace", fail_once)
+    try:
+        with pytest.raises(
+            audit_evidence_identities.AuditEvidenceIdentityError,
+            match="transaction failed",
+        ):
+            audit_evidence_identities._transactional_write(
+                [(first_target, b"first-after"), (second_target, b"second-after")]
+            )
+    finally:
+        os.close(first_target.directory_fd)
+        os.close(second_target.directory_fd)
+    assert first.read_bytes() == b"first-before"
+    assert second.read_bytes() == b"second-before"
+
+
+def test_reviewed_authority_publication_rejects_parent_directory_swap(
+    tmp_path, monkeypatch
+) -> None:
+    directory = tmp_path / "authority"
+    directory.mkdir()
+    path = directory / "target.json"
+    path.write_bytes(b"before")
+    target = audit_evidence_identities._pin_target(tmp_path, path.relative_to(tmp_path))
+    detached = tmp_path / "detached-authority"
+    original_allocate = audit_evidence_identities._allocate_temporary
+
+    def swap_parent(pinned):
+        descriptor, name = original_allocate(pinned)
+        directory.rename(detached)
+        directory.mkdir()
+        (directory / path.name).write_bytes(b"attacker")
+        return descriptor, name
+
+    monkeypatch.setattr(audit_evidence_identities, "_allocate_temporary", swap_parent)
+    try:
+        with pytest.raises(
+            audit_evidence_identities.AuditEvidenceIdentityError,
+            match="target directory changed",
+        ):
+            audit_evidence_identities._transactional_write([(target, b"after")])
+    finally:
+        os.close(target.directory_fd)
+
+    assert (directory / path.name).read_bytes() == b"attacker"
+    assert (detached / path.name).read_bytes() == b"before"
+
+
+def test_reviewed_authority_pin_rejects_symlinked_ancestor(tmp_path) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "target.json").write_bytes(b"outside")
+    (tmp_path / "authority").symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises(
+        audit_evidence_identities.AuditEvidenceIdentityError,
+        match="target directory is unavailable",
+    ):
+        audit_evidence_identities._pin_target(tmp_path, Path("authority/target.json"))
+
+    assert (outside / "target.json").read_bytes() == b"outside"
+
+
+def test_reviewed_authority_rollback_never_enters_swapped_parent(
+    tmp_path, monkeypatch
+) -> None:
+    first_directory = tmp_path / "first-authority"
+    second_directory = tmp_path / "second-authority"
+    first_directory.mkdir()
+    second_directory.mkdir()
+    first = first_directory / "first.json"
+    second = second_directory / "second.json"
+    first.write_bytes(b"first-before")
+    second.write_bytes(b"second-before")
+    first_target = audit_evidence_identities._pin_target(
+        tmp_path, first.relative_to(tmp_path)
+    )
+    second_target = audit_evidence_identities._pin_target(
+        tmp_path, second.relative_to(tmp_path)
+    )
+    detached = tmp_path / "detached-first-authority"
+    original_replace = audit_evidence_identities._atomic_replace
+
+    def fail_after_parent_swap(target, contents, expected, ledger):
+        if target is second_target:
+            first_directory.rename(detached)
+            first_directory.mkdir()
+            (first_directory / first.name).write_bytes(b"attacker")
+            raise OSError("injected second publication failure")
+        return original_replace(target, contents, expected, ledger)
+
+    monkeypatch.setattr(
+        audit_evidence_identities, "_atomic_replace", fail_after_parent_swap
+    )
+    try:
+        with pytest.raises(
+            audit_evidence_identities.AuditEvidenceIdentityError,
+            match="transaction failed",
+        ):
+            audit_evidence_identities._transactional_write(
+                [(first_target, b"first-after"), (second_target, b"second-after")]
+            )
+    finally:
+        os.close(first_target.directory_fd)
+        os.close(second_target.directory_fd)
+
+    assert (first_directory / first.name).read_bytes() == b"attacker"
+    assert (detached / first.name).read_bytes() == b"first-before"
+    assert second.read_bytes() == b"second-before"
+
+
+def test_reviewed_authority_transaction_rejects_final_ancestor_swap_with_decoy(
+    tmp_path, monkeypatch
+) -> None:
+    directory = tmp_path / "authority"
+    directory.mkdir()
+    first = directory / "first.json"
+    second = directory / "second.json"
+    first.write_bytes(b"first-before")
+    second.write_bytes(b"second-before")
+    first_target = audit_evidence_identities._pin_target(
+        tmp_path, first.relative_to(tmp_path)
+    )
+    second_target = audit_evidence_identities._pin_target(
+        tmp_path, second.relative_to(tmp_path)
+    )
+    detached = tmp_path / "detached-authority"
+    real_validate = audit_evidence_identities._validate_publication
+    injected = False
+
+    def swap_ancestor_before_transaction_commit(publication):
+        nonlocal injected
+        if not injected:
+            injected = True
+            directory.rename(detached)
+            shutil.copytree(detached, directory)
+        real_validate(publication)
+
+    monkeypatch.setattr(
+        audit_evidence_identities,
+        "_validate_publication",
+        swap_ancestor_before_transaction_commit,
+    )
+    try:
+        with pytest.raises(
+            audit_evidence_identities.AuditEvidenceIdentityError,
+            match="transaction failed.*target directory changed",
+        ):
+            audit_evidence_identities._transactional_write(
+                [(first_target, b"first-after"), (second_target, b"second-after")]
+            )
+    finally:
+        os.close(first_target.directory_fd)
+        os.close(second_target.directory_fd)
+
+    assert injected
+    assert first.read_bytes() == b"first-after"
+    assert second.read_bytes() == b"second-after"
+    assert (detached / first.name).read_bytes() == b"first-before"
+    assert (detached / second.name).read_bytes() == b"second-before"
 
 
 @pytest.mark.parametrize(

@@ -28,6 +28,81 @@ REVIEW_RECORD_SHA256_ALLOWLIST: dict[str, str] = {
     "challenge-special-interiors.json": (
         "ad32754b0f0e28d4ffa4067679a78b8c2e246cdac1cca11f12bfa2dc3eeb585a"
     ),
+    "specs/full-colors/evidence/map-background-reviews/forest-cavern.json": (
+        "9ccee4da14d9f13c07ed80be17f96e41361b683da3f550e4c439715d3cb75f4a"
+    ),
+    "specs/full-colors/evidence/map-background-reviews/transport-special.json": (
+        "964f797f0517edf8dfde445808e7dd027449ec62c2fec1e2a1669f79bb1be645"
+    ),
+}
+_REVIEW_BATCH_IDENTITIES = {
+    "overworld": (
+        "Codex independent visual review (overworld)",
+        "phase3-overworld-pallet-route1-viridian",
+        None,
+        "test-results/full-color-map-background-atlases/manifest.json",
+    ),
+    "residential-services": (
+        "Codex independent visual review (residential-services)",
+        "phase3-residential-bedroom-mart",
+        None,
+        "test-results/full-color-map-background-atlases/manifest.json",
+    ),
+    "challenge-special-interiors": (
+        "Codex independent visual review (challenge-special-interiors)",
+        "phase3-challenge-oaks-lab-dojo",
+        None,
+        "test-results/full-color-map-background-atlases/manifest.json",
+    ),
+    "forest-cavern": (
+        "Codex independent visual review (forest-cavern)",
+        "phase4-forest-cavern-artifact-review",
+        "artifact-only-atlas-and-linked-product-parity",
+        "reviewer-local/forest-cavern/manifest.json",
+    ),
+    "transport-special": (
+        "Codex independent visual review (transport-special)",
+        "phase4-transport-special-artifact-review",
+        "artifact-only-atlas-and-linked-product-parity",
+        "reviewer-local/transport-special/manifest.json",
+    ),
+}
+_REVIEWED_CANDIDATE_IDENTITIES = {
+    "overworld": (
+        "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
+        "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
+        "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c",
+    ),
+    "residential-services": (
+        "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
+        "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
+        "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c",
+    ),
+    "challenge-special-interiors": (
+        "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
+        "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
+        "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c",
+    ),
+    "forest-cavern": (
+        "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+        "57dcaf95fd2fdbeb1e206a0bdd64589a3bb7e4843dc2d1d137f1bcb21d645450",
+        "7f8b5fd33c900c409137a293f2007003f61b6db120ac82613f06220288349c3f",
+    ),
+    "transport-special": (
+        "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
+        "57dcaf95fd2fdbeb1e206a0bdd64589a3bb7e4843dc2d1d137f1bcb21d645450",
+        "7f8b5fd33c900c409137a293f2007003f61b6db120ac82613f06220288349c3f",
+    ),
+}
+_PHASE4_ATLAS_IDENTITIES = {
+    "forest-cavern": (
+        "7aa6f0e2a703c813d15c8dbbfa394b898abf2aa25c4098a05311841b2c644f52",
+        42,
+    ),
+    "transport-special": (
+        "6024178ee0eff83495574141e9b9f70ef34cab6bf8a2b4dcf544841490f9a26b",
+        23,
+    ),
 }
 # Yellow's source has one historical concrete-copy header whose internal block-data
 # constant names its original map. Keep the exception exact across every identity
@@ -239,7 +314,6 @@ _BATCH_TILESETS = {
     "forest-cavern": frozenset({"FOREST", "CAVERN"}),
     "transport-special": frozenset({"SHIP_PORT", "PLATEAU", "BEACH_HOUSE"}),
 }
-_PHASE1_ANIMATIONS = {"OVERWORLD": ("TILEANIM_WATER_FLOWER",)}
 _PHASE1_REPLACEMENTS = {"OVERWORLD": ("CUT_TREE",)}
 _MAP_OVERRIDE_IDENTITIES = {
     "CELADON_MART_ROOF": ("CELADON_MART_ROOF_TILES_4B_TO_4F_BLUE",),
@@ -333,6 +407,9 @@ _PHASE1_REPLACEMENT_AUTHORITIES = {
 }
 _MISSING_FALLBACK_AUTHORITY = (
     "data/tilesets/full_color_interiors.asm#FullColorBGPalettePointers"
+)
+_ARCHITECTURE_BOUNDARY_AUTHORITY = (
+    "engine/full_color/passive_overworld.asm#PassiveFullColorIsPresentedSliceMap"
 )
 _PRODUCTION_PRESENTATION_PREDICATE = (
     "PassiveFullColorIsPresentedSliceMap:",
@@ -1460,7 +1537,7 @@ def _payload_pointer_authorities(
     if (
         tuple(palettes) != expected_prefix
         or tuple(attributes) != expected_prefix
-        or len(palettes) != 23
+        or len(palettes) != len(tilesets)
     ):
         raise MapBackgroundContentError(
             f"{path}: palette/attribute pointer identities drifted from tileset ABI"
@@ -1519,28 +1596,53 @@ def _roof_authorities(root: Path) -> dict[int, tuple[str, str]]:
     return rows
 
 
-def _validate_phase1_semantic_identities(root: Path) -> None:
+def _tileset_animation_authorities(
+    root: Path, tilesets: tuple[tuple[int, str], ...]
+) -> dict[str, tuple[str, ...]]:
     animation_constants = (root / "constants/map_data_constants.asm").read_text(
         encoding="utf-8"
     )
-    tileset_headers = (root / "data/tilesets/tileset_headers.asm").read_text(
-        encoding="utf-8"
+    header_path = root / "data/tilesets/tileset_headers.asm"
+    tileset_headers = header_path.read_text(encoding="utf-8")
+    rows = re.findall(
+        r"^\s*tileset\s+([A-Za-z][A-Za-z0-9_]*),.*?,\s*"
+        r"(TILEANIM_[A-Z_]+)\s*$",
+        tileset_headers,
+        re.MULTILINE,
     )
-    if (
-        re.search(
-            r"^\s*const\s+TILEANIM_WATER_FLOWER\b", animation_constants, re.MULTILINE
-        )
-        is None
-        or re.search(
-            r"^\s*tileset\s+Overworld,.*\bTILEANIM_WATER_FLOWER\s*$",
-            tileset_headers,
-            re.MULTILINE,
-        )
-        is None
-    ):
+    if len(rows) != len(tilesets):
         raise MapBackgroundContentError(
-            "TILEANIM_WATER_FLOWER lacks its source-owned constant/OVERWORLD identity"
+            f"{header_path}: animation rows drifted from the tileset ABI"
         )
+    authorities: dict[str, tuple[str, ...]] = {}
+    for (tileset_id, tileset), (source_name, identity) in zip(
+        tilesets, rows, strict=True
+    ):
+        expected_source_name = tileset.title().replace("_", "")
+        if source_name != expected_source_name:
+            raise MapBackgroundContentError(
+                f"{header_path}: positional tileset {tileset_id} names "
+                f"{source_name}, expected {expected_source_name}"
+            )
+        authorities[tileset] = () if identity == "TILEANIM_NONE" else (identity,)
+
+    animation_identities = {identity for _, identity in rows}
+    for identity in animation_identities:
+        if (
+            re.search(
+                rf"^\s*const\s+{re.escape(identity)}\b",
+                animation_constants,
+                re.MULTILINE,
+            )
+            is None
+        ):
+            raise MapBackgroundContentError(
+                f"{identity} lacks its source-owned constant identity"
+            )
+    return authorities
+
+
+def _validate_phase1_semantic_identities(root: Path) -> None:
     for identity, (relative, label) in _PHASE1_REPLACEMENT_AUTHORITIES.items():
         path = root / relative
         if (
@@ -1681,18 +1783,29 @@ def _review_finding(
             )
         if document["batch"] != batch:
             raise MapBackgroundContentError(f"{path}.batch: wrong batch identity")
+        try:
+            expected_reviewer, expected_route, expected_purpose, expected_atlas_path = (
+                _REVIEW_BATCH_IDENTITIES[batch]
+            )
+        except KeyError as exc:
+            raise MapBackgroundContentError(
+                f"{path}.batch: unknown review batch"
+            ) from exc
+        review_fields = {
+            "review_kind",
+            "reviewer",
+            "result",
+            "revision",
+            "route",
+            "products",
+            "observations",
+        }
+        if expected_purpose is not None:
+            review_fields.add("purpose")
         review_summary = _object(
             document["review"],
             path=f"{path}.review",
-            fields={
-                "review_kind",
-                "reviewer",
-                "result",
-                "revision",
-                "route",
-                "products",
-                "observations",
-            },
+            fields=review_fields,
         )
         if review_summary["review_kind"] != "independent-ai-visual":
             raise MapBackgroundContentError(
@@ -1702,22 +1815,42 @@ def _review_finding(
             raise MapBackgroundContentError(
                 f"{path}.review.result: review not accepted"
             )
-        _string(review_summary["reviewer"], path=f"{path}.review.reviewer")
+        if review_summary["reviewer"] != expected_reviewer:
+            raise MapBackgroundContentError(f"{path}.review.reviewer: wrong identity")
         if review_summary["revision"] != review.revision:
             raise MapBackgroundContentError(
                 f"{path}.review.revision: identity mismatch"
             )
         if review_summary["route"] != review.route:
             raise MapBackgroundContentError(f"{path}.review.route: identity mismatch")
+        if review.route != expected_route:
+            raise MapBackgroundContentError(f"{path}.review.route: wrong batch route")
+        if (
+            expected_purpose is not None
+            and review_summary["purpose"] != expected_purpose
+        ):
+            raise MapBackgroundContentError(
+                f"{path}.review.purpose: wrong evidence purpose"
+            )
         products = review_summary["products"]
         expected_products = [
             {"product": product, "mode": mode}
             for product in ("pokeyellow", "pokeyellow_debug")
             for mode in ("color", "yellow")
         ]
+        if expected_purpose is not None:
+            expected_products = [
+                {"product": product, "claim": "linked-artifact-parity"}
+                for product in (
+                    "pokeyellow",
+                    "pokeyellow_debug",
+                    "pokeyellow_vc",
+                    "pokeyellow_phase2_audit",
+                )
+            ]
         if products != expected_products:
             raise MapBackgroundContentError(
-                f"{path}.review.products: exact normal/debug Color+Yellow set required"
+                f"{path}.review.products: exact evidence claim set required"
             )
         observations = review_summary["observations"]
         if (
@@ -1736,10 +1869,7 @@ def _review_finding(
             path=f"{path}.atlas",
             fields={"path", "manifest_sha256", "content_sha256", "artifacts"},
         )
-        if (
-            atlas["path"]
-            != "test-results/full-color-map-background-atlases/manifest.json"
-        ):
+        if atlas["path"] != expected_atlas_path:
             raise MapBackgroundContentError(f"{path}.atlas.path: wrong producer path")
         if atlas["manifest_sha256"] != review.atlas_sha256:
             raise MapBackgroundContentError(
@@ -1771,6 +1901,18 @@ def _review_finding(
                 path=f"{path}.atlas.artifacts[{index}].sha256",
                 pattern=_SHA256_RE,
             )
+        if expected_purpose is not None:
+            expected_content_sha256, expected_artifact_count = _PHASE4_ATLAS_IDENTITIES[
+                batch
+            ]
+            if atlas["content_sha256"] != expected_content_sha256:
+                raise MapBackgroundContentError(
+                    f"{path}.atlas.content_sha256: wrong reviewed content"
+                )
+            if len(atlas_artifacts) != expected_artifact_count:
+                raise MapBackgroundContentError(
+                    f"{path}.atlas.artifacts: incomplete reviewed content"
+                )
         candidate = _object(
             document["reviewed_candidate"],
             path=f"{path}.reviewed_candidate",
@@ -1794,6 +1936,21 @@ def _review_finding(
                 path=f"{path}.reviewed_candidate.{field}",
                 pattern=_SHA256_RE,
             )
+        expected_candidate = _REVIEWED_CANDIDATE_IDENTITIES[batch]
+        if (
+            tuple(
+                candidate[field]
+                for field in (
+                    "sha256",
+                    "ledger_canonical_sha256",
+                    "source_semantic_sha256",
+                )
+            )
+            != expected_candidate
+        ):
+            raise MapBackgroundContentError(
+                f"{path}.reviewed_candidate: stale or unreviewed candidate identity"
+            )
         content = _object(
             document["content"],
             path=f"{path}.content",
@@ -1812,16 +1969,19 @@ def _review_finding(
             )
         retained_products: list[dict[str, str]] = []
         for index, retained_raw in enumerate(retained):
+            retained_fields = {
+                "manifest_path",
+                "manifest_sha256",
+                "product",
+                "mode",
+                "artifacts",
+            }
+            if expected_purpose is not None:
+                retained_fields.add("purpose")
             retained_row = _object(
                 retained_raw,
                 path=f"{path}.retained_artifacts[{index}]",
-                fields={
-                    "manifest_path",
-                    "manifest_sha256",
-                    "product",
-                    "mode",
-                    "artifacts",
-                },
+                fields=retained_fields,
             )
             product = _string(
                 retained_row["product"],
@@ -1832,6 +1992,13 @@ def _review_finding(
                 path=f"{path}.retained_artifacts[{index}].mode",
             )
             retained_products.append({"product": product, "mode": mode})
+            if (
+                expected_purpose is not None
+                and retained_row["purpose"] != expected_purpose
+            ):
+                raise MapBackgroundContentError(
+                    f"{path}.retained_artifacts[{index}].purpose: wrong evidence purpose"
+                )
             _string(
                 retained_row["manifest_sha256"],
                 path=f"{path}.retained_artifacts[{index}].manifest_sha256",
@@ -1857,7 +2024,18 @@ def _review_finding(
                     path=f"{path}.retained_artifacts[{index}].artifacts[{artifact_index}].sha256",
                     pattern=_SHA256_RE,
                 )
-        if retained_products != expected_products:
+        expected_retained_products = expected_products
+        if expected_purpose is not None:
+            expected_retained_products = [
+                {"product": product, "mode": "artifact-only"}
+                for product in (
+                    "pokeyellow",
+                    "pokeyellow_debug",
+                    "pokeyellow_vc",
+                    "pokeyellow_phase2_audit",
+                )
+            ]
+        if retained_products != expected_retained_products:
             raise MapBackgroundContentError(
                 f"{path}.retained_artifacts: product/mode order or membership drifted"
             )
@@ -1973,6 +2151,9 @@ class MapBackgroundAuthority:
         roofs = _roof_authorities(root)
         production_map_override_rules(root)
         _validate_phase1_semantic_identities(root)
+        animation_authorities = _tileset_animation_authorities(
+            root, discovered_tilesets
+        )
         _validate_production_presentation_predicate(root)
         findings: list[str] = []
         ledger_tilesets = tuple((row.id, row.name) for row in self.tilesets)
@@ -2013,7 +2194,7 @@ class MapBackgroundAuthority:
                 findings.append(
                     f"tileset {row.name}: batch is outside the Phase 1 closed partition"
                 )
-            expected_animations = _PHASE1_ANIMATIONS.get(row.name, ())
+            expected_animations = animation_authorities.get(row.name, ())
             expected_replacements = _PHASE1_REPLACEMENTS.get(row.name, ())
             if row.animations != expected_animations:
                 findings.append(
@@ -2061,7 +2242,7 @@ class MapBackgroundAuthority:
                 findings.append(
                     f"map {row.name}: batch disagrees with the Phase 1 tileset partition"
                 )
-            expected_animations = _PHASE1_ANIMATIONS.get(row.tileset, ())
+            expected_animations = animation_authorities.get(row.tileset, ())
             expected_replacements = _PHASE1_REPLACEMENTS.get(row.tileset, ())
             if row.animations != expected_animations:
                 findings.append(
@@ -2099,11 +2280,12 @@ class MapBackgroundAuthority:
                 findings.append(
                     f"map {row.name}: roof disagrees with repository-owned assignment table"
                 )
-            expected_fallback = (
-                _MISSING_FALLBACK_AUTHORITY
-                if row.content_status is ContentStatus.MISSING
-                else None
-            )
+            if row.content_status is ContentStatus.MISSING:
+                expected_fallback = _MISSING_FALLBACK_AUTHORITY
+            elif row.presentation is Presentation.YELLOW:
+                expected_fallback = _ARCHITECTURE_BOUNDARY_AUTHORITY
+            else:
+                expected_fallback = None
             actual_fallback = (
                 None if row.fallback_reason is None else row.fallback_reason.authority
             )

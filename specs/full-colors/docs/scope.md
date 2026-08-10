@@ -107,16 +107,17 @@ Transition and reconstruction behavior is defined by
 
 ## Quarantined diagnostic and future material
 
-The all-25-tileset palette/attribute corpus, overlay request oracle, precedence
-and clipping matrices, and diagnostic `OVERWORLD_OVERLAY` model may remain as
-authoring, synthetic-conformance, or audit evidence only. They are explicitly
-non-production and non-gating for this bounded release. They cannot expand the
-supported-map allowlist, make a production Color overlay reachable, select an owner,
-or authorize any production write.
+The completed all-25-tileset palette/attribute corpus, overlay request oracle,
+precedence and clipping matrices, and diagnostic `OVERWORLD_OVERLAY` model may
+remain as content, synthetic-conformance, or audit evidence only. They are
+explicitly non-production and non-gating for this bounded release. They cannot
+expand the supported-map allowlist, make a production Color overlay reachable,
+select an owner, or authorize any production write.
 
-Production completion does not require Color authoring for maps using other
-tilesets or Color rendering of dialogue, text, menus, or overlays.
-Those are future product work and require a separately reviewed scope change.
+The completed Color authoring for maps using other tilesets does not make those
+maps production-eligible. Color rendering of those maps, dialogue, text, menus,
+or overlays is future product work and requires a separately reviewed scope
+change.
 
 ## Compatibility
 

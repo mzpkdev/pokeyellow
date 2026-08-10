@@ -55,12 +55,12 @@ resolver described by later phases.
 `PHASE2_AUDIT` adds diagnostics and certification surfaces only. It does not
 gate the toggle, passive renderer, or mode selection in any product.
 
-The diagnostic overlay oracle and remaining all-25-tileset work remain valuable
-future authoring foundations, but production Color-overlay rollout and complete
-all-map coloring are not gates for this bounded release. Their prior
-phase descriptions are interpreted as quarantined diagnostic/future work and
-MUST NOT be activated without the separately approved architecture change
-described above.
+The diagnostic overlay oracle remains a valuable future foundation. The
+repository-owned all-25-tileset background corpus is now authored and reviewed,
+but production Color-overlay rollout and runtime admission of excluded maps are
+not gates for this bounded release. Prior phase descriptions of broader runtime
+behavior remain quarantined diagnostic/future work and MUST NOT be activated
+without the separately approved architecture change described above.
 
 ## Historical Phase 0: mandatory iteration foundation
 
@@ -410,8 +410,8 @@ used to load or transform its palette or to apply its lookup, override,
 animation, or field replacement.
 
 **Acceptance:** The execution record closes bounded `AC-OW-04`, `AC-OW-06`,
-`AC-TECH-05`, and `AC-TECH-10` obligations. Future `AC-OW-01` all-25 content
-does not close here and is not required for bounded-release completion.
+`AC-TECH-05`, and `AC-TECH-10` obligations. Completed, non-gating `AC-OW-01`
+content does not close these bounded runtime obligations or widen their scope.
 
 **Evidence:** Named Pallet Town/Route 1 table-length, Yellow-graphics,
 override, animation, field-replacement, semantic full-byte attribute,
@@ -523,7 +523,8 @@ builds, and excluded-scene regressions.
 criterion still open after Phases 0–8, including `AC-TIME-01`, `AC-TRACE-01`,
 `AC-TECH-01`, `AC-TECH-08`, `AC-TECH-10`, `AC-HO-02`, `AC-REMOVE-04`, and
 `AC-DONE-01`.
-Future/non-gating `AC-OW-01` is explicitly excluded.
+Completed, non-gating `AC-OW-01` is explicitly outside this runtime release
+gate.
 
 **Evidence:** Named timing-budget and baseline-comparison tables, exact
 threshold-plus-one deferrals, complete traceability report,
@@ -534,17 +535,18 @@ checks; execution records their concrete `CHK-…` IDs and every timing-row key.
 **Exit gate:** All remaining bounded-release rows in the
 [acceptance criteria](acceptance-criteria.md), traceability, numeric timing
 comparison, threshold deferral, soak, build, and excluded-scene regression
-evidence pass. Future completion of the remaining tilesets remains non-gating.
+evidence pass. The completed all-25 content corpus remains non-gating and does
+not widen runtime admission.
 
-## Future non-gating work: all-25-tileset authoring
+## Completed non-gating work: all-25-tileset authoring
 
-After the bounded release, a separate future effort may independently author
-and validate the remaining Yellow palette sets and `$60` assignment tables,
-native Beach House data, roofs and map overrides, all-map animations, and all-map
-palette-effect evidence. That effort targets `R8.1` through `R8.6` and
-`AC-OW-01`, but is outside this migration's ordered phases, completion
-criteria, and release gate. Its evidence cannot weaken or substitute for the
-exact Pallet Town/Route 1 production matrix.
+A separate content effort independently authored and validated all Yellow
+palette sets and `$60` assignment tables, native Beach House data, roofs and
+map overrides, all-map animations, and all-map palette-effect evidence. That
+completed corpus closes the content scope of `AC-OW-01` outside this
+migration's ordered runtime phases and release gate. Its evidence cannot weaken
+or substitute for the exact Pallet Town/Route 1 production matrix, and it does
+not authorize runtime presentation of excluded maps.
 
 ## Iteration rule
 

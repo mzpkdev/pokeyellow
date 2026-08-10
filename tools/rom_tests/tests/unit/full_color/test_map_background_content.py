@@ -9,6 +9,7 @@ import shutil
 
 import pytest
 
+from tools.rom_tests.full_color import map_background_content
 from tools.rom_tests.full_color.map_background_content import (
     ContentStatus,
     FallbackKind,
@@ -29,18 +30,40 @@ REVIEW_BATCHES = {
         "Codex independent visual review (overworld)",
         1,
         34,
+        "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+        None,
     ),
     "residential-services": (
         "phase3-residential-bedroom-mart",
         "Codex independent visual review (residential-services)",
         11,
         98,
+        "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+        None,
     ),
     "challenge-special-interiors": (
         "phase3-challenge-oaks-lab-dojo",
         "Codex independent visual review (challenge-special-interiors)",
         8,
         64,
+        "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+        None,
+    ),
+    "forest-cavern": (
+        "phase4-forest-cavern-artifact-review",
+        "Codex independent visual review (forest-cavern)",
+        2,
+        24,
+        "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+        "artifact-only-atlas-and-linked-product-parity",
+    ),
+    "transport-special": (
+        "phase4-transport-special-artifact-review",
+        "Codex independent visual review (transport-special)",
+        3,
+        4,
+        "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5",
+        "artifact-only-atlas-and-linked-product-parity",
     ),
 }
 
@@ -125,25 +148,32 @@ def test_reviewed_batches_record_content_and_presentation_as_independent_axes() 
     authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
     assert [row.id for row in authority.tilesets] == list(range(25))
     assert {row.content_status for row in authority.tilesets} == {
-        ContentStatus.COMPLETE,
-        ContentStatus.MISSING,
+        ContentStatus.COMPLETE
     }
     assert (
         sum(row.content_status is ContentStatus.MISSING for row in authority.tilesets)
-        == 5
+        == 0
     )
     assert (
-        sum(row.content_status is ContentStatus.MISSING for row in authority.maps) == 28
+        sum(row.content_status is ContentStatus.MISSING for row in authority.maps) == 0
+    )
+    assert (
+        sum(row.content_status is ContentStatus.FALLBACK for row in authority.tilesets)
+        == 0
+    )
+    assert (
+        sum(row.content_status is ContentStatus.FALLBACK for row in authority.maps) == 0
     )
     assert (
         sum(row.content_status is ContentStatus.COMPLETE for row in authority.tilesets)
-        == 20
+        == 25
     )
     assert (
         sum(row.content_status is ContentStatus.COMPLETE for row in authority.maps)
-        == 196
+        == 224
     )
     assert sum(row.presentation is Presentation.COLOR for row in authority.maps) == 196
+    assert sum(row.presentation is Presentation.YELLOW for row in authority.maps) == 28
     assert all(
         (row.review is not None) == (row.content_status is ContentStatus.COMPLETE)
         for row in (*authority.tilesets, *authority.maps)
@@ -152,7 +182,12 @@ def test_reviewed_batches_record_content_and_presentation_as_independent_axes() 
         row.name
         for row in authority.tilesets
         if row.content_status is ContentStatus.MISSING
-    } == {"FOREST", "SHIP_PORT", "CAVERN", "PLATEAU", "BEACH_HOUSE"}
+    } == set()
+    assert not {
+        row.name
+        for row in authority.tilesets
+        if row.content_status is ContentStatus.FALLBACK
+    }
     roofs = {row.name: row.roof for row in authority.maps if row.tileset == "OVERWORLD"}
     assert len(roofs) == 34
     assert roofs["PALLET_TOWN"] == "PALLET"
@@ -166,7 +201,14 @@ def test_reviewed_batches_record_content_and_presentation_as_independent_axes() 
 
 def test_exact_accepted_batch_membership_and_review_identity_are_durable() -> None:
     authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
-    for batch, (route, reviewer, tileset_count, map_count) in REVIEW_BATCHES.items():
+    for batch, (
+        route,
+        reviewer,
+        tileset_count,
+        map_count,
+        revision,
+        purpose,
+    ) in REVIEW_BATCHES.items():
         record = json.loads((REVIEW_DIRECTORY / f"{batch}.json").read_text())
         tilesets = [
             {"id": row.id, "name": row.name}
@@ -181,11 +223,11 @@ def test_exact_accepted_batch_membership_and_review_identity_are_durable() -> No
         assert len(tilesets) == tileset_count
         assert len(maps) == map_count
         assert record["content"] == {"tilesets": tilesets, "maps": maps}
-        assert record["review"] == {
+        expected_review = {
             "review_kind": "independent-ai-visual",
             "reviewer": reviewer,
             "result": "accepted",
-            "revision": "69de585dd447e666c638947cdf9c73b0a49ae0ef",
+            "revision": revision,
             "route": route,
             "products": [
                 {"product": product, "mode": mode}
@@ -194,6 +236,18 @@ def test_exact_accepted_batch_membership_and_review_identity_are_durable() -> No
             ],
             "observations": record["review"]["observations"],
         }
+        if purpose is not None:
+            expected_review["purpose"] = purpose
+            expected_review["products"] = [
+                {"product": product, "claim": "linked-artifact-parity"}
+                for product in (
+                    "pokeyellow",
+                    "pokeyellow_debug",
+                    "pokeyellow_vc",
+                    "pokeyellow_phase2_audit",
+                )
+            ]
+        assert record["review"] == expected_review
         assert len(record["review"]["observations"]) >= 2
         assert set(record["reviews"]) == {
             *(f"tileset-{row['id']}" for row in tilesets),
@@ -207,7 +261,7 @@ def test_review_records_match_current_generated_manifests_and_frames_when_presen
     atlas_manifest = (
         REPOSITORY_ROOT / "test-results/full-color-map-background-atlases/manifest.json"
     )
-    for batch in REVIEW_BATCHES:
+    for batch in ("overworld", "residential-services", "challenge-special-interiors"):
         record = json.loads((REVIEW_DIRECTORY / f"{batch}.json").read_text())
         assert record["atlas"]["manifest_sha256"] == (
             "631a835a67ca568f320dddc25d7557bc6789a99990ce421ee118a9a70907f110"
@@ -360,9 +414,121 @@ def test_every_map_has_the_exact_recorded_tileset_status_and_fallback_contract()
             assert row.presentation is Presentation.YELLOW
             assert row.fallback_reason is not None
             assert row.fallback_reason.kind is FallbackKind.CONTENT_MISSING
+        elif row.content_status is ContentStatus.FALLBACK:
+            assert row.presentation is Presentation.YELLOW
+            assert row.fallback_reason is not None
+            assert row.fallback_reason.kind is FallbackKind.ARCHITECTURE_BOUNDARY
+            assert row.review is None
         else:
-            assert row.presentation is Presentation.COLOR
-            assert row.fallback_reason is None
+            if row.presentation is Presentation.YELLOW:
+                assert row.fallback_reason is not None
+                assert row.fallback_reason.kind is FallbackKind.ARCHITECTURE_BOUNDARY
+            else:
+                assert row.presentation is Presentation.COLOR
+                assert row.fallback_reason is None
+            assert row.review is not None
+
+
+def test_forest_cavern_candidates_cover_exact_maps_and_water_animation() -> None:
+    authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    expected = {
+        "FOREST": {
+            "SAFARI_ZONE_CENTER",
+            "SAFARI_ZONE_EAST",
+            "SAFARI_ZONE_NORTH",
+            "SAFARI_ZONE_WEST",
+            "VIRIDIAN_FOREST",
+        },
+        "CAVERN": {
+            "CERULEAN_CAVE_1F",
+            "CERULEAN_CAVE_2F",
+            "CERULEAN_CAVE_B1F",
+            "DIGLETTS_CAVE",
+            "DIGLETTS_CAVE_ROUTE_11",
+            "DIGLETTS_CAVE_ROUTE_2",
+            "MT_MOON_1F",
+            "MT_MOON_B1F",
+            "MT_MOON_B2F",
+            "ROCK_TUNNEL_1F",
+            "ROCK_TUNNEL_B1F",
+            "SEAFOAM_ISLANDS_1F",
+            "SEAFOAM_ISLANDS_B1F",
+            "SEAFOAM_ISLANDS_B2F",
+            "SEAFOAM_ISLANDS_B3F",
+            "SEAFOAM_ISLANDS_B4F",
+            "VICTORY_ROAD_1F",
+            "VICTORY_ROAD_2F",
+            "VICTORY_ROAD_3F",
+        },
+    }
+    for tileset, map_names in expected.items():
+        tileset_row = next(row for row in authority.tilesets if row.name == tileset)
+        assert tileset_row.content_status is ContentStatus.COMPLETE
+        assert tileset_row.review is not None
+        assert tileset_row.animations == ("TILEANIM_WATER",)
+        rows = {row.name: row for row in authority.maps if row.tileset == tileset}
+        assert set(rows) == map_names
+        assert all(
+            row.content_status is ContentStatus.COMPLETE for row in rows.values()
+        )
+        assert all(row.animations == ("TILEANIM_WATER",) for row in rows.values())
+        assert all(row.presentation is Presentation.YELLOW for row in rows.values())
+        assert all(row.review is not None for row in rows.values())
+
+
+def test_transport_special_candidates_cover_exact_maps_and_semantics() -> None:
+    authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    expected = {
+        "SHIP_PORT": ({"VERMILION_DOCK"}, ("TILEANIM_WATER",)),
+        "PLATEAU": ({"INDIGO_PLATEAU", "ROUTE_23"}, ("TILEANIM_WATER",)),
+        "BEACH_HOUSE": ({"SUMMER_BEACH_HOUSE"}, ()),
+    }
+    for tileset, (map_names, animations) in expected.items():
+        tileset_row = next(row for row in authority.tilesets if row.name == tileset)
+        assert tileset_row.content_status is ContentStatus.COMPLETE
+        assert tileset_row.animations == animations
+        assert tileset_row.review is not None
+        rows = {row.name: row for row in authority.maps if row.tileset == tileset}
+        assert set(rows) == map_names
+        assert all(
+            row.content_status is ContentStatus.COMPLETE for row in rows.values()
+        )
+        assert all(row.animations == animations for row in rows.values())
+        assert all(row.presentation is Presentation.YELLOW for row in rows.values())
+        assert all(row.review is not None for row in rows.values())
+
+
+def test_all_source_declared_tileset_animations_are_closed_in_the_ledger() -> None:
+    authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    expected = {
+        "OVERWORLD": ("TILEANIM_WATER_FLOWER",),
+        "FOREST": ("TILEANIM_WATER",),
+        "DOJO": ("TILEANIM_WATER_FLOWER",),
+        "GYM": ("TILEANIM_WATER_FLOWER",),
+        "SHIP": ("TILEANIM_WATER",),
+        "SHIP_PORT": ("TILEANIM_WATER",),
+        "CAVERN": ("TILEANIM_WATER",),
+        "FACILITY": ("TILEANIM_WATER",),
+        "PLATEAU": ("TILEANIM_WATER",),
+    }
+    assert {
+        row.name: row.animations for row in authority.tilesets if row.animations
+    } == expected
+    assert all(
+        row.animations == expected.get(row.tileset, ()) for row in authority.maps
+    )
+
+
+@pytest.mark.parametrize("tileset", ["DOJO", "GYM", "SHIP", "FACILITY"])
+def test_newly_closed_animation_ledger_rows_are_mutation_sensitive(
+    tileset: str,
+) -> None:
+    raw = raw_ledger()
+    tileset_row = next(row for row in raw["tilesets"] if row["name"] == tileset)
+    tileset_row["animations"] = []
+    map_row = next(row for row in raw["maps"] if row["tileset"] == tileset)
+    map_row["animations"] = []
+    assert_parse_or_reconciliation_rejects(raw)
 
 
 @pytest.mark.parametrize(
@@ -1372,6 +1538,54 @@ def test_forged_fallback_authority_cannot_reconcile() -> None:
             "TILEANIM_WATER_FLOWER",
         ),
         (
+            "data/tilesets/tileset_headers.asm",
+            "tileset Forest,       -1, -1, -1, $20, TILEANIM_WATER",
+            "tileset Forest,       -1, -1, -1, $20, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
+            "data/tilesets/tileset_headers.asm",
+            "tileset Dojo,        $3A, -1, -1,  -1, TILEANIM_WATER_FLOWER",
+            "tileset Dojo,        $3A, -1, -1,  -1, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
+            "data/tilesets/tileset_headers.asm",
+            "tileset Gym,         $3A, -1, -1,  -1, TILEANIM_WATER_FLOWER",
+            "tileset Gym,         $3A, -1, -1,  -1, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
+            "data/tilesets/tileset_headers.asm",
+            "tileset Ship,         -1, -1, -1,  -1, TILEANIM_WATER",
+            "tileset Ship,         -1, -1, -1,  -1, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
+            "data/tilesets/tileset_headers.asm",
+            "tileset Facility,    $12, -1, -1,  -1, TILEANIM_WATER",
+            "tileset Facility,    $12, -1, -1,  -1, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
+            "data/tilesets/tileset_headers.asm",
+            "tileset Cavern,       -1, -1, -1,  -1, TILEANIM_WATER",
+            "tileset Cavern,       -1, -1, -1,  -1, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
+            "data/tilesets/tileset_headers.asm",
+            "tileset ShipPort,     -1, -1, -1,  -1, TILEANIM_WATER",
+            "tileset ShipPort,     -1, -1, -1,  -1, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
+            "data/tilesets/tileset_headers.asm",
+            "tileset Plateau,      -1, -1, -1, $45, TILEANIM_WATER",
+            "tileset Plateau,      -1, -1, -1, $45, TILEANIM_NONE",
+            "animations disagree with Phase 1 metadata contract",
+        ),
+        (
             "data/tilesets/cut_tree_blocks.asm",
             "CutTreeBlockSwaps:",
             "ForgedCutTreeBlockSwaps:",
@@ -1399,7 +1613,7 @@ def test_repository_semantic_authority_drift_fails_closed(
     path.write_text(source.replace(original, replacement, 1), encoding="utf-8")
 
     authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
-    if "roof disagrees" in expected:
+    if "disagree" in expected:
         assert any(expected in finding for finding in authority.reconcile(tmp_path))
     else:
         with pytest.raises(MapBackgroundContentError, match=expected):
@@ -1515,12 +1729,56 @@ def test_present_matching_forged_review_record_is_rejected_when_not_allowlisted(
         ),
         encoding="utf-8",
     )
-
     authority = parse(raw)
     assert any(
         "review authority path is not independently allowlisted" in finding
         for finding in authority.reconcile(tmp_path)
     )
+
+
+@pytest.mark.parametrize(
+    "mutation", ("batch", "purpose", "route", "candidate", "missing-artifact")
+)
+def test_phase4_review_semantic_mutations_fail_even_with_a_matching_digest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    copy_map_source_universe(tmp_path)
+    relative = "specs/full-colors/evidence/map-background-reviews/forest-cavern.json"
+    path = tmp_path / relative
+    record = json.loads(path.read_text())
+    if mutation == "batch":
+        record["batch"] = "transport-special"
+    elif mutation == "purpose":
+        record["review"]["purpose"] = "runtime-admission"
+    elif mutation == "route":
+        record["review"]["route"] = "phase4-forged-route"
+    elif mutation == "candidate":
+        record["reviewed_candidate"]["sha256"] = "0" * 64
+    else:
+        record["atlas"]["artifacts"].pop()
+    path.write_text(json.dumps(record), encoding="utf-8")
+    canonical = json.dumps(
+        record, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode()
+    allowlist = dict(map_background_content.REVIEW_RECORD_SHA256_ALLOWLIST)
+    allowlist[relative] = hashlib.sha256(canonical).hexdigest()
+    monkeypatch.setattr(
+        map_background_content, "REVIEW_RECORD_SHA256_ALLOWLIST", allowlist
+    )
+
+    authority = parse(raw_ledger())
+    assert any(
+        "review authority is not durable" in finding
+        for finding in authority.reconcile(tmp_path)
+    )
+
+
+def test_phase4_completion_cannot_overclaim_runtime_admission() -> None:
+    raw = raw_ledger()
+    row = next(row for row in raw["maps"] if row["name"] == "VIRIDIAN_FOREST")
+    row["presentation"] = "color"
+    with pytest.raises(MapBackgroundContentError):
+        parse(raw)
 
 
 def test_review_hashes_and_revision_are_exact_lowercase_encodings() -> None:

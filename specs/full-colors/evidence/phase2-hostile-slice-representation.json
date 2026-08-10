@@ -14,55 +14,55 @@
   "inputs": {
     "pokeyellow.gbc": {
       "path": "pokeyellow.gbc",
-      "sha256": "faa520b454046b6b33171b3328d77a13b61b3dd049f286478e1db07998691547"
+      "sha256": "339161361c3bdce12cda32f5c32b7a05fd3127a689b36cab9db6ba331686ed4e"
     },
     "pokeyellow.map": {
       "path": "pokeyellow.map",
-      "sha256": "f3b750ce4887b71494b35c26e01ba3e5fefdb6457c7b4b374dc06e2e1cd0d4bf"
+      "sha256": "648457cab39d622f49c9bf7481b0128fcaeca82ace735a791360eea47824af1a"
     },
     "pokeyellow.sym": {
       "path": "pokeyellow.sym",
-      "sha256": "56279b0495858850ce0a5cf3c47a7c7c0020bff248e2bf543c4b38cc467174fb"
+      "sha256": "22aa7d219684e3841c01244a0fe259125a5fb028230d2c095ab11a1d04d21859"
     },
     "pokeyellow_debug.gbc": {
       "path": "pokeyellow_debug.gbc",
-      "sha256": "b8f692dc3f678bcb58b5396fe949b5526ea02a785c2cadf526e94e2ebe2379c8"
+      "sha256": "785e8f73d59d64b98cd1438f4b65288a03ea2583831b3c5079c81dcd610fff77"
     },
     "pokeyellow_debug.map": {
       "path": "pokeyellow_debug.map",
-      "sha256": "1c61d62151a256dd691f3e530cc67e975757828d5b5a67d0f6e25c1d93d3fe2a"
+      "sha256": "90ceb4c028c9f9016aa7539c67f5c3bdf2611d49324379f5fc9bf9e356cc7922"
     },
     "pokeyellow_debug.sym": {
       "path": "pokeyellow_debug.sym",
-      "sha256": "f90c6d6b574c247134878c3dd8d416f7df57522ecdb195e63f52f7e5cfc1a6b6"
+      "sha256": "a3e4d11543640b4a9ca29a0f5262f20ec0f699d4bf579cd54af202d403a24762"
     },
     "pokeyellow_phase2_audit.gbc": {
       "path": "pokeyellow_phase2_audit.gbc",
-      "sha256": "d89974b402fe1803272b89973787d5d0d906109139840a71bf0e93b8021d3bb2"
+      "sha256": "2a8f692ca9b1a9d4b741bcb6de77007bc99870cf540ba26cf5ae331662c15512"
     },
     "pokeyellow_phase2_audit.map": {
       "path": "pokeyellow_phase2_audit.map",
-      "sha256": "5697e61a9680a59b428f8558cf78ac2567234297ac85644c3fdb8f42f3e7f593"
+      "sha256": "5e4e00b6333a5491035042df9df9ab925995fa91c9d4a6c9c6f5e71ee93d5f91"
     },
     "pokeyellow_phase2_audit.sym": {
       "path": "pokeyellow_phase2_audit.sym",
-      "sha256": "8aa3312774fb5340f5d319cd0b651ee82bfcfd2165cfeade0f60474c77f61a70"
+      "sha256": "729d2e2ee5386c8208832b51d5d8617dd56fcd526b9706f2f8e725c4a9f84ac6"
     },
     "pokeyellow_vc.gbc": {
       "path": "pokeyellow_vc.gbc",
-      "sha256": "b88acc8e1dccbad093e24d31c495cbde8ce2301b12089b834c8f03dce49a46e4"
+      "sha256": "d3a7e035f0ed9dc4fa93834a61d4e5c9534da5400ab27e8a1e344abcf08fd64b"
     },
     "pokeyellow_vc.map": {
       "path": "pokeyellow_vc.map",
-      "sha256": "f1cf2d556f5583b7a57bab93d95b264c89effa5ea168b06a709272de8a5fdc6c"
+      "sha256": "4b837e629e586905d42f7ef4d6f86627201ca26761031755510b55335e85f1f2"
     },
     "pokeyellow_vc.sym": {
       "path": "pokeyellow_vc.sym",
-      "sha256": "28af2d053bf07222a7cedbd0f94e75e1d13e7f2bfce2444ed122c80d149a1667"
+      "sha256": "794f76c4ff78df91fbde99c571c4c813d4470b833a8c878a38e3bc3f8ac77857"
     },
     "specs/full-colors/definitions/phase1-audit-source-transition.json": {
       "path": "specs/full-colors/definitions/phase1-audit-source-transition.json",
-      "sha256": "6e9b9917485e3159e1f1dfbf9c7eaba32dc350ab489508e34485abd4c0248d68"
+      "sha256": "9c4bb900dae7638419ab0647ab765be98e67a1c8256e63564cf1ba5c33da7342"
     },
     "specs/full-colors/definitions/phase2-hostile-slice-representation.json": {
       "path": "specs/full-colors/definitions/phase2-hostile-slice-representation.json",
@@ -70,23 +70,23 @@
     },
     "specs/full-colors/definitions/phase2-planned-subjects.json": {
       "path": "specs/full-colors/definitions/phase2-planned-subjects.json",
-      "sha256": "7555a490ca771a2717eeef2930dfc09f1109a6d7764ddb2544a89b9bb126cf94"
+      "sha256": "5d9f4e80713fbb38346e13d617d906febf352e60312f83e4a7a30d3515d26df5"
     },
     "specs/full-colors/inventory/assignments.json": {
       "path": "specs/full-colors/inventory/assignments.json",
-      "sha256": "2305a913d02621b869279e5188dc1ee826638c94db3ad7665e75030e2f5a094b"
+      "sha256": "529b544025c941b79a5bc41bcb874396b6c0c19559ed97c3a4ee44791786a0a4"
     },
     "specs/full-colors/inventory/mutations.json": {
       "path": "specs/full-colors/inventory/mutations.json",
-      "sha256": "66cb1618c7ed535d47bc22526504fd40d4295cb38efed5d9528883ea789cbcad"
+      "sha256": "e078124cafc8023ba65e0a06fdee5c05a3518cdb2f0a399848baf8c5394e2c67"
     },
     "specs/full-colors/inventory/scenes.json": {
       "path": "specs/full-colors/inventory/scenes.json",
-      "sha256": "44ab8fd2917319f25295ed844416d785f0a29ebbdcd74039447472445bb36bb3"
+      "sha256": "55da69839eaad9877cc6a2a8a459c753cb5ad68ebe599c7c7081c7b9627a6b10"
     },
     "specs/full-colors/inventory/writers.json": {
       "path": "specs/full-colors/inventory/writers.json",
-      "sha256": "d53ffd9742a7e38f988664717c7d5ed8d54fcf015f162632fafa5831fa98857a"
+      "sha256": "f6092ce3ef057526ce977468e2ddf2f52df88bdd79a4534365cf0313a226eba2"
     }
   },
   "inventory_audit": {

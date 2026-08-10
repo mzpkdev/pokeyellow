@@ -9,15 +9,21 @@ manifest binds both inputs, every emitted PNG, and the exact map/tileset order.
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+import ctypes
+import errno
 import hashlib
 import json
 import os
-from pathlib import Path
 import re
+import shutil
+import stat
+import subprocess
 import tempfile
-from typing import Sequence
-import uuid
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
+from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
 
 from PIL import Image, ImageDraw
 
@@ -27,16 +33,17 @@ from .map_background_content import (
 )
 from .rom_discovery import SymbolTable, load_sym
 
-
 SCHEMA = "full-color-map-background-atlas-v1"
 MANIFEST_NAME = "manifest.json"
+ARTIFACT_STORE = ".artifacts"
 TILE_COUNT = 256
 TILE_SIZE = 8
 ATLAS_COLUMNS = 16
 ATLAS_CELL = (52, 50)
 
-# This is the exact closed partition approved by the Phase 3 plan.  The later
-# missing-content batches are intentionally not silently admitted here.
+# This is the exact closed partition of reviewed map-background batches.  The
+# Phase 4 additions remain content evidence only; membership here does not widen
+# the production presentation predicate.
 BATCH_TILESETS = {
     "overworld": ("OVERWORLD",),
     "residential-services": (
@@ -62,6 +69,8 @@ BATCH_TILESETS = {
         "MANSION",
         "FACILITY",
     ),
+    "forest-cavern": ("FOREST", "CAVERN"),
+    "transport-special": ("SHIP_PORT", "PLATEAU", "BEACH_HOUSE"),
 }
 
 _SOURCE_STEM = {
@@ -85,6 +94,11 @@ _SOURCE_STEM = {
     "LAB": "lab",
     "CLUB": "club",
     "FACILITY": "facility",
+    "FOREST": "forest",
+    "CAVERN": "cavern",
+    "SHIP_PORT": "ship_port",
+    "PLATEAU": "plateau",
+    "BEACH_HOUSE": "beach_house",
 }
 
 _LINKED_STEM = {
@@ -108,11 +122,25 @@ _LINKED_STEM = {
     "LAB": "Lab",
     "CLUB": "Club",
     "FACILITY": "Facility",
+    "FOREST": "Forest",
+    "CAVERN": "Cavern",
+    "SHIP_PORT": "ShipPort",
+    "PLATEAU": "Plateau",
+    "BEACH_HOUSE": "BeachHouse",
 }
 
 
 class MapBackgroundAtlasError(ValueError):
     """Atlas inputs are incomplete or disagree with the linked product."""
+
+
+class MapBackgroundAtlasCompositeError(MapBackgroundAtlasError):
+    """Several publication or rollback failures preserved together."""
+
+    def __init__(self, message: str, failures: Sequence[Exception]) -> None:
+        self.failures = tuple(failures)
+        details = "; ".join(f"{type(exc).__name__}: {exc}" for exc in self.failures)
+        super().__init__(f"{message}: {details}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -142,9 +170,490 @@ def canonical_json(value: object) -> str:
     return json.dumps(value, indent=2, sort_keys=True) + "\n"
 
 
+def _rewrite_artifact_paths(value: object, replacements: dict[str, str]) -> None:
+    if isinstance(value, dict):
+        path = value.get("path")
+        if isinstance(path, str) and path in replacements:
+            value["path"] = replacements[path]
+        for child in value.values():
+            _rewrite_artifact_paths(child, replacements)
+    elif isinstance(value, list):
+        for child in value:
+            _rewrite_artifact_paths(child, replacements)
+
+
+def _address_artifacts(output: Path, manifest: dict[str, object]) -> dict[str, object]:
+    """Move artifacts under immutable digest paths and rewrite every reference."""
+    replacements: dict[str, str] = {}
+    for record in manifest["artifacts"]:
+        source_relative = str(record["path"])
+        digest = str(record["sha256"])
+        destination_relative = (
+            Path(ARTIFACT_STORE) / digest / Path(source_relative)
+        ).as_posix()
+        source = output / source_relative
+        destination = output / destination_relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        if destination.exists():
+            if _sha(destination.read_bytes()) != digest:
+                raise MapBackgroundAtlasError(
+                    f"content-addressed atlas artifact collision: {destination_relative}"
+                )
+            source.unlink()
+        else:
+            source.replace(destination)
+        replacements[source_relative] = destination_relative
+    # Empty legacy batch directories are not part of the publication contract.
+    for directory in sorted(
+        (path for path in output.rglob("*") if path.is_dir()),
+        key=lambda path: len(path.parts),
+        reverse=True,
+    ):
+        if directory.name != ARTIFACT_STORE:
+            try:
+                directory.rmdir()
+            except OSError:
+                pass
+    _rewrite_artifact_paths(manifest, replacements)
+    unhashed = dict(manifest)
+    unhashed.pop("content_sha256", None)
+    manifest["content_sha256"] = _sha(canonical_json(unhashed).encode("utf-8"))
+    (output / MANIFEST_NAME).write_text(canonical_json(manifest), encoding="utf-8")
+    return manifest
+
+
+def _carry_forward_artifacts(previous: Path, temporary: Path) -> None:
+    """Copy immutable prior blobs; cleanup is deliberately an external action."""
+    source = previous / ARTIFACT_STORE
+    if not source.exists():
+        return
+    shutil.copytree(source, temporary / ARTIFACT_STORE, dirs_exist_ok=True)
+
+
 def _save_png(image: Image.Image, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     image.save(path, format="PNG", optimize=False, compress_level=9)
+
+
+_CONVERTER_FLAGS = ("-O3", "-std=c11", "-Wall", "-Wextra", "-pedantic")
+
+
+def _resolved_tool(command: str) -> Path:
+    candidate = shutil.which(command)
+    if candidate is None:
+        raise MapBackgroundAtlasError(f"required graphics tool is absent: {command}")
+    path = Path(candidate).resolve(strict=True)
+    if not path.is_file():
+        raise MapBackgroundAtlasError(
+            f"required graphics tool is not a regular file: {command}"
+        )
+    return path
+
+
+@dataclass(frozen=True, slots=True)
+class _ExecutableSnapshot:
+    descriptor: int
+
+
+@contextmanager
+def _executable_snapshot(
+    directory: Path, name: str, data: bytes
+) -> Iterator[_ExecutableSnapshot]:
+    """Pin captured executable bytes after removing their only pathname."""
+    path = directory / name
+    path.write_bytes(data)
+    path.chmod(stat.S_IRUSR | stat.S_IXUSR)
+    descriptor = os.open(path, os.O_RDONLY)
+    os.unlink(path)
+    try:
+        yield _ExecutableSnapshot(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _run_executable_snapshot(
+    executable: _ExecutableSnapshot,
+    command: Sequence[str],
+    *,
+    cwd: Path,
+) -> subprocess.CompletedProcess[str]:
+    """Execute the pinned inode while preserving the installed tool's argv[0]."""
+    command_bytes = [os.fsencode(argument) for argument in command]
+    argv = (ctypes.c_char_p * (len(command_bytes) + 1))(*command_bytes, None)
+    environment_bytes = [
+        os.fsencode(f"{name}={value}") for name, value in os.environ.items()
+    ]
+    environment = (ctypes.c_char_p * (len(environment_bytes) + 1))(
+        *environment_bytes, None
+    )
+    libc = ctypes.CDLL(None, use_errno=True)
+
+    def execute_pinned_inode() -> None:
+        libc.fexecve(executable.descriptor, argv, environment)
+        os._exit(ctypes.get_errno() or 127)
+
+    return subprocess.run(
+        list(command),
+        executable="/bin/false",
+        pass_fds=(executable.descriptor,),
+        preexec_fn=execute_pinned_inode,
+        cwd=cwd,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+@lru_cache(maxsize=16)
+def _graphics_toolchain_cached(
+    root_text: str,
+    rgbds_version_bytes: bytes,
+    gfx_source_bytes: bytes,
+    common_source_bytes: bytes,
+    rgbgfx_path_text: str,
+    rgbgfx_binary_bytes: bytes,
+    compiler_path_text: str,
+    compiler_binary_bytes: bytes,
+) -> dict[str, object]:
+    """Bind the tracked converter implementation and exact executable tools."""
+    root = Path(root_text)
+    rgbds_version_sha256 = _sha(rgbds_version_bytes)
+    gfx_source_sha256 = _sha(gfx_source_bytes)
+    common_source_sha256 = _sha(common_source_bytes)
+    rgbgfx_binary_sha256 = _sha(rgbgfx_binary_bytes)
+    compiler_binary_sha256 = _sha(compiler_binary_bytes)
+    expected_rgbds = rgbds_version_bytes.decode("utf-8").strip()
+    rgbgfx_path = Path(rgbgfx_path_text)
+    compiler_path = Path(compiler_path_text)
+    with tempfile.TemporaryDirectory(prefix="map-background-converter-") as temporary:
+        snapshot = Path(temporary)
+        converter = snapshot / "gfx"
+        gfx_source = snapshot / "gfx.c"
+        common_source = snapshot / "common.h"
+        gfx_source.write_bytes(gfx_source_bytes)
+        common_source.write_bytes(common_source_bytes)
+        try:
+            with (
+                _executable_snapshot(
+                    snapshot, "rgbgfx", rgbgfx_binary_bytes
+                ) as rgbgfx_executable,
+                _executable_snapshot(
+                    snapshot, "cc", compiler_binary_bytes
+                ) as compiler_executable,
+            ):
+                rgbgfx_version = _run_executable_snapshot(
+                    rgbgfx_executable,
+                    [str(rgbgfx_path), "--version"],
+                    cwd=root,
+                ).stdout.strip()
+                compiler_version = (
+                    _run_executable_snapshot(
+                        compiler_executable,
+                        [str(compiler_path), "--version"],
+                        cwd=root,
+                    )
+                    .stdout.splitlines()[0]
+                    .strip()
+                )
+                if rgbgfx_version != f"rgbgfx v{expected_rgbds}":
+                    raise MapBackgroundAtlasError(
+                        "rgbgfx version disagrees with the checked-in .rgbds-version"
+                    )
+                _run_executable_snapshot(
+                    compiler_executable,
+                    [
+                        str(compiler_path),
+                        *_CONVERTER_FLAGS,
+                        "-o",
+                        str(converter),
+                        str(gfx_source),
+                    ],
+                    cwd=root,
+                )
+        except MapBackgroundAtlasError:
+            raise
+        except (OSError, subprocess.CalledProcessError) as exc:
+            detail = (
+                exc.stderr.strip()
+                if isinstance(exc, subprocess.CalledProcessError)
+                else str(exc)
+            )
+            raise MapBackgroundAtlasError(
+                f"cannot compile checked-in graphics converter: {detail}"
+            ) from exc
+        converter_sha256 = _sha(converter.read_bytes())
+    _revalidate_converter_inputs(
+        root,
+        rgbds_version_sha256=rgbds_version_sha256,
+        gfx_source_sha256=gfx_source_sha256,
+        common_source_sha256=common_source_sha256,
+        rgbgfx_path=rgbgfx_path,
+        rgbgfx_binary_sha256=rgbgfx_binary_sha256,
+        compiler_path=compiler_path,
+        compiler_binary_sha256=compiler_binary_sha256,
+    )
+    return {
+        "rgbds_version": {
+            "path": ".rgbds-version",
+            "sha256": rgbds_version_sha256,
+            "value": expected_rgbds,
+        },
+        "rgbgfx": {
+            "command": "rgbgfx",
+            "binary_sha256": rgbgfx_binary_sha256,
+            "version": rgbgfx_version,
+        },
+        "postprocessor": {
+            "binary_sha256": converter_sha256,
+            "sources": [
+                {
+                    "path": "tools/common.h",
+                    "sha256": common_source_sha256,
+                },
+                {"path": "tools/gfx.c", "sha256": gfx_source_sha256},
+            ],
+        },
+        "compiler": {
+            "command": "cc",
+            "binary_sha256": compiler_binary_sha256,
+            "version": compiler_version,
+            "flags": list(_CONVERTER_FLAGS),
+        },
+    }
+
+
+def _revalidate_converter_inputs(
+    root: Path,
+    *,
+    rgbds_version_sha256: str,
+    gfx_source_sha256: str,
+    common_source_sha256: str,
+    rgbgfx_path: Path,
+    rgbgfx_binary_sha256: str,
+    compiler_path: Path,
+    compiler_binary_sha256: str,
+) -> None:
+    """Fail closed if any path used by conversion changed after identification."""
+    expected = {
+        root / ".rgbds-version": rgbds_version_sha256,
+        root / "tools/gfx.c": gfx_source_sha256,
+        root / "tools/common.h": common_source_sha256,
+        rgbgfx_path: rgbgfx_binary_sha256,
+        compiler_path: compiler_binary_sha256,
+    }
+    for path, digest in expected.items():
+        try:
+            current = _sha(path.read_bytes())
+        except OSError as exc:
+            raise MapBackgroundAtlasError(
+                f"graphics conversion input disappeared after identification: {path}"
+            ) from exc
+        if current != digest:
+            raise MapBackgroundAtlasError(
+                f"graphics conversion input changed after identification: {path}"
+            )
+
+
+def graphics_toolchain(root: Path) -> dict[str, object]:
+    rgbgfx = _resolved_tool("rgbgfx")
+    compiler = _resolved_tool("cc")
+    version_path = root / ".rgbds-version"
+    gfx_source = root / "tools/gfx.c"
+    common_source = root / "tools/common.h"
+    return _graphics_toolchain_cached(
+        str(root.resolve()),
+        version_path.read_bytes(),
+        gfx_source.read_bytes(),
+        common_source.read_bytes(),
+        str(rgbgfx),
+        rgbgfx.read_bytes(),
+        str(compiler),
+        compiler.read_bytes(),
+    )
+
+
+@lru_cache(maxsize=64)
+def _generated_2bpp_cached(
+    root_text: str,
+    relative_text: str,
+    source_bytes: bytes,
+    gfx_source_bytes: bytes,
+    common_source_bytes: bytes,
+    rgbgfx_path_text: str,
+    rgbgfx_binary_bytes: bytes,
+    compiler_path_text: str,
+    compiler_binary_bytes: bytes,
+    toolchain_sha256: str,
+) -> bytes:
+    """Derive a generated graphics include without writing into the checkout."""
+    root = Path(root_text)
+    relative = Path(relative_text)
+    source = (root / relative).with_suffix(".png")
+    source_sha256 = _sha(source_bytes)
+    toolchain = _graphics_toolchain_cached(
+        root_text,
+        (root / ".rgbds-version").read_bytes(),
+        gfx_source_bytes,
+        common_source_bytes,
+        rgbgfx_path_text,
+        rgbgfx_binary_bytes,
+        compiler_path_text,
+        compiler_binary_bytes,
+    )
+    if _sha(canonical_json(toolchain).encode("utf-8")) != toolchain_sha256:
+        raise MapBackgroundAtlasError(
+            "graphics toolchain changed between provenance and conversion"
+        )
+    if _sha(source.read_bytes()) != source_sha256:
+        raise MapBackgroundAtlasError(
+            f"graphics source changed between provenance and conversion: {source}"
+        )
+    source_rows = {
+        row["path"]: row["sha256"] for row in toolchain["postprocessor"]["sources"]
+    }
+    if (
+        _sha(gfx_source_bytes) != source_rows["tools/gfx.c"]
+        or _sha(common_source_bytes) != source_rows["tools/common.h"]
+    ):
+        raise MapBackgroundAtlasError(
+            "converter source snapshot disagrees with graphics toolchain provenance"
+        )
+    with tempfile.TemporaryDirectory(prefix="map-background-gfx-") as temporary:
+        snapshot = Path(temporary)
+        compiler = Path(compiler_path_text)
+        rgbgfx = Path(rgbgfx_path_text)
+        converter = snapshot / "gfx"
+        raw = snapshot / relative.name
+        processed = snapshot / f"processed-{relative.name}"
+        snapshot_source = snapshot / "source.png"
+        snapshot_gfx_source = snapshot / "gfx.c"
+        snapshot_common_source = snapshot / "common.h"
+        snapshot_source.write_bytes(source_bytes)
+        snapshot_gfx_source.write_bytes(gfx_source_bytes)
+        snapshot_common_source.write_bytes(common_source_bytes)
+        try:
+            with (
+                _executable_snapshot(
+                    snapshot, "cc", compiler_binary_bytes
+                ) as compiler_executable,
+                _executable_snapshot(
+                    snapshot, "rgbgfx", rgbgfx_binary_bytes
+                ) as rgbgfx_executable,
+            ):
+                _run_executable_snapshot(
+                    compiler_executable,
+                    [
+                        str(compiler),
+                        *_CONVERTER_FLAGS,
+                        "-o",
+                        str(converter),
+                        str(snapshot_gfx_source),
+                    ],
+                    cwd=root,
+                )
+                if (
+                    _sha(converter.read_bytes())
+                    != toolchain["postprocessor"]["binary_sha256"]
+                ):
+                    raise MapBackgroundAtlasError(
+                        "compiled graphics converter disagrees with toolchain provenance"
+                    )
+                _run_executable_snapshot(
+                    rgbgfx_executable,
+                    [
+                        str(rgbgfx),
+                        "--colors",
+                        "dmg",
+                        "-Weverything",
+                        "-o",
+                        str(raw),
+                        str(snapshot_source),
+                    ],
+                    cwd=root,
+                )
+            filters = ["--trim-whitespace"]
+            if relative == Path("gfx/tilesets/reds_house.2bpp"):
+                filters.append("--preserve=0x48")
+            subprocess.run(
+                [
+                    str(converter),
+                    *filters,
+                    "-o",
+                    str(processed),
+                    str(raw),
+                ],
+                cwd=root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            current_toolchain = _graphics_toolchain_cached(
+                root_text,
+                (root / ".rgbds-version").read_bytes(),
+                gfx_source_bytes,
+                common_source_bytes,
+                rgbgfx_path_text,
+                rgbgfx_binary_bytes,
+                compiler_path_text,
+                compiler_binary_bytes,
+            )
+            if (
+                _sha(canonical_json(current_toolchain).encode("utf-8"))
+                != toolchain_sha256
+            ):
+                raise MapBackgroundAtlasError(
+                    "graphics toolchain changed while conversion executed"
+                )
+            return processed.read_bytes()
+        except (OSError, subprocess.CalledProcessError) as exc:
+            detail = (
+                exc.stderr.strip()
+                if isinstance(exc, subprocess.CalledProcessError)
+                else str(exc)
+            )
+            raise MapBackgroundAtlasError(
+                f"cannot derive {relative.as_posix()} from checked-in PNG: {detail}"
+            ) from exc
+
+
+def source_2bpp(root: Path, relative: Path) -> bytes:
+    """Return Makefile-equivalent 2bpp bytes from the checked-in PNG source."""
+    png = (root / relative).with_suffix(".png")
+    return _source_2bpp_from_snapshot(root, relative, png.read_bytes())
+
+
+def _source_2bpp_from_snapshot(
+    root: Path, relative: Path, source_bytes: bytes
+) -> bytes:
+    """Convert one already-captured PNG snapshot with equally bound sources."""
+    rgbgfx = _resolved_tool("rgbgfx")
+    compiler = _resolved_tool("cc")
+    rgbgfx_binary_bytes = rgbgfx.read_bytes()
+    compiler_binary_bytes = compiler.read_bytes()
+    gfx_source_bytes = (root / "tools/gfx.c").read_bytes()
+    common_source_bytes = (root / "tools/common.h").read_bytes()
+    toolchain = _graphics_toolchain_cached(
+        str(root.resolve()),
+        (root / ".rgbds-version").read_bytes(),
+        gfx_source_bytes,
+        common_source_bytes,
+        str(rgbgfx),
+        rgbgfx_binary_bytes,
+        str(compiler),
+        compiler_binary_bytes,
+    )
+    return _generated_2bpp_cached(
+        str(root.resolve()),
+        relative.as_posix(),
+        source_bytes,
+        gfx_source_bytes,
+        common_source_bytes,
+        str(rgbgfx),
+        rgbgfx_binary_bytes,
+        str(compiler),
+        compiler_binary_bytes,
+        _sha(canonical_json(toolchain).encode("utf-8")),
+    )
 
 
 def _linked_payload(
@@ -431,48 +940,70 @@ def moving_water_frames(base: bytes) -> tuple[tuple[int, str, bytes], ...]:
 
 
 def _animation_frames(
-    root: Path, tileset: str, attributes: bytes, palettes: bytes
+    root: Path,
+    tileset: str,
+    animation_identity: str | None,
+    attributes: bytes,
+    palettes: bytes,
 ) -> list[dict[str, object]]:
-    if tileset != "OVERWORLD":
+    if animation_identity is None:
         return []
+    if animation_identity not in {"TILEANIM_WATER", "TILEANIM_WATER_FLOWER"}:
+        raise MapBackgroundAtlasError(
+            f"{tileset}: unsupported animation identity {animation_identity}"
+        )
     decoded_palettes = decode_palettes(palettes)
     records = []
-    for index, path in enumerate(
-        sorted((root / "gfx/tilesets/flower").glob("flower*.2bpp")), 1
-    ):
-        data = path.read_bytes()
-        tile = decode_2bpp(data)[0]
-        records.append(
-            {
-                "identity": "TILEANIM_WATER_FLOWER",
-                "observation": "artifact-only-source-frame",
-                "kind": "flower",
-                "frame": index,
-                "tile_id": 0x03,
-                "source": path.relative_to(root).as_posix(),
-                "source_sha256": _sha(data),
-                "image": render_tile(
-                    tile, decoded_palettes[attributes[0x03] & 7], scale=8
-                ),
-            }
-        )
+    if animation_identity == "TILEANIM_WATER_FLOWER":
+        for index, png_path in enumerate(
+            sorted((root / "gfx/tilesets/flower").glob("flower*.png")), 1
+        ):
+            path = png_path.with_suffix(".2bpp")
+            data = source_2bpp(root, path.relative_to(root))
+            tile = decode_2bpp(data)[0]
+            records.append(
+                {
+                    "identity": animation_identity,
+                    "observation": "artifact-only-source-frame",
+                    "kind": "flower",
+                    "frame": index,
+                    "tile_id": 0x03,
+                    "source": path.relative_to(root).as_posix(),
+                    "source_input": _file_record(png_path, root=root),
+                    "source_sha256": _sha(data),
+                    "image": render_tile(
+                        tile, decoded_palettes[attributes[0x03] & 7], scale=8
+                    ),
+                }
+            )
     # Water frames follow the routine's post-increment counter: counters 1-3
     # rotate right, 4-7 rotate left, and 0 rotates right.
     routine_path = root / "home/vcopy.asm"
     routine_sha256 = _sha(routine_path.read_bytes())
-    base = (root / "gfx/tilesets/overworld.2bpp").read_bytes()[0x14 * 16 : 0x15 * 16]
+    source_path = Path(f"gfx/tilesets/{_SOURCE_STEM[tileset]}.2bpp")
+    source_bytes = source_2bpp(root, source_path)
+    base = source_bytes[0x14 * 16 : 0x15 * 16]
+    if len(base) != 16:
+        raise MapBackgroundAtlasError(
+            f"{tileset}: TILEANIM_WATER source tile $14 is absent"
+        )
     previous = base
     for frame, (counter, direction, data) in enumerate(moving_water_frames(base)):
         tile = decode_2bpp(data)[0]
         records.append(
             {
-                "identity": "TILEANIM_WATER_FLOWER",
+                "identity": animation_identity,
                 "observation": "artifact-only-runtime-semantics",
                 "kind": "water-rotation",
                 "frame": frame,
                 "counter": counter,
                 "direction": direction,
                 "tile_id": 0x14,
+                "source": source_path.as_posix(),
+                "source_input": _file_record(
+                    (root / source_path).with_suffix(".png"), root=root
+                ),
+                "source_sha256": _sha(source_bytes),
                 "routine": "UpdateMovingBgTiles",
                 "routine_source_path": routine_path.relative_to(root).as_posix(),
                 "routine_source_file_sha256": routine_sha256,
@@ -520,6 +1051,14 @@ def _file_record(path: Path, *, root: Path) -> dict[str, object]:
     }
 
 
+def _bytes_record(relative: Path, data: bytes) -> dict[str, object]:
+    return {
+        "path": relative.as_posix(),
+        "size": len(data),
+        "sha256": _sha(data),
+    }
+
+
 def _build_atlases_in_directory(
     root: Path | str,
     output: Path | str,
@@ -533,6 +1072,7 @@ def _build_atlases_in_directory(
     if unknown:
         raise MapBackgroundAtlasError(f"unknown Phase 3 batch(es): {unknown}")
     authority = MapBackgroundAuthority.load(root)
+    toolchain = graphics_toolchain(root)
     override_rules = production_map_override_rules(root)
     rom_path, sym_path = root / f"{product}.gbc", root / f"{product}.sym"
     rom, sym_bytes = rom_path.read_bytes(), sym_path.read_bytes()
@@ -559,7 +1099,14 @@ def _build_atlases_in_directory(
                 root / f"gfx/tilesets/{stem}.2bpp",
                 root / f"gfx/blocksets/{stem}.bst",
             )
-            graphics, blockset = gfx_path.read_bytes(), block_path.read_bytes()
+            gfx_relative = gfx_path.relative_to(root)
+            gfx_input = gfx_path.with_suffix(".png")
+            gfx_input_bytes = gfx_input.read_bytes()
+            gfx_input_record = _bytes_record(
+                gfx_input.relative_to(root), gfx_input_bytes
+            )
+            graphics = _source_2bpp_from_snapshot(root, gfx_relative, gfx_input_bytes)
+            blockset = block_path.read_bytes()
             gfx_link = _linked_source(rom, symbols, f"{linked_stem}_GFX", graphics)
             block_link = _linked_source(rom, symbols, f"{linked_stem}_Block", blockset)
             palette = _linked_payload(rom, symbols, row.palette_authority, 64)
@@ -571,9 +1118,36 @@ def _build_atlases_in_directory(
             _save_png(atlas, atlas_path)
             all_artifacts.append(_file_record(atlas_path, root=output))
 
+            if len(row.animations) > 1:
+                raise MapBackgroundAtlasError(
+                    f"{tileset}: multiple tileset animation identities are unsupported"
+                )
+            animation_identity = row.animations[0] if row.animations else None
             animation_records = _animation_frames(
-                root, tileset, attributes.data, palette.data
+                root, tileset, animation_identity, attributes.data, palette.data
             )
+            if animation_identity is not None:
+                water_records = [
+                    record
+                    for record in animation_records
+                    if record.get("kind") == "water-rotation"
+                ]
+                if len(water_records) != 8:
+                    raise MapBackgroundAtlasError(
+                        f"{tileset}: declared water animation lacks eight review frames"
+                    )
+                flower_records = [
+                    record
+                    for record in animation_records
+                    if record.get("kind") == "flower"
+                ]
+                expected_flowers = (
+                    3 if animation_identity == "TILEANIM_WATER_FLOWER" else 0
+                )
+                if len(flower_records) != expected_flowers:
+                    raise MapBackgroundAtlasError(
+                        f"{tileset}: declared flower animation lacks three review frames"
+                    )
             animations = []
             for record in animation_records:
                 image = record.pop("image")
@@ -695,7 +1269,8 @@ def _build_atlases_in_directory(
                     "name": tileset,
                     "palette": palette.manifest(),
                     "attributes": attributes.manifest(),
-                    "graphics_source": _file_record(gfx_path, root=root),
+                    "graphics_input": gfx_input_record,
+                    "graphics_source": _bytes_record(gfx_relative, graphics),
                     "graphics_linked": gfx_link.manifest(),
                     "blockset_source": _file_record(block_path, root=root),
                     "blockset_linked": block_link.manifest(),
@@ -719,6 +1294,7 @@ def _build_atlases_in_directory(
             "size": len(sym_bytes),
             "sha256": _sha(sym_bytes),
         },
+        "graphics_toolchain": toolchain,
         "batches": [
             {"name": name, "tilesets": list(BATCH_TILESETS[name])} for name in batches
         ],
@@ -731,19 +1307,198 @@ def _build_atlases_in_directory(
     return manifest
 
 
-def _owned_output_entries(output: Path) -> tuple[set[str], list[Path]]:
-    """Validate and enumerate one complete tree owned by this producer."""
-    if output.is_symlink() or not output.is_dir():
-        raise MapBackgroundAtlasError(f"refusing non-directory atlas output: {output}")
-    manifest_path = output / MANIFEST_NAME
-    if manifest_path.is_symlink() or not manifest_path.is_file():
-        if not any(output.iterdir()):
-            return set(), []
-        raise MapBackgroundAtlasError("existing atlas output lacks a regular manifest")
+_DIRECTORY_FLAGS = (
+    os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
+)
+_FILE_FLAGS = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+_RENAME_NOREPLACE = 1
+_RENAME_EXCHANGE = 2
+
+
+def _identity(metadata: os.stat_result) -> tuple[int, int, int]:
+    return metadata.st_dev, metadata.st_ino, stat.S_IFMT(metadata.st_mode)
+
+
+@dataclass(frozen=True, slots=True)
+class _ValidatedOutput:
+    root_identity: tuple[int, int, int]
+    entries: dict[str, _ValidatedEntry]
+    manifest_sha256: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class _ValidatedEntry:
+    identity: tuple[int, int, int]
+    nlink: int
+    size: int
+    sha256: str | None
+
+
+@dataclass(slots=True)
+class _QuarantinedOutput:
+    path: Path
+    name: str
+    parent_descriptor: int
+    tree_descriptor: int
+    validated: _ValidatedOutput
+
+    def close(self) -> None:
+        errors: list[Exception] = []
+        for attribute in ("tree_descriptor", "parent_descriptor"):
+            descriptor = getattr(self, attribute)
+            if descriptor < 0:
+                continue
+            setattr(self, attribute, -1)
+            try:
+                os.close(descriptor)
+            except OSError as exc:
+                errors.append(exc)
+        if errors:
+            raise MapBackgroundAtlasCompositeError(
+                "failed to close atlas quarantine handles", errors
+            )
+
+
+def _regular_file_metadata(
+    directory_descriptor: int, name: str, *, description: str
+) -> tuple[os.stat_result, int]:
     try:
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError) as exc:
+        metadata = os.stat(name, dir_fd=directory_descriptor, follow_symlinks=False)
+        descriptor = os.open(name, _FILE_FLAGS, dir_fd=directory_descriptor)
+    except OSError as exc:
+        raise MapBackgroundAtlasError(f"{description} is not a regular file") from exc
+    try:
+        opened = os.fstat(descriptor)
+        if metadata.st_nlink != 1 or opened.st_nlink != 1:
+            raise MapBackgroundAtlasError(f"{description} is a hard-linked file")
+        if not stat.S_ISREG(metadata.st_mode) or _identity(metadata) != _identity(
+            opened
+        ):
+            raise MapBackgroundAtlasError(
+                f"{description} is not a private regular file"
+            )
+    except BaseException:
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+        raise
+    return metadata, descriptor
+
+
+def _read_regular_file(
+    directory_descriptor: int,
+    name: str,
+    *,
+    description: str,
+    synchronize: bool = False,
+) -> tuple[os.stat_result, bytes]:
+    metadata, descriptor = _regular_file_metadata(
+        directory_descriptor, name, description=description
+    )
+    try:
+        chunks = []
+        while chunk := os.read(descriptor, 1024 * 1024):
+            chunks.append(chunk)
+        data = b"".join(chunks)
+        if synchronize:
+            os.fsync(descriptor)
+        final = os.fstat(descriptor)
+    finally:
+        os.close(descriptor)
+    if (
+        _identity(final) != _identity(metadata)
+        or final.st_nlink != 1
+        or final.st_size != len(data)
+    ):
+        raise MapBackgroundAtlasError(f"{description} changed during validation")
+    return final, data
+
+
+def _walk_output(
+    directory_descriptor: int,
+    *,
+    prefix: str = "",
+    synchronize_files: bool = False,
+) -> dict[str, _ValidatedEntry]:
+    entries: dict[str, _ValidatedEntry] = {}
+    with os.scandir(directory_descriptor) as iterator:
+        names = sorted(entry.name for entry in iterator)
+    for name in names:
+        relative = f"{prefix}/{name}" if prefix else name
+        metadata = os.stat(name, dir_fd=directory_descriptor, follow_symlinks=False)
+        identity = _identity(metadata)
+        if stat.S_ISREG(metadata.st_mode):
+            final, data = _read_regular_file(
+                directory_descriptor,
+                name,
+                description=f"atlas file {relative}",
+                synchronize=synchronize_files,
+            )
+            metadata = final
+            identity = _identity(final)
+            entry = _ValidatedEntry(identity, final.st_nlink, len(data), _sha(data))
+        elif stat.S_ISDIR(metadata.st_mode):
+            try:
+                child_descriptor = os.open(
+                    name, _DIRECTORY_FLAGS, dir_fd=directory_descriptor
+                )
+            except OSError as exc:
+                raise MapBackgroundAtlasError(
+                    "existing atlas output directory changed during validation"
+                ) from exc
+            try:
+                if _identity(os.fstat(child_descriptor)) != identity:
+                    raise MapBackgroundAtlasError(
+                        "existing atlas output directory changed during validation"
+                    )
+                entries.update(
+                    _walk_output(
+                        child_descriptor,
+                        prefix=relative,
+                        synchronize_files=synchronize_files,
+                    )
+                )
+            finally:
+                os.close(child_descriptor)
+            entry = _ValidatedEntry(identity, metadata.st_nlink, metadata.st_size, None)
+        elif stat.S_ISLNK(metadata.st_mode):
+            raise MapBackgroundAtlasError("existing atlas output contains a symlink")
+        else:
+            raise MapBackgroundAtlasError(
+                "existing atlas output contains a special file"
+            )
+        entries[relative] = entry
+    return entries
+
+
+def _validate_output_descriptor(
+    tree_descriptor: int,
+    output: Path,
+    *,
+    synchronize_files: bool = False,
+) -> _ValidatedOutput:
+    root_metadata = os.fstat(tree_descriptor)
+    entries = _walk_output(tree_descriptor, synchronize_files=synchronize_files)
+    if not entries:
+        return _ValidatedOutput(_identity(root_metadata), entries, None)
+    manifest_metadata, manifest_bytes = _read_regular_file(
+        tree_descriptor, MANIFEST_NAME, description="atlas manifest"
+    )
+    try:
+        manifest = json.loads(manifest_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise MapBackgroundAtlasError("existing atlas manifest is unreadable") from exc
+    manifest_entry = entries.get(MANIFEST_NAME)
+    if (
+        manifest_entry is None
+        or manifest_entry.identity != _identity(manifest_metadata)
+        or manifest_entry.size != len(manifest_bytes)
+        or manifest_entry.sha256 != _sha(manifest_bytes)
+    ):
+        raise MapBackgroundAtlasError(
+            "existing atlas manifest changed during validation"
+        )
     if (
         manifest.get("schema") != SCHEMA
         or manifest.get("producer") != "tools.rom_tests.full_color.map_background_atlas"
@@ -751,43 +1506,321 @@ def _owned_output_entries(output: Path) -> tuple[set[str], list[Path]]:
         raise MapBackgroundAtlasError(
             "existing atlas output belongs to another producer"
         )
+    canonical_manifest = canonical_json(manifest).encode("utf-8")
+    if manifest_bytes != canonical_manifest:
+        raise MapBackgroundAtlasError("atlas manifest is not canonical")
+    unhashed = dict(manifest)
+    content_sha256 = unhashed.pop("content_sha256", None)
+    if content_sha256 != _sha(canonical_json(unhashed).encode("utf-8")):
+        raise MapBackgroundAtlasError("atlas manifest content hash is invalid")
+    artifacts = manifest.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise MapBackgroundAtlasError("atlas manifest artifacts are invalid")
     owned = {MANIFEST_NAME}
-    for record in manifest.get("artifacts", []):
+    addressed = True
+    for record in artifacts:
+        if not isinstance(record, dict):
+            raise MapBackgroundAtlasError("atlas manifest artifact is invalid")
         relative = Path(str(record.get("path", "")))
         if relative.is_absolute() or ".." in relative.parts or not relative.parts:
             raise MapBackgroundAtlasError("existing atlas manifest has an unsafe path")
-        owned.add(relative.as_posix())
-    actual = set()
-    directories = []
-    for path in output.rglob("*"):
-        if path.is_symlink():
-            raise MapBackgroundAtlasError("existing atlas output contains a symlink")
-        relative = path.relative_to(output).as_posix()
-        if path.is_dir():
-            directories.append(path)
-        elif path.is_file():
-            actual.add(relative)
-        else:
+        normalized = relative.as_posix()
+        parts = relative.parts
+        if len(parts) < 3 or parts[0] != ARTIFACT_STORE:
+            addressed = False
+        elif not re.fullmatch(r"[0-9a-f]{64}", parts[1]) or parts[1] != record.get(
+            "sha256"
+        ):
             raise MapBackgroundAtlasError(
-                "existing atlas output contains a special file"
+                "atlas manifest artifact content address is invalid"
             )
-    if actual != owned:
+        if normalized in owned:
+            raise MapBackgroundAtlasError(
+                "existing atlas manifest repeats an owned path"
+            )
+        owned.add(normalized)
+        entry = entries.get(normalized)
+        if (
+            entry is None
+            or entry.identity[2] != stat.S_IFREG
+            or entry.size != record.get("size")
+            or entry.sha256 != record.get("sha256")
+        ):
+            raise MapBackgroundAtlasError(
+                f"atlas artifact does not match manifest: {normalized}"
+            )
+    actual_files = {
+        relative
+        for relative, entry in entries.items()
+        if entry.identity[2] == stat.S_IFREG
+    }
+    retained = actual_files - owned
+    if addressed:
+        for relative in retained:
+            parts = Path(relative).parts
+            entry = entries[relative]
+            if (
+                len(parts) < 3
+                or parts[0] != ARTIFACT_STORE
+                or not re.fullmatch(r"[0-9a-f]{64}", parts[1])
+                or entry.sha256 != parts[1]
+            ):
+                raise MapBackgroundAtlasError(
+                    f"existing atlas output contains an invalid retained artifact: {relative}"
+                )
+    elif retained:
         raise MapBackgroundAtlasError(
             "existing atlas output contains stale or unowned files"
         )
-    return owned, directories
+    return _ValidatedOutput(_identity(root_metadata), entries, _sha(manifest_bytes))
 
 
-def _remove_owned_output(output: Path) -> None:
-    """Remove only a complete output tree declared by this producer."""
-    owned, directories = _owned_output_entries(output)
-    for relative in sorted(owned):
-        (output / relative).unlink()
-    for directory in sorted(
-        directories, key=lambda path: len(path.parts), reverse=True
-    ):
-        directory.rmdir()
-    output.rmdir()
+def _owned_output_entries(output: Path) -> tuple[set[str], list[Path]]:
+    """Validate and enumerate one complete tree owned by this producer."""
+    try:
+        descriptor = os.open(output, _DIRECTORY_FLAGS)
+    except OSError as exc:
+        raise MapBackgroundAtlasError(
+            f"refusing non-directory atlas output: {output}"
+        ) from exc
+    try:
+        validated = _validate_output_descriptor(descriptor, output)
+    finally:
+        os.close(descriptor)
+    files = {
+        relative
+        for relative, entry in validated.entries.items()
+        if entry.identity[2] == stat.S_IFREG
+    }
+    directories = [
+        output / relative
+        for relative, entry in validated.entries.items()
+        if entry.identity[2] == stat.S_IFDIR
+    ]
+    return files, directories
+
+
+def _retention_name(output: Path, slot: str) -> str:
+    return f".{output.name}.{slot}"
+
+
+def _require_absent(directory_descriptor: int, name: str, *, description: str) -> None:
+    try:
+        os.stat(name, dir_fd=directory_descriptor, follow_symlinks=False)
+    except FileNotFoundError:
+        return
+    raise MapBackgroundAtlasError(
+        f"{description} is occupied; external operator cleanup is required"
+    )
+
+
+def _rename_noreplace(
+    source: str,
+    destination: str,
+    *,
+    source_directory_descriptor: int,
+    destination_directory_descriptor: int,
+) -> None:
+    """Rename atomically without ever replacing a raced-in destination."""
+    libc = ctypes.CDLL(None, use_errno=True)
+    try:
+        renameat2 = libc.renameat2
+    except AttributeError as exc:
+        raise MapBackgroundAtlasError(
+            "atomic no-replace rename is unavailable on this host"
+        ) from exc
+    result = renameat2(
+        source_directory_descriptor,
+        os.fsencode(source),
+        destination_directory_descriptor,
+        os.fsencode(destination),
+        _RENAME_NOREPLACE,
+    )
+    if result != 0:
+        error = ctypes.get_errno()
+        if error in {errno.ENOSYS, errno.EINVAL}:
+            raise MapBackgroundAtlasError(
+                "atomic no-replace rename is unavailable on this filesystem"
+            )
+        raise OSError(error, os.strerror(error), destination)
+
+
+def _rename_exchange(
+    first: str,
+    second: str,
+    *,
+    directory_descriptor: int,
+) -> None:
+    """Atomically exchange two directory entries without an absent-name window."""
+    libc = ctypes.CDLL(None, use_errno=True)
+    try:
+        renameat2 = libc.renameat2
+    except AttributeError as exc:
+        raise MapBackgroundAtlasError(
+            "atomic exchange rename is unavailable on this host"
+        ) from exc
+    result = renameat2(
+        directory_descriptor,
+        os.fsencode(first),
+        directory_descriptor,
+        os.fsencode(second),
+        _RENAME_EXCHANGE,
+    )
+    if result != 0:
+        error = ctypes.get_errno()
+        if error in {errno.ENOSYS, errno.EINVAL, errno.EOPNOTSUPP}:
+            raise MapBackgroundAtlasError(
+                "atomic exchange rename is unavailable on this filesystem"
+            )
+        raise OSError(error, os.strerror(error), f"{first}<->{second}")
+
+
+def _pin_owned_output(output: Path) -> _QuarantinedOutput:
+    """Open and validate the current publication without changing its name."""
+    parent_descriptor = os.open(output.parent, _DIRECTORY_FLAGS)
+    try:
+        tree_descriptor = os.open(
+            output.name, _DIRECTORY_FLAGS, dir_fd=parent_descriptor
+        )
+    except OSError as exc:
+        os.close(parent_descriptor)
+        raise MapBackgroundAtlasError(
+            f"refusing non-directory atlas output: {output}"
+        ) from exc
+    try:
+        validated = _validate_output_descriptor(tree_descriptor, output)
+        current = os.stat(output.name, dir_fd=parent_descriptor, follow_symlinks=False)
+        if _identity(current) != validated.root_identity:
+            raise MapBackgroundAtlasError(
+                "atlas output changed while its publication was pinned"
+            )
+        return _QuarantinedOutput(
+            output,
+            output.name,
+            parent_descriptor,
+            tree_descriptor,
+            validated,
+        )
+    except Exception:
+        os.close(tree_descriptor)
+        os.close(parent_descriptor)
+        raise
+
+
+def _quarantine_owned_output(
+    output: Path, *, slot: str = "prior"
+) -> _QuarantinedOutput:
+    """Pin, validate, and atomically isolate the exact published directory."""
+    parent_descriptor = os.open(output.parent, _DIRECTORY_FLAGS)
+    try:
+        tree_descriptor = os.open(
+            output.name, _DIRECTORY_FLAGS, dir_fd=parent_descriptor
+        )
+    except OSError as exc:
+        os.close(parent_descriptor)
+        raise MapBackgroundAtlasError(
+            f"refusing non-directory atlas output: {output}"
+        ) from exc
+    quarantine_moved = False
+    try:
+        validated = _validate_output_descriptor(tree_descriptor, output)
+        quarantine_name = _retention_name(output, slot)
+        _rename_noreplace(
+            output.name,
+            quarantine_name,
+            source_directory_descriptor=parent_descriptor,
+            destination_directory_descriptor=parent_descriptor,
+        )
+        quarantine_moved = True
+        moved = os.stat(
+            quarantine_name, dir_fd=parent_descriptor, follow_symlinks=False
+        )
+        if _identity(moved) != validated.root_identity:
+            raise MapBackgroundAtlasError(
+                "atlas output changed while it was moved to quarantine"
+            )
+        quarantined_validation = _validate_output_descriptor(tree_descriptor, output)
+        if quarantined_validation != validated:
+            raise MapBackgroundAtlasError(
+                "atlas output tree changed while it was moved to quarantine"
+            )
+        return _QuarantinedOutput(
+            output.parent / quarantine_name,
+            quarantine_name,
+            parent_descriptor,
+            tree_descriptor,
+            validated,
+        )
+    except Exception as quarantine_error:
+        recovery_errors: list[Exception] = []
+        if quarantine_moved:
+            try:
+                current_validation = _validate_output_descriptor(
+                    tree_descriptor, output
+                )
+                if current_validation != validated:
+                    raise MapBackgroundAtlasError(
+                        "quarantined atlas publication changed before restoration"
+                    )
+                current = os.stat(
+                    quarantine_name,
+                    dir_fd=parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if _identity(current) != validated.root_identity:
+                    raise MapBackgroundAtlasError(
+                        "quarantined atlas publication changed before restoration"
+                    )
+                _rename_noreplace(
+                    quarantine_name,
+                    output.name,
+                    source_directory_descriptor=parent_descriptor,
+                    destination_directory_descriptor=parent_descriptor,
+                )
+                os.fsync(parent_descriptor)
+                restored = os.stat(
+                    output.name,
+                    dir_fd=parent_descriptor,
+                    follow_symlinks=False,
+                )
+                restored_validation = _validate_output_descriptor(
+                    tree_descriptor, output
+                )
+                if (
+                    _identity(restored) != validated.root_identity
+                    or restored_validation != validated
+                ):
+                    raise MapBackgroundAtlasError(
+                        "quarantined atlas publication changed during restoration"
+                    )
+            except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                recovery_errors.append(exc)
+        for descriptor in (tree_descriptor, parent_descriptor):
+            try:
+                os.close(descriptor)
+            except OSError as exc:
+                recovery_errors.append(exc)
+        if recovery_errors:
+            raise MapBackgroundAtlasCompositeError(
+                "atlas quarantine failed and the prior publication could not be "
+                "restored; the public atlas output may be unavailable",
+                [quarantine_error, *recovery_errors],
+            ) from None
+        raise
+
+
+def _retain_owned_output(output: Path) -> Path:
+    """Atomically quarantine a validated tree for deferred external cleanup.
+
+    In-process recursive deletion cannot bind an unlink or rmdir to the identity
+    checked immediately beforehand.  Retention is deliberately fail-closed: the
+    fixed quarantine name is never destructively accessed by this process.
+    """
+    quarantined = _quarantine_owned_output(output)
+    try:
+        return quarantined.path
+    finally:
+        quarantined.close()
 
 
 def _fsync_directory(path: Path) -> None:
@@ -807,26 +1840,258 @@ def _fsync_tree_directories(root: Path) -> None:
     _fsync_directory(root)
 
 
-def _unique_backup_path(output: Path) -> Path:
-    for _ in range(32):
-        candidate = output.parent / f".{output.name}.backup-{uuid.uuid4().hex}"
-        if not candidate.exists() and not candidate.is_symlink():
-            return candidate
-    raise MapBackgroundAtlasError("unable to reserve an atlas backup identity")
+def _rollback_publication(output: Path, backup: _QuarantinedOutput) -> None:
+    """Restore the prior tree and retain any failed publication for recovery."""
+    errors: list[Exception] = []
+    failed: _QuarantinedOutput | None = None
+    restore_allowed = not (output.exists() or output.is_symlink())
+    try:
+        if not restore_allowed:
+            try:
+                failed = _quarantine_owned_output(output, slot="failed")
+            except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                errors.append(exc)
+            else:
+                restore_allowed = True
+                try:
+                    _fsync_directory(output.parent)
+                    failed_metadata = os.stat(
+                        failed.name,
+                        dir_fd=failed.parent_descriptor,
+                        follow_symlinks=False,
+                    )
+                    failed_descriptor_metadata = os.fstat(failed.tree_descriptor)
+                    failed_validation = _validate_output_descriptor(
+                        failed.tree_descriptor, failed.path
+                    )
+                    if (
+                        _identity(failed_metadata) != failed.validated.root_identity
+                        or _identity(failed_descriptor_metadata)
+                        != failed.validated.root_identity
+                        or failed_validation != failed.validated
+                    ):
+                        raise MapBackgroundAtlasError(
+                            "failed atlas publication changed while quarantine was "
+                            "synchronized"
+                        )
+                except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                    errors.append(exc)
+        if restore_allowed:
+            try:
+                current_validation = _validate_output_descriptor(
+                    backup.tree_descriptor, backup.path
+                )
+                if current_validation != backup.validated:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed before rollback"
+                    )
+                current = os.stat(
+                    backup.name,
+                    dir_fd=backup.parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if _identity(current) != backup.validated.root_identity:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed before rollback"
+                    )
+                _rename_noreplace(
+                    backup.name,
+                    output.name,
+                    source_directory_descriptor=backup.parent_descriptor,
+                    destination_directory_descriptor=backup.parent_descriptor,
+                )
+                _fsync_directory(output.parent)
+                restored = os.stat(
+                    output.name,
+                    dir_fd=backup.parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if _identity(restored) != backup.validated.root_identity:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed during rollback"
+                    )
+                restored_validation = _validate_output_descriptor(
+                    backup.tree_descriptor, output
+                )
+                if restored_validation != backup.validated:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed during rollback"
+                    )
+            except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                errors.append(exc)
+    finally:
+        try:
+            backup.close()
+        except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+            errors.append(exc)
+        if failed is not None:
+            try:
+                failed.close()
+            except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                errors.append(exc)
+    if errors:
+        raise MapBackgroundAtlasCompositeError(
+            "atlas rollback encountered failures", errors
+        )
 
 
-def _rollback_publication(output: Path, backup: Path) -> None:
-    """Restore the validated prior tree, retaining no failed new publication."""
-    failed: Path | None = None
-    if output.exists() or output.is_symlink():
-        failed = _unique_backup_path(output)
-        os.replace(output, failed)
-        _fsync_directory(output.parent)
-    os.replace(backup, output)
-    _fsync_directory(output.parent)
-    if failed is not None:
-        _remove_owned_output(failed)
-        _fsync_directory(output.parent)
+def _quarantine_pinned_publication(
+    output: Path,
+    *,
+    parent_descriptor: int,
+    tree_descriptor: int,
+    expected_root_identity: tuple[int, int, int],
+) -> None:
+    """Move the exact descriptor-pinned failed publication to its fixed slot."""
+    failed_name = _retention_name(output, "failed")
+    _require_absent(
+        parent_descriptor,
+        failed_name,
+        description="atlas failed-publication slot",
+    )
+    if _identity(os.fstat(tree_descriptor)) != expected_root_identity:
+        raise MapBackgroundAtlasError(
+            "failed atlas publication no longer matches its pinned tree"
+        )
+    current = os.stat(output.name, dir_fd=parent_descriptor, follow_symlinks=False)
+    if _identity(current) != expected_root_identity:
+        raise MapBackgroundAtlasError(
+            "failed atlas publication changed before quarantine"
+        )
+    _rename_noreplace(
+        output.name,
+        failed_name,
+        source_directory_descriptor=parent_descriptor,
+        destination_directory_descriptor=parent_descriptor,
+    )
+    moved = os.stat(failed_name, dir_fd=parent_descriptor, follow_symlinks=False)
+    if _identity(moved) != expected_root_identity:
+        recovery_errors: list[Exception] = [
+            MapBackgroundAtlasError(
+                "failed atlas publication changed during quarantine"
+            )
+        ]
+        try:
+            _rename_noreplace(
+                failed_name,
+                output.name,
+                source_directory_descriptor=parent_descriptor,
+                destination_directory_descriptor=parent_descriptor,
+            )
+            _fsync_directory(output.parent)
+            restored = os.stat(
+                output.name,
+                dir_fd=parent_descriptor,
+                follow_symlinks=False,
+            )
+            if (
+                _identity(restored) != expected_root_identity
+                or _identity(os.fstat(tree_descriptor)) != expected_root_identity
+            ):
+                raise MapBackgroundAtlasError(
+                    "failed atlas publication changed during quarantine recovery"
+                )
+        except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+            recovery_errors.append(exc)
+        raise MapBackgroundAtlasCompositeError(
+            "failed atlas quarantine encountered failures", recovery_errors
+        )
+
+
+def _recover_postpublication_failure(
+    output: Path,
+    backup: _QuarantinedOutput | None,
+    *,
+    parent_descriptor: int,
+    tree_descriptor: int,
+    expected_root_identity: tuple[int, int, int],
+) -> None:
+    """Retain a failed new tree, then restore the exact prior tree if present."""
+    errors: list[Exception] = []
+    failed_quarantined = False
+    try:
+        try:
+            _quarantine_pinned_publication(
+                output,
+                parent_descriptor=parent_descriptor,
+                tree_descriptor=tree_descriptor,
+                expected_root_identity=expected_root_identity,
+            )
+        except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+            errors.append(exc)
+        else:
+            failed_quarantined = True
+            try:
+                _fsync_directory(output.parent)
+                failed_metadata = os.stat(
+                    _retention_name(output, "failed"),
+                    dir_fd=parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if (
+                    _identity(failed_metadata) != expected_root_identity
+                    or _identity(os.fstat(tree_descriptor)) != expected_root_identity
+                ):
+                    raise MapBackgroundAtlasError(
+                        "failed atlas publication changed while quarantine was "
+                        "synchronized"
+                    )
+            except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                errors.append(exc)
+
+        if failed_quarantined and backup is not None:
+            try:
+                current_validation = _validate_output_descriptor(
+                    backup.tree_descriptor, backup.path
+                )
+                if current_validation != backup.validated:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed before rollback"
+                    )
+                current = os.stat(
+                    backup.name,
+                    dir_fd=backup.parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if _identity(current) != backup.validated.root_identity:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed before rollback"
+                    )
+                _rename_noreplace(
+                    backup.name,
+                    output.name,
+                    source_directory_descriptor=backup.parent_descriptor,
+                    destination_directory_descriptor=backup.parent_descriptor,
+                )
+                _fsync_directory(output.parent)
+                restored = os.stat(
+                    output.name,
+                    dir_fd=backup.parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if _identity(restored) != backup.validated.root_identity:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed during rollback"
+                    )
+                restored_validation = _validate_output_descriptor(
+                    backup.tree_descriptor, output
+                )
+                if restored_validation != backup.validated:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed during rollback"
+                    )
+            except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                errors.append(exc)
+    finally:
+        if backup is not None:
+            try:
+                backup.close()
+            except Exception as exc:  # noqa: BLE001 - preserve recovery failures
+                errors.append(exc)
+    if errors:
+        raise MapBackgroundAtlasCompositeError(
+            "atlas post-publication recovery encountered failures", errors
+        )
 
 
 def build_atlases(
@@ -839,58 +2104,279 @@ def build_atlases(
     """Build into a sibling temporary tree, then publish one stale-free result."""
     root, output = Path(root), Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = Path(tempfile.mkdtemp(prefix=f".{output.name}.tmp-", dir=output.parent))
+    parent_descriptor = os.open(output.parent, _DIRECTORY_FLAGS)
+    temporary_name = _retention_name(output, "tmp")
+    prior_name = _retention_name(output, "prior")
+    failed_name = _retention_name(output, "failed")
+    try:
+        _require_absent(
+            parent_descriptor, temporary_name, description="atlas temporary slot"
+        )
+        _require_absent(
+            parent_descriptor, prior_name, description="atlas prior-publication slot"
+        )
+        _require_absent(
+            parent_descriptor, failed_name, description="atlas failed-publication slot"
+        )
+        os.mkdir(temporary_name, mode=0o700, dir_fd=parent_descriptor)
+        temporary_descriptor = os.open(
+            temporary_name, _DIRECTORY_FLAGS, dir_fd=parent_descriptor
+        )
+    except Exception:
+        os.close(parent_descriptor)
+        raise
+    temporary = output.parent / temporary_name
     published = False
-    backup: Path | None = None
+    backup: _QuarantinedOutput | None = None
     try:
         manifest = _build_atlases_in_directory(
             root, temporary, product=product, batches=batches
         )
-        _fsync_tree_directories(temporary)
+        producer_validation = _validate_output_descriptor(
+            temporary_descriptor, temporary
+        )
+        if producer_validation.manifest_sha256 != _sha(
+            canonical_json(manifest).encode("utf-8")
+        ):
+            raise MapBackgroundAtlasError(
+                "atlas producer result does not match its temporary manifest"
+            )
+        manifest = _address_artifacts(temporary, manifest)
         if output.exists() or output.is_symlink():
-            # Validate the complete previous publication before moving it aside.
-            # It remains recoverable until the new tree has been published and
-            # the containing directory has reached stable storage.
             if output.is_symlink() or not output.is_dir():
                 raise MapBackgroundAtlasError(
                     f"refusing non-directory atlas output: {output}"
                 )
-            _owned_output_entries(output)
-            backup = _unique_backup_path(output)
-            os.replace(output, backup)
-            try:
-                _fsync_directory(output.parent)
-            except Exception:
-                _rollback_publication(output, backup)
-                backup = None
-                raise
+            backup = _pin_owned_output(output)
+            _carry_forward_artifacts(output, temporary)
+            if _validate_output_descriptor(backup.tree_descriptor, output) != (
+                backup.validated
+            ):
+                raise MapBackgroundAtlasError(
+                    "prior atlas publication changed while artifacts were retained"
+                )
+        producer_validation = _validate_output_descriptor(
+            temporary_descriptor, temporary
+        )
+        if producer_validation.manifest_sha256 != _sha(
+            canonical_json(manifest).encode("utf-8")
+        ):
+            raise MapBackgroundAtlasError(
+                "content-addressed atlas result does not match its manifest"
+            )
+        synchronized_files = _validate_output_descriptor(
+            temporary_descriptor, temporary, synchronize_files=True
+        )
+        if synchronized_files != producer_validation:
+            raise MapBackgroundAtlasError(
+                "atlas temporary tree changed while its files were synchronized"
+            )
+        _fsync_tree_directories(temporary)
+        validated_temporary = _validate_output_descriptor(
+            temporary_descriptor, temporary
+        )
+        if validated_temporary != synchronized_files:
+            raise MapBackgroundAtlasError(
+                "atlas temporary tree changed while it was synchronized"
+            )
+        publication_moved = False
         try:
-            os.replace(temporary, output)
+            # Validate the pinned producer tree again after every fsync and with
+            # no intervening filesystem operation before its atomic publication.
+            final_validation = _validate_output_descriptor(
+                temporary_descriptor, temporary
+            )
+            if final_validation != validated_temporary:
+                raise MapBackgroundAtlasError(
+                    "atlas temporary tree changed after synchronization"
+                )
+            if backup is None:
+                _rename_noreplace(
+                    temporary_name,
+                    output.name,
+                    source_directory_descriptor=parent_descriptor,
+                    destination_directory_descriptor=parent_descriptor,
+                )
+                publication_moved = True
+            else:
+                current_validation = _validate_output_descriptor(
+                    backup.tree_descriptor, output
+                )
+                if current_validation != backup.validated:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed before atomic replacement"
+                    )
+                current_root = os.stat(
+                    output.name,
+                    dir_fd=parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if _identity(current_root) != backup.validated.root_identity:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas public root changed before atomic replacement"
+                    )
+                _rename_exchange(
+                    temporary_name,
+                    output.name,
+                    directory_descriptor=parent_descriptor,
+                )
+                publication_moved = True
+                backup.path = temporary
+                backup.name = temporary_name
+                retained_root = os.stat(
+                    temporary_name,
+                    dir_fd=parent_descriptor,
+                    follow_symlinks=False,
+                )
+                if _identity(retained_root) != backup.validated.root_identity:
+                    raise MapBackgroundAtlasError(
+                        "atomic replacement did not retain the exact prior atlas root"
+                    )
             _fsync_directory(output.parent)
-        except Exception:
+            published_metadata = os.stat(
+                output.name,
+                dir_fd=parent_descriptor,
+                follow_symlinks=False,
+            )
+            published_descriptor_metadata = os.fstat(temporary_descriptor)
+            postpublication_validation = _validate_output_descriptor(
+                temporary_descriptor, output
+            )
+            if (
+                postpublication_validation != final_validation
+                or _identity(published_metadata) != final_validation.root_identity
+                or _identity(published_descriptor_metadata)
+                != final_validation.root_identity
+            ):
+                raise MapBackgroundAtlasError(
+                    "published atlas changed after its final validation"
+                )
             if backup is not None:
-                _rollback_publication(output, backup)
+                _rename_noreplace(
+                    temporary_name,
+                    prior_name,
+                    source_directory_descriptor=parent_descriptor,
+                    destination_directory_descriptor=parent_descriptor,
+                )
+                backup.path = output.parent / prior_name
+                backup.name = prior_name
+                _fsync_directory(output.parent)
+                retained_validation = _validate_output_descriptor(
+                    backup.tree_descriptor, backup.path
+                )
+                if retained_validation != backup.validated:
+                    raise MapBackgroundAtlasError(
+                        "prior atlas publication changed during retention"
+                    )
+        except Exception as publication_error:
+            if publication_moved and backup is not None:
+                recovery_errors: list[Exception] = []
+                try:
+                    # Put the old complete tree back at the public name in one
+                    # exchange.  The rejected new tree moves back to the fixed
+                    # temporary slot and is then retained for diagnosis.
+                    rejected_name = backup.name
+                    rollback_validation = _validate_output_descriptor(
+                        backup.tree_descriptor, backup.path
+                    )
+                    if rollback_validation != backup.validated:
+                        raise MapBackgroundAtlasError(
+                            "prior atlas publication changed before atomic rollback"
+                        )
+                    retained_root = os.stat(
+                        rejected_name,
+                        dir_fd=parent_descriptor,
+                        follow_symlinks=False,
+                    )
+                    if _identity(retained_root) != backup.validated.root_identity:
+                        raise MapBackgroundAtlasError(
+                            "exact prior atlas root is disconnected from its retained name"
+                        )
+                    _rename_exchange(
+                        output.name,
+                        rejected_name,
+                        directory_descriptor=parent_descriptor,
+                    )
+                    _fsync_directory(output.parent)
+                    restored_root = os.stat(
+                        output.name,
+                        dir_fd=parent_descriptor,
+                        follow_symlinks=False,
+                    )
+                    rejected_root = os.stat(
+                        rejected_name,
+                        dir_fd=parent_descriptor,
+                        follow_symlinks=False,
+                    )
+                    restored = _validate_output_descriptor(
+                        backup.tree_descriptor, output
+                    )
+                    if (
+                        restored != backup.validated
+                        or _identity(restored_root) != backup.validated.root_identity
+                        or _identity(os.fstat(backup.tree_descriptor))
+                        != backup.validated.root_identity
+                        or _identity(rejected_root) != final_validation.root_identity
+                        or _identity(os.fstat(temporary_descriptor))
+                        != final_validation.root_identity
+                    ):
+                        raise MapBackgroundAtlasError(
+                            "atomic rollback did not restore the exact prior atlas "
+                            "root and retain the exact failed publication"
+                        )
+                    backup.path = output
+                    backup.name = output.name
+                    _rename_noreplace(
+                        rejected_name,
+                        failed_name,
+                        source_directory_descriptor=parent_descriptor,
+                        destination_directory_descriptor=parent_descriptor,
+                    )
+                    _fsync_directory(output.parent)
+                except Exception as recovery_error:  # noqa: BLE001
+                    recovery_errors.append(recovery_error)
+                try:
+                    backup.close()
+                except Exception as close_error:  # noqa: BLE001
+                    recovery_errors.append(close_error)
+                backup = None
+                if recovery_errors:
+                    raise MapBackgroundAtlasCompositeError(
+                        "atlas publication and recovery both failed",
+                        [publication_error, *recovery_errors],
+                    ) from None
+            elif publication_moved:
+                try:
+                    _recover_postpublication_failure(
+                        output,
+                        None,
+                        parent_descriptor=parent_descriptor,
+                        tree_descriptor=temporary_descriptor,
+                        expected_root_identity=final_validation.root_identity,
+                    )
+                except Exception as recovery_error:  # noqa: BLE001
+                    raise MapBackgroundAtlasCompositeError(
+                        "atlas publication and recovery both failed",
+                        [publication_error, recovery_error],
+                    ) from None
+            elif backup is not None:
+                backup.close()
                 backup = None
             raise
         published = True
         if backup is not None:
-            _remove_owned_output(backup)
+            backup.close()
             backup = None
-            _fsync_directory(output.parent)
         return manifest
     finally:
-        if not published and temporary.exists():
-            # The temporary tree is producer-created in this call.  Enumerate it
-            # without following links instead of applying broad recursive cleanup.
-            paths = sorted(
-                temporary.rglob("*"), key=lambda path: len(path.parts), reverse=True
-            )
-            for path in paths:
-                if path.is_symlink() or path.is_file():
-                    path.unlink()
-                elif path.is_dir():
-                    path.rmdir()
-            temporary.rmdir()
+        if backup is not None:
+            backup.close()
+        os.close(temporary_descriptor)
+        os.close(parent_descriptor)
+        if not published:
+            # The fixed temporary slot is retained for diagnosis.  A later run
+            # refuses while it is occupied, bounding retained producer trees.
+            pass
 
 
 def _parser() -> argparse.ArgumentParser:
