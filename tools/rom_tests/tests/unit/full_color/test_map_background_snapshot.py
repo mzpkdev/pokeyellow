@@ -39,13 +39,37 @@ def _copy_product(tmp_path: Path, product: str = "pokeyellow") -> None:
 
 
 def _mutate_symbol_payload(
-    tmp_path: Path, symbol: str, *, value: int, product: str = "pokeyellow"
+    tmp_path: Path,
+    symbol: str,
+    *,
+    value: int,
+    offset: int = 0,
+    product: str = "pokeyellow",
 ) -> None:
     table = load_sym(tmp_path / f"{product}.sym")
-    offset = table.by_name[symbol].rom_offset
+    rom_offset = table.by_name[symbol].rom_offset + offset
     path = tmp_path / f"{product}.gbc"
     rom = bytearray(path.read_bytes())
-    rom[offset] = value
+    rom[rom_offset] = value
+    path.write_bytes(rom)
+
+
+def _mutate_routine_sequence(
+    tmp_path: Path,
+    product: str,
+    routine: str,
+    sequence: bytes,
+    *,
+    sequence_offset: int,
+) -> None:
+    symbols = load_sym(tmp_path / f"{product}.sym")
+    path = tmp_path / f"{product}.gbc"
+    rom = bytearray(path.read_bytes())
+    start = symbols.by_name[routine].rom_offset
+    relative = bytes(rom[start : start + 256]).find(sequence)
+    assert relative >= 0, (product, routine, sequence.hex())
+    location = start + relative + sequence_offset
+    rom[location] ^= 1
     path.write_bytes(rom)
 
 
@@ -85,12 +109,20 @@ def test_checked_manifest_is_canonical_stable_and_current() -> None:
 def test_source_and_all_four_products_have_exact_payload_parity() -> None:
     snapshot = generate(ROOT)
     assert [row["product"] for row in snapshot["products"]] == list(PRODUCTS)
-    assert len(snapshot["source"]["authorities"]) == 6
+    assert len(snapshot["source"]["authorities"]) == 14
     views = []
     for product in snapshot["products"]:
         assert len(product["payloads"]) == 31
         assert len(product["pointer_tables"]["palettes"]["rows"]) == 25
         assert len(product["pointer_tables"]["attributes"]["rows"]) == 25
+        assert set(product["linked_consumers"]) == {
+            "MAP_ATTRIBUTE_OVERRIDES",
+            "ROOF_REGION_RULES",
+            "SPINNER_ARROW_TILES",
+            "REPLACE_TILE_BLOCK",
+            "CUT_TREE",
+            "CINNABAR_GYM_GATE_BLOCKS",
+        }
         views.append(
             {
                 name: (row["size"], row["sha256"], row["bytes"])
@@ -104,12 +136,41 @@ def test_exact_sizes_roofs_semantics_and_legal_attribute_bits_are_retained() -> 
     snapshot = generate(ROOT)
     product = snapshot["products"][0]
     assert product["roof_assignments"]["size"] == 37
+    assert product["roof_region_rules"]["size"] == 4
     assert product["roof_palettes"]["size"] == 44
+    assert product["map_overrides"]["size"] == 15
+    assert bytes.fromhex(product["roof_region_rules"]["bytes"]) == bytes(
+        (0x11, 2, 10, 5)
+    )
+    assert bytes.fromhex(product["map_overrides"]["bytes"]) == bytes(
+        (
+            0x7E,
+            5,
+            3,
+            0x4B,
+            0x4C,
+            0x4D,
+            0x4E,
+            0x4F,
+            0x7A,
+            4,
+            4,
+            0x07,
+            0x08,
+            0x17,
+            0x18,
+        )
+    )
     assert snapshot["source"]["semantic"]["animations"] == [
         "TILEANIM_WATER",
         "TILEANIM_WATER_FLOWER",
     ]
-    assert snapshot["source"]["semantic"]["replacements"] == ["CUT_TREE"]
+    assert snapshot["source"]["semantic"]["replacements"] == [
+        "CINNABAR_GYM_GATE_BLOCKS",
+        "CUT_TREE",
+        "REPLACE_TILE_BLOCK",
+        "SPINNER_ARROW_TILES",
+    ]
     assert snapshot["source"]["semantic"]["overrides"] == [
         {
             "map_id": 122,
@@ -176,34 +237,178 @@ def test_linked_byte_mutation_is_observed(tmp_path: Path, symbol: str) -> None:
 
 
 @pytest.mark.parametrize(
-    ("offset", "value"),
+    ("symbol", "offset", "value", "message"),
     [
-        pytest.param(2, 0x7D, id="roof-map-identity"),
-        pytest.param(7, 0x4A, id="range-lower-bound"),
-        pytest.param(11, 0x4F, id="range-upper-bound"),
-        pytest.param(15, 5, id="blue-palette-immediate"),
-        pytest.param(19, 0x79, id="first-floor-map-identity"),
-        pytest.param(24, 0x06, id="exact-tile-comparison"),
-        pytest.param(40, 5, id="yellow-palette-immediate"),
+        pytest.param(
+            "FullColorMapAttributeOverrides",
+            0,
+            0x7D,
+            "linked map override data contradicts semantic rules",
+            id="roof-map-identity",
+        ),
+        pytest.param(
+            "FullColorMapAttributeOverrides",
+            1,
+            4,
+            "linked map override data contradicts semantic rules",
+            id="roof-tile-count",
+        ),
+        pytest.param(
+            "FullColorMapAttributeOverrides",
+            2,
+            5,
+            "linked map override data contradicts semantic rules",
+            id="blue-full-byte-result",
+        ),
+        pytest.param(
+            "FullColorMapAttributeOverrides",
+            3,
+            0x4A,
+            "linked map override data contradicts semantic rules",
+            id="roof-tile-identity",
+        ),
+        pytest.param(
+            "FullColorMapAttributeOverrides",
+            8,
+            0x79,
+            "linked map override data contradicts semantic rules",
+            id="first-floor-map-identity",
+        ),
+        pytest.param(
+            "FullColorMapAttributeOverrides",
+            10,
+            5,
+            "linked map override data contradicts semantic rules",
+            id="yellow-full-byte-result",
+        ),
+        pytest.param(
+            "FullColorOverworldRoofRegionRules",
+            0,
+            0x10,
+            "linked roof-region data contradicts Route 6 reviewed semantics",
+            id="roof-region-map",
+        ),
+        pytest.param(
+            "FullColorOverworldRoofRegionRules",
+            1,
+            3,
+            "linked roof-region data contradicts Route 6 reviewed semantics",
+            id="roof-region-boundary",
+        ),
+        pytest.param(
+            "FullColorOverworldRoofRegionRules",
+            2,
+            9,
+            "linked roof-region data contradicts Route 6 reviewed semantics",
+            id="roof-region-upper-identity",
+        ),
     ],
 )
-def test_linked_override_semantic_mutation_fails_closed(
-    tmp_path: Path, offset: int, value: int
+def test_linked_compact_runtime_data_mutation_fails_closed(
+    tmp_path: Path, symbol: str, offset: int, value: int, message: str
 ) -> None:
     _copy_product(tmp_path)
-    symbols = load_sym(tmp_path / "pokeyellow.sym")
-    start = symbols.by_name["PassiveFullColorResolveAttributeForIdentity"]
-    path = tmp_path / "pokeyellow.gbc"
-    rom = bytearray(path.read_bytes())
-    rom[start.rom_offset + offset] = value
-    path.write_bytes(rom)
+    _mutate_symbol_payload(tmp_path, symbol, offset=offset, value=value)
 
     authority = MapBackgroundAuthority.load(ROOT)
-    with pytest.raises(
-        MapBackgroundSnapshotError,
-        match="linked map override routine contradicts semantic rules",
-    ):
+    with pytest.raises(MapBackgroundSnapshotError, match=message):
         _snapshot_product(tmp_path, "pokeyellow", authority)
+
+
+@pytest.mark.parametrize("product", PRODUCTS)
+def test_all_products_fail_closed_when_semantic_consumers_are_bypassed_or_split(
+    tmp_path: Path, product: str
+) -> None:
+    authority = MapBackgroundAuthority.load(ROOT)
+    symbols = load_sym(ROOT / f"{product}.sym")
+    address = lambda name: symbols.by_name[name].address.to_bytes(2, "little")
+    mutations = (
+        (
+            "remove-override-consumer",
+            "PassiveFullColorResolveAttributeForIdentity",
+            b"\x21" + address("FullColorMapAttributeOverrides"),
+            0,
+        ),
+        (
+            "alter-full-byte-result",
+            "PassiveFullColorResolveAttributeForIdentity",
+            b"\x2a\x47\x2a\x5f",
+            3,
+        ),
+        (
+            "split-roof-palette-consumer",
+            "PassiveFullColorRoofPaletteForMap",
+            b"\xcd" + address("PassiveFullColorCurrentRoofRegion"),
+            1,
+        ),
+        (
+            "retarget-roof-invalidation-consumer",
+            "PassiveFullColorRoofRegionChanged",
+            b"\xcd" + address("PassiveFullColorCurrentRoofRegion"),
+            1,
+        ),
+        (
+            "bypass-spinner-writer",
+            "LoadSpinnerArrowTiles",
+            b"\xcd" + address("CopyVideoData"),
+            1,
+        ),
+        (
+            "remove-generic-block-writer",
+            "ReplaceTileBlock",
+            b"\xfa" + address("wNewTileBlockID") + b"\x77",
+            3,
+        ),
+        (
+            "retarget-generic-block-destination",
+            "ReplaceTileBlock",
+            b"\x21" + address("wOverworldMap"),
+            1,
+        ),
+        (
+            "retarget-cut-authority",
+            "UsedCut",
+            b"\x11" + address("CutTreeBlockSwaps"),
+            1,
+        ),
+        (
+            "retarget-cut-block-destination",
+            "ReplaceTreeTileBlock",
+            b"\x21" + address("wCurrentTileBlockMapViewPointer"),
+            1,
+        ),
+        (
+            "split-cinnabar-writer",
+            "UpdateCinnabarGymGateTileBlocks_",
+            b"\xcd" + address("CinnabarGym_ReplaceTileBlock"),
+            1,
+        ),
+        (
+            "alter-cinnabar-block-store",
+            "CinnabarGym_ReplaceTileBlock",
+            b"\xfa" + address("wNewTileBlockID") + b"\x77\xc9",
+            3,
+        ),
+        (
+            "retarget-cinnabar-block-destination",
+            "CinnabarGym_ReplaceTileBlock",
+            b"\x21" + address("wOverworldMap"),
+            1,
+        ),
+    )
+    for identity, routine, sequence, sequence_offset in mutations:
+        mutation_root = tmp_path / identity
+        mutation_root.mkdir()
+        _copy_product(mutation_root, product)
+        _mutate_routine_sequence(
+            mutation_root,
+            product,
+            routine,
+            sequence,
+            sequence_offset=sequence_offset,
+        )
+        with pytest.raises(MapBackgroundSnapshotError):
+            _snapshot_product(mutation_root, product, authority)
 
 
 def test_pointer_alias_cannot_replace_the_ledger_authority(tmp_path: Path) -> None:
@@ -382,34 +587,43 @@ def test_generate_rejects_stale_products_after_exact_authored_payload_mutation(
 def test_override_boundary_mutation_fails_closed_before_snapshot(
     tmp_path: Path,
 ) -> None:
-    root = _shadow_repository(tmp_path, copied_directories=("engine",))
-    path = root / "engine/full_color/passive_overworld.asm"
+    root = _shadow_repository(tmp_path, copied_directories=("data",))
+    path = root / "data/tilesets/full_color_interiors.asm"
     source = path.read_text(encoding="utf-8")
-    assert "\tcp $4b" in source
-    path.write_text(source.replace("\tcp $4b", "\tcp $4c", 1), encoding="utf-8")
+    original = "\tdb $4b, $4c, $4d, $4e, $4f"
+    assert original in source
+    path.write_text(
+        source.replace(original, "\tdb $4c, $4d, $4e, $4f, $50", 1),
+        encoding="utf-8",
+    )
     with pytest.raises(
-        ValueError, match="override identities, control flow, or exact values drifted"
+        ValueError, match="override identities, data shape, or exact values drifted"
     ):
         generate(root)
 
 
-@pytest.mark.parametrize("insertion_point", [".lookup\n", ".done\n"])
-def test_extra_executable_override_anywhere_in_complete_routine_fails_closed(
-    tmp_path: Path, insertion_point: str
+@pytest.mark.parametrize(
+    ("original", "replacement"),
+    (
+        ("CELADON_MART_ROOF, 5", "CELADON_MART_ROOF, 6"),
+        ("$07, $08, $17, $18", "$06, $07, $08, $17, $18"),
+    ),
+)
+def test_extra_data_override_anywhere_in_complete_table_fails_closed(
+    tmp_path: Path, original: str, replacement: str
 ) -> None:
-    root = _shadow_repository(tmp_path, copied_directories=("engine",))
-    path = root / "engine/full_color/passive_overworld.asm"
+    root = _shadow_repository(tmp_path, copied_directories=("data",))
+    path = root / "data/tilesets/full_color_interiors.asm"
     source = path.read_text(encoding="utf-8")
-    assert insertion_point in source
-    injected = "\tld a, e\n\tcp PALLET_TOWN\n\tjr z, .done\n" + insertion_point
-    path.write_text(source.replace(insertion_point, injected, 1), encoding="utf-8")
+    assert original in source
+    path.write_text(source.replace(original, replacement, 1), encoding="utf-8")
     with pytest.raises(
-        ValueError, match="override identities, control flow, or exact values drifted"
+        ValueError, match="override identities, data shape, or exact values drifted"
     ):
         production_map_override_rules(root)
 
 
-def test_override_palette_value_is_derived_from_constant_authority(
+def test_override_palette_value_drift_fails_closed(
     tmp_path: Path,
 ) -> None:
     root = _shadow_repository(tmp_path, copied_directories=("data",))
@@ -424,9 +638,10 @@ def test_override_palette_value_is_derived_from_constant_authority(
         ),
         encoding="utf-8",
     )
-    rules = production_map_override_rules(root)
-    assert rules[0]["palette"] == "FULL_COLOR_INTERIOR_BLUE"
-    assert rules[0]["palette_value"] == 4
+    with pytest.raises(
+        ValueError, match="override identities, data shape, or exact values drifted"
+    ):
+        production_map_override_rules(root)
 
 
 def test_macro_redefinition_changes_all_fresh_products_but_semantics_fail_closed(
@@ -456,7 +671,7 @@ def test_macro_redefinition_changes_all_fresh_products_but_semantics_fail_closed
     authority = MapBackgroundAuthority.load(root)
     with pytest.raises(
         MapBackgroundSnapshotError,
-        match="linked map override routine contradicts semantic rules",
+        match="linked map override data contradicts semantic rules or exact values",
     ):
         generate(root)
 
@@ -467,17 +682,13 @@ def test_macro_redefinition_changes_all_fresh_products_but_semantics_fail_closed
     for product_name in PRODUCTS:
         baseline_symbols = load_sym(ROOT / f"{product_name}.sym")
         mutated_symbols = load_sym(isolated_root / f"{product_name}.sym")
-        baseline_symbol = baseline_symbols.by_name[
-            "PassiveFullColorResolveAttributeForIdentity"
-        ]
-        mutated_symbol = mutated_symbols.by_name[
-            "PassiveFullColorResolveAttributeForIdentity"
-        ]
+        baseline_symbol = baseline_symbols.by_name["FullColorMapAttributeOverrides"]
+        mutated_symbol = mutated_symbols.by_name["FullColorMapAttributeOverrides"]
         baseline = (ROOT / f"{product_name}.gbc").read_bytes()[
-            baseline_symbol.rom_offset : baseline_symbol.rom_offset + 63
+            baseline_symbol.rom_offset : baseline_symbol.rom_offset + 15
         ]
         mutated = (isolated_root / f"{product_name}.gbc").read_bytes()[
-            mutated_symbol.rom_offset : mutated_symbol.rom_offset + 63
+            mutated_symbol.rom_offset : mutated_symbol.rom_offset + 15
         ]
         differences = [
             (before, after)
@@ -487,7 +698,7 @@ def test_macro_redefinition_changes_all_fresh_products_but_semantics_fail_closed
         assert differences == [(3, 5)]
         with pytest.raises(
             MapBackgroundSnapshotError,
-            match="linked map override routine contradicts semantic rules",
+            match="linked map override data contradicts semantic rules",
         ):
             _product_snapshot(isolated_root, product_name, authority, rules)
 

@@ -1,6 +1,6 @@
 {
   "baseline_manifest_sha256": "75c058f0d0df07a25918c710dc8ddebf43d3e5b809a06faaf7391cf015a9d774",
-  "current_source_sha256": "d3e54ead0eb0401117d1b8cfa32b3ae37463ed70db674b93ec55d3fbbb488ee2",
+  "current_source_sha256": "8158fb52a5ee64f8de8980a7de53d01559d4966af5bac9eb22de182ec2b8f913",
   "reviewed_delta_paths": {
     "constants/full_color_constants.asm": {
       "current_sha256": "33ea30e6b29ba1c5b14ddade6fdb4e6a049640810404a4859b402721f5b2446c",
@@ -15,11 +15,11 @@
       "reviewed_sha256": "b9413152b2b6c846ca918544f6f517ca9c775446d0bb2d93e231adb7e5aec4ee"
     },
     "data/tilesets/full_color_interiors.asm": {
-      "current_sha256": "318afdc195d5645a4bd34c0f04b7c841152c87f65211e82ba1c1e86407ad9587",
+      "current_sha256": "47a464487df40ac928bab832e1af5cbeab5025ccc2062514079c51a8e5092e10",
       "reviewed_sha256": null
     },
     "data/tilesets/full_color_overworld.asm": {
-      "current_sha256": "13d7448c0489c47295356b2f5d12fcb3c9d109410b6dcb2b429aab2c1d9632dc",
+      "current_sha256": "4223c5292f8c76b1514c587d9a282bedc1c8497dee6a34fcd70945c12f0a58c7",
       "reviewed_sha256": null
     },
     "engine/battle/init_battle.asm": {
@@ -51,11 +51,11 @@
       "reviewed_sha256": null
     },
     "engine/full_color/passive_overworld.asm": {
-      "current_sha256": "fb462f944adf37d4c576aff35dfebb20bb08bc5f58300a567f5825c90360b6cb",
+      "current_sha256": "4483216137e7e08c55fb3ae863ebf1a72dc17735bf92550ce115111f44ea1630",
       "reviewed_sha256": null
     },
     "engine/full_color/passive_palette_refresh.asm": {
-      "current_sha256": "de26905b5c6499d17007a66d30273a0e9274d88866f489870957c0f4dc8bd839",
+      "current_sha256": "2573226736cf3dad1a7c4a8dafc640086c3c95e4869935ecf87cd4e1d9ee6aa5",
       "reviewed_sha256": null
     },
     "engine/full_color/phase2_audit.asm": {

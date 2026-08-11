@@ -35,8 +35,8 @@ from tools.rom_tests.full_color.phase2_measurements import (
 from tools.rom_tests.full_color.inventory import WriterInventory
 
 ROOT = Path(__file__).resolve().parents[5]
-BASE_COMMIT = "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5"
-BASE_TREE = "a02a502375a964268ad9ec00ecf7401d3bc0b9ff"
+BASE_COMMIT = "1fe39464be71d7ddaf378c689b40f33faf5c9290"
+BASE_TREE = "d915abf57fcdec79e45e723dd278c7a697d2e0f9"
 GIT_OBJECTS = Path(
     subprocess.run(
         ["git", "rev-parse", "--git-path", "objects"],
@@ -101,10 +101,10 @@ def _phase2_apply_fixture(
 
 
 def _activate_phase4_transition(root: Path) -> None:
-    for relative in (
-        "specs/full-colors/inventory/assignments.json",
-        phase2_measurements.PLANNED_SUBJECTS_PATH,
-    ):
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    for relative in transition["predecessor_authority_sha256"]:
         (root / relative).write_bytes(
             subprocess.run(
                 ["git", "show", f"{BASE_COMMIT}:{relative}"],
@@ -209,6 +209,112 @@ def test_reviewed_subject_apply_accepts_normal_canonical_target(
 
     assert json.loads(target.read_text())
     assert not tuple(target.parent.glob(f".{target.name}.*"))
+
+
+def test_reviewed_subject_apply_rebinds_exact_inventory_source_coordinates(
+    tmp_path, monkeypatch
+) -> None:
+    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+
+    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+
+    documents = {
+        filename: json.loads(
+            (root / "specs/full-colors/inventory" / filename).read_text()
+        )
+        for filename in ("writers.json", "mutations.json")
+    }
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    source_transitions = [
+        item
+        for item in transition["inventory_site_transitions"]
+        if item["site_kind"] == "source_sites"
+    ]
+    assert len(source_transitions) == 9
+    for item in source_transitions:
+        filename = Path(item["inventory"]).name
+        row = next(
+            row for row in documents[filename]["rows"] if row["id"] == item["row_id"]
+        )
+        assert row["source_sites"][item["index"]] == item["to"]
+
+
+@pytest.mark.parametrize("field", ("path", "symbol", "line"))
+def test_reviewed_subject_apply_rejects_inventory_source_identity_mutation(
+    tmp_path, monkeypatch, field: str
+) -> None:
+    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    binding = next(
+        item
+        for item in transition["inventory_site_transitions"]
+        if item["site_kind"] == "source_sites"
+    )
+    inventory_path = root / binding["inventory"]
+    document = json.loads(inventory_path.read_text())
+    row = next(row for row in document["rows"] if row["id"] == binding["row_id"])
+    site = row["source_sites"][binding["index"]]
+    hostile_values = {
+        "path": "engine/full_color/hostile.asm",
+        "symbol": f"{site['symbol']}.hostile",
+        "line": site["line"] + 1,
+    }
+    site[field] = hostile_values[field]
+    inventory_path.write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="reviewed transition predecessor authority set is partial or changed",
+    ):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+
+
+def test_reviewed_inventory_site_transition_rejects_exact_predecessor_tamper(
+    tmp_path,
+) -> None:
+    transition = json.loads(
+        (ROOT / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    binding = transition["inventory_site_transitions"][0]
+    inventory_documents = {}
+    for relative in transition["predecessor_authority_sha256"]:
+        if not relative.startswith("specs/full-colors/inventory/") or relative.endswith(
+            "assignments.json"
+        ):
+            continue
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        document = json.loads(
+            subprocess.run(
+                ["git", "show", f"{BASE_COMMIT}:{relative}"],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout
+        )
+        inventory_documents[path] = document
+    document = next(
+        document
+        for path, document in inventory_documents.items()
+        if path.relative_to(tmp_path).as_posix() == binding["inventory"]
+    )
+    row = next(row for row in document["rows"] if row["id"] == binding["row_id"])
+    row[binding["site_kind"]][binding["index"]]["address"] += 1
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="reviewed inventory site predecessor identity changed",
+    ):
+        phase2_measurements._apply_reviewed_inventory_site_transitions(
+            inventory_documents, [binding]
+        )
 
 
 @pytest.mark.parametrize("replacement", ("symlink", "hardlink", "directory"))
@@ -395,24 +501,23 @@ def test_reviewed_subject_apply_retains_backup_when_postpublish_restore_fails(
     root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
     assignment = root / "specs/full-colors/inventory/assignments.json"
     original = assignment.read_bytes()
-    real_directory_identity = phase2_measurements._directory_identity
+    real_validate_publication = phase2_measurements._validate_publication
     real_replace = os.replace
     validations = 0
 
-    def fail_postpublish(directory, directory_fd):
+    def fail_postpublish(publication):
         nonlocal validations
-        if directory == assignment.parent:
-            validations += 1
-            if validations == 3:
-                raise Phase2MeasurementError("injected postpublish validation failure")
-        return real_directory_identity(directory, directory_fd)
+        validations += 1
+        if validations == 1:
+            raise Phase2MeasurementError("injected postpublish validation failure")
+        return real_validate_publication(publication)
 
     def fail_restore(src, dst, *args, **kwargs):
         if isinstance(src, str) and src.endswith(".restore"):
             raise OSError("injected restore failure")
         return real_replace(src, dst, *args, **kwargs)
 
-    monkeypatch.setattr(phase2_measurements, "_directory_identity", fail_postpublish)
+    monkeypatch.setattr(phase2_measurements, "_validate_publication", fail_postpublish)
     monkeypatch.setattr(phase2_measurements.os, "replace", fail_restore)
     with pytest.raises(
         Phase2MeasurementError,
@@ -627,6 +732,7 @@ def test_reviewed_subject_apply_rejects_rom_semantic_drift(
     tmp_path, monkeypatch, mutation: str
 ) -> None:
     root, proposal_path, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
     proposal = json.loads(proposal_path.read_text())
     subject = proposal["products"][phase2_measurements.PHASE2_AUDIT_PRODUCT][
         "rom_subjects"
@@ -650,8 +756,142 @@ def test_reviewed_subject_apply_rejects_rom_semantic_drift(
         phase2_measurements, "propose_phase2_subjects", lambda root: proposal
     )
 
-    with pytest.raises(Phase2MeasurementError, match="reviewed ROM subject semantics"):
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="exact reviewed subject identity|unreviewed Phase 2 root",
+    ):
         phase2_measurements.apply_reviewed_subject_proposal(root, proposal_path, target)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("call-retarget", "same-offset-unrelated-subject"),
+)
+def test_reviewed_transition_rejects_exact_rom_successor_tamper(
+    tmp_path, monkeypatch, mutation: str
+) -> None:
+    root, proposal_path, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    proposal = json.loads(proposal_path.read_text())
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    assignments = json.loads(
+        (root / "specs/full-colors/inventory/assignments.json").read_text()
+    )
+    rows = {row["id"]: row for row in assignments["rows"]}
+    assignment_id, binding = next(
+        (assignment_id, binding)
+        for assignment_id, binding in transition["subject_transitions"].items()
+        if rows[assignment_id]["subject"]["kind"] == "ROM_FINDING"
+        and isinstance(
+            rows[assignment_id]["subject"]["metadata"]["destination_low"], int
+        )
+    )
+    product = rows[assignment_id]["product"]
+    subject = next(
+        subject
+        for subject in (
+            *proposal["products"][product]["rom_subjects"],
+            *proposal["products"][product]["rom_candidate_subjects"],
+        )
+        if subject["sha256"] == binding["to_sha256"]
+    )
+    metadata = subject["metadata"]
+    if mutation == "call-retarget":
+        metadata["destination_low"] += 1
+        metadata["destination_high"] += 1
+    else:
+        metadata["root"] = "HostileSameOffsetUnrelatedRoot"
+    _rewrite_subject_digest(subject)
+    proposal_path.write_text(
+        json.dumps(proposal, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: proposal
+    )
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="exact reviewed subject identity|unreviewed Phase 2 root",
+    ):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal_path, target)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("cross-subject-pairing", "unlisted-line-and-destination-delta"),
+)
+def test_reviewed_transition_rejects_exact_source_successor_tamper(
+    tmp_path, monkeypatch, mutation: str
+) -> None:
+    root, proposal_path, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    proposal = json.loads(proposal_path.read_text())
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    successor_digests = {
+        binding["to_sha256"]
+        for binding in transition["subject_transitions"].values()
+    }
+    subjects = [
+        subject
+        for subject in proposal["source_subjects"]
+        if subject["sha256"] in successor_digests
+    ]
+    if mutation == "cross-subject-pairing":
+        first, second = subjects[:2]
+        first["metadata"]["line"], second["metadata"]["line"] = (
+            second["metadata"]["line"],
+            first["metadata"]["line"],
+        )
+        _rewrite_subject_digest(first)
+        _rewrite_subject_digest(second)
+    else:
+        subject = next(
+            subject
+            for subject in subjects
+            if isinstance(subject["metadata"]["destination_line"], int)
+        )
+        subject["metadata"]["line"] += 97
+        subject["metadata"]["destination_line"] += 41
+        _rewrite_subject_digest(subject)
+    proposal_path.write_text(
+        json.dumps(proposal, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: proposal
+    )
+
+    with pytest.raises(Phase2MeasurementError, match="exact reviewed subject identity"):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal_path, target)
+
+
+def test_reviewed_transition_cannot_replay_from_partial_predecessor_restore(
+    tmp_path, monkeypatch
+) -> None:
+    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+    for relative in (
+        "specs/full-colors/inventory/assignments.json",
+        phase2_measurements.PLANNED_SUBJECTS_PATH,
+    ):
+        (root / relative).write_bytes(
+            subprocess.run(
+                ["git", "show", f"{BASE_COMMIT}:{relative}"],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+            ).stdout
+        )
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="reviewed transition predecessor authority set is partial or changed",
+    ):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
 
 
 def test_current_phase2_authorities_reproduce_exactly_from_pinned_base_verifier(
@@ -666,18 +906,18 @@ def test_current_phase2_authorities_reproduce_exactly_from_pinned_base_verifier(
         phase2_measurements.PLANNED_SUBJECTS_PATH,
     )
     expected = {relative: (ROOT / relative).read_bytes() for relative in relative_paths}
-    for relative in relative_paths:
-        baseline = subprocess.run(
-            ["git", "show", f"HEAD:{relative}"],
-            cwd=ROOT,
-            check=True,
-            capture_output=True,
-        ).stdout
-        (root / relative).write_bytes(baseline)
 
     for product in phase2_measurements.PRODUCT_ARTIFACTS.values():
         for suffix in (".gbc", ".map", ".sym"):
             shutil.copy2(ROOT / f"{product}{suffix}", root / f"{product}{suffix}")
+    # The reviewed semantic relocation is a source-coordinate transition, so
+    # historical reproduction needs the same reviewed sources as the products.
+    for reviewed_source in (
+        Path("data/tilesets/full_color_overworld.asm"),
+        Path("engine/full_color/passive_overworld.asm"),
+        Path("engine/full_color/passive_palette_refresh.asm"),
+    ):
+        shutil.copy2(ROOT / reviewed_source, root / reviewed_source)
     proposal.unlink()
     module = "tools.rom_tests.full_color.phase2_measurements"
     subprocess.run(
@@ -862,15 +1102,13 @@ def test_reviewed_phase4_transition_rejects_unrelated_tracked_edit(
 def test_reviewed_phase4_transition_accepts_hash_bound_intended_dirty_paths(
     tmp_path, monkeypatch
 ) -> None:
-    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
     _activate_phase4_transition(root)
 
-    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
-
-    assert (
-        target.read_bytes()
-        == (ROOT / phase2_measurements.PLANNED_SUBJECTS_PATH).read_bytes()
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
     )
+    phase2_measurements._validate_reviewed_phase4_worktree(root, transition)
 
 
 def test_reviewed_phase4_transition_rejects_mm_index_bypass(
@@ -921,7 +1159,7 @@ def test_reviewed_phase4_transition_rejects_every_staged_change_kind(
 def test_reviewed_phase4_transition_ignores_untracked_build_artifacts(
     tmp_path, monkeypatch
 ) -> None:
-    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
     _activate_phase4_transition(root)
     (root / "pokeyellow.gbc").write_bytes(b"disposable build artifact")
     disposable = root / "test-results/phase2"
@@ -931,7 +1169,10 @@ def test_reviewed_phase4_transition_ignores_untracked_build_artifacts(
     preemdeck.mkdir(parents=True)
     (preemdeck / "state.json").write_text("{}\n", encoding="utf-8")
 
-    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    phase2_measurements._validate_reviewed_phase4_worktree(root, transition)
 
 
 @pytest.mark.parametrize(
@@ -1802,17 +2043,33 @@ def test_passive_rom_pointer_authority_has_exact_site_and_root_coverage() -> Non
     } == {"WR-P2-YELLOW-OVERLAY-TRANSFER"}
 
 
-def test_passive_rom_pointer_authority_has_one_uniform_payload_rebase() -> None:
+def test_passive_rom_pointer_authority_has_exact_reviewed_rebases() -> None:
     previous = phase2_measurements._PREVIOUS_PASSIVE_ROM_POINTER_WRITES
     current = phase2_measurements._PASSIVE_ROM_POINTER_WRITES
     assert len(previous) == len(current) == 78
 
-    expected_delta = phase2_measurements._PASSIVE_ROM_POINTER_REBASE_BYTES
-    assert expected_delta == 0x780
+    payload_delta = phase2_measurements._PASSIVE_ROM_POINTER_REBASE_BYTES
+    column_delta = phase2_measurements._MAP_SEMANTIC_COLUMN_POINTER_REBASE_BYTES
+    row_delta = phase2_measurements._MAP_SEMANTIC_ROW_POINTER_REBASE_BYTES
+    assert payload_delta == 0x780
+    assert column_delta == 0xA2
+    assert row_delta == 0xB4
+    assert phase2_measurements._MAP_SEMANTIC_COLUMN_POINTER_SITES == {
+        0x6BD5,
+        0x6BD8,
+        0x6BDE,
+        0x6BE1,
+    }
+    assert phase2_measurements._MAP_SEMANTIC_ROW_POINTER_SITES == {
+        0x6C8E,
+        0x6C91,
+        0x6C97,
+        0x6C9A,
+    }
     deltas = []
     expected_sites = []
     for (old_bank, old_address, opcode), roots in previous.items():
-        delta = expected_delta if opcode == "12" else 0
+        delta = phase2_measurements._passive_pointer_rebase(old_address, opcode)
         rebased = (old_bank, old_address + delta, opcode)
         assert current[rebased] is roots
         deltas.append(delta)
@@ -1820,7 +2077,38 @@ def test_passive_rom_pointer_authority_has_one_uniform_payload_rebase() -> None:
 
     assert list(current) == expected_sites
     assert deltas.count(0) == 2
-    assert deltas.count(expected_delta) == 76
+    assert deltas.count(payload_delta) == 68
+    assert deltas.count(payload_delta + column_delta) == 4
+    assert deltas.count(payload_delta + row_delta) == 4
+
+
+@pytest.mark.parametrize(
+    ("site", "opcode", "expected"),
+    [
+        (0x6BD5, "12", 0x822),
+        (0x6C8E, "12", 0x834),
+        (0x6BE7, "12", 0x780),
+        (0x54CF, "72", 0),
+    ],
+)
+def test_passive_rom_pointer_rebase_is_site_and_opcode_bound(
+    site: int, opcode: str, expected: int
+) -> None:
+    assert phase2_measurements._passive_pointer_rebase(site, opcode) == expected
+
+
+def test_map_semantic_subject_relocations_are_exact_reviewed_transitions() -> None:
+    transition = json.loads(
+        (ROOT / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    assert transition["schema"] == "full-color-phase2-reviewed-transition-v2"
+    assert len(transition["subject_transitions"]) == 1784
+    assert all(
+        set(binding) == {"from_sha256", "to_sha256"}
+        and binding["from_sha256"] != binding["to_sha256"]
+        for binding in transition["subject_transitions"].values()
+    )
+    assert len(transition["inventory_site_transitions"]) == 17
 
 
 def test_transport_special_relocation_is_exactly_three_complete_payload_pairs() -> None:

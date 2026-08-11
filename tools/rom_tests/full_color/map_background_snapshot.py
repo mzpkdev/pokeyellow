@@ -42,9 +42,17 @@ SOURCE_AUTHORITIES = (
     Path("data/tilesets/full_color_overworld.asm"),
     Path("data/tilesets/full_color_interiors.asm"),
     Path("data/tilesets/tileset_headers.asm"),
+    Path("data/tilesets/spinner_tiles.asm"),
     Path("constants/map_data_constants.asm"),
     Path("data/tilesets/cut_tree_blocks.asm"),
+    Path("data/predef_pointers.asm"),
+    Path("engine/overworld/spinners.asm"),
+    Path("engine/overworld/update_map.asm"),
+    Path("engine/overworld/cut.asm"),
+    Path("engine/events/hidden_events/cinnabar_gym_quiz.asm"),
+    Path("home/hidden_events.asm"),
     Path("engine/full_color/passive_overworld.asm"),
+    Path("engine/full_color/passive_palette_refresh.asm"),
 )
 POINTER_TABLES = (
     ("palettes", "FullColorBGPalettePointers", "FullColorBGPalettePointersEnd"),
@@ -56,8 +64,9 @@ POINTER_TABLES = (
 )
 FIXED_PAYLOADS = (
     ("roof_assignments", "FullColorOverworldRoofAssignments", 37),
+    ("roof_region_rules", "FullColorOverworldRoofRegionRules", 4),
     ("roof_palettes", "FullColorOverworldRoofPalettes", 44),
-    ("map_overrides", "PassiveFullColorResolveAttributeForIdentity", 84),
+    ("map_overrides", "FullColorMapAttributeOverrides", 15),
 )
 
 
@@ -126,28 +135,370 @@ def _pointer_target(symbols: SymbolTable, pointer: int, bank: int) -> tuple[str,
     return tuple(sorted(aliases))
 
 
-def _relative_jump(source_operand: int, target: int) -> int:
-    displacement = target - (source_operand + 1)
-    if not -128 <= displacement <= 127:
+def _routine_bytes(
+    rom: bytes,
+    symbols: SymbolTable,
+    start_name: str,
+    terminal_name: str,
+    terminal_bytes: bytes,
+) -> tuple[bytes, dict[str, object]]:
+    """Read one linked routine through its reviewed terminal instruction bytes."""
+    start = _symbol(symbols, start_name)
+    terminal = _symbol(symbols, terminal_name)
+    if start.bank != terminal.bank or terminal.address < start.address:
         raise MapBackgroundSnapshotError(
-            "map override routine requires an out-of-range relative branch"
+            f"{start_name}: terminal identity is outside the linked routine"
         )
-    return displacement & 0xFF
+    size = terminal.address - start.address + len(terminal_bytes)
+    payload = rom[start.rom_offset : start.rom_offset + size]
+    if len(payload) != size or not payload.endswith(terminal_bytes):
+        raise MapBackgroundSnapshotError(
+            f"{start_name}: linked terminal instruction contract drifted"
+        )
+    return payload, {
+        "symbol": start_name,
+        "bank": start.bank,
+        "address": start.address,
+        "rom_offset": start.rom_offset,
+        "size": size,
+        "sha256": _sha(payload),
+    }
 
 
-def _validate_map_override_routine(
+def _reference_bytes(symbols: SymbolTable, name: str, opcodes: Sequence[int]) -> tuple[bytes, ...]:
+    target = _symbol(symbols, name)
+    address = target.address.to_bytes(2, "little")
+    return tuple(bytes((opcode,)) + address for opcode in opcodes)
+
+
+def _require_reference(
+    payload: bytes,
+    symbols: SymbolTable,
+    source: str,
+    target: str,
+    *,
+    opcodes: Sequence[int],
+    count: int = 1,
+) -> None:
+    found = sum(payload.count(pattern) for pattern in _reference_bytes(symbols, target, opcodes))
+    if found != count:
+        raise MapBackgroundSnapshotError(
+            f"{source}: linked reference to {target} must occur exactly {count} time(s)"
+        )
+
+
+def _require_sequence(payload: bytes, source: str, identity: str, sequence: bytes) -> None:
+    if payload.count(sequence) != 1:
+        raise MapBackgroundSnapshotError(
+            f"{source}: linked {identity} instruction contract drifted"
+        )
+
+
+def _consumer_contracts(
+    rom: bytes, symbols: SymbolTable
+) -> dict[str, dict[str, object]]:
+    """Prove every reviewed map semantic has a linked production consumer."""
+    override, override_record = _routine_bytes(
+        rom,
+        symbols,
+        "PassiveFullColorResolveAttributeForIdentity",
+        "PassiveFullColorResolveAttributeForIdentity.done",
+        b"\xc1\xd1\xe1\xc9",
+    )
+    override_table = _symbol(symbols, "FullColorMapAttributeOverrides")
+    attribute_table = _symbol(symbols, "FullColorTileAttributePointers")
+    override_prefix = bytes(
+        (
+            0xE5,
+            0x21,
+            override_table.address & 0xFF,
+            override_table.address >> 8,
+            0x06,
+            0x02,
+        )
+    )
+    fallback = bytes(
+        (
+            0xE1,
+            0x7C,
+            0x87,
+            0x5F,
+            0x16,
+            0x00,
+            0x21,
+            attribute_table.address & 0xFF,
+            attribute_table.address >> 8,
+        )
+    )
+    if not override.startswith(override_prefix) or override.count(fallback) != 1:
+        raise MapBackgroundSnapshotError(
+            "map attribute overrides are not bounded before tileset fallback"
+        )
+    if override.index(override_prefix) >= override.index(fallback):
+        raise MapBackgroundSnapshotError(
+            "map attribute overrides no longer precede tileset fallback"
+        )
+    _require_sequence(
+        override,
+        "PassiveFullColorResolveAttributeForIdentity",
+        "full-byte override result",
+        b"\x2a\x47\x2a\x5f",
+    )
+    _require_sequence(
+        override,
+        "PassiveFullColorResolveAttributeForIdentity",
+        "bounded override tile loop",
+        b"\x2a\xb9\x28\x05\x05\x20\xf9",
+    )
+    _require_sequence(
+        override,
+        "PassiveFullColorResolveAttributeForIdentity",
+        "unmasked full-byte return",
+        b"\x7b\xe1\x18",
+    )
+
+    roof_select, roof_select_record = _routine_bytes(
+        rom,
+        symbols,
+        "PassiveFullColorRoofPaletteForMap",
+        "PassiveFullColorRoofPaletteForMap.resolve",
+        b"\x87\x87\x4f\x06\x00\x21"
+        + _symbol(symbols, "FullColorOverworldRoofPalettes").address.to_bytes(2, "little")
+        + b"\x09\xc9",
+    )
+    roof_invalidate, roof_invalidate_record = _routine_bytes(
+        rom,
+        symbols,
+        "PassiveFullColorRoofRegionChanged",
+        "PassiveFullColorRoofRegionChanged.unchanged",
+        b"\xa7\xc9",
+    )
+    roof_rule, roof_rule_record = _routine_bytes(
+        rom,
+        symbols,
+        "PassiveFullColorCurrentRoofRegion",
+        "PassiveFullColorCurrentRoofRegion.resolved",
+        b"\x4e\xe1\xc9",
+    )
+    _require_reference(
+        roof_rule,
+        symbols,
+        "PassiveFullColorCurrentRoofRegion",
+        "FullColorOverworldRoofRegionRules",
+        opcodes=(0x21,),
+    )
+    for source, payload in (
+        ("PassiveFullColorRoofPaletteForMap", roof_select),
+        ("PassiveFullColorRoofRegionChanged", roof_invalidate),
+    ):
+        _require_reference(
+            payload,
+            symbols,
+            source,
+            "PassiveFullColorCurrentRoofRegion",
+            opcodes=(0xCD,),
+        )
+
+    spinner, spinner_record = _routine_bytes(
+        rom,
+        symbols,
+        "LoadSpinnerArrowTiles",
+        "LoadSpinnerArrowTiles.loop",
+        b"\xf5\xe5\xc5\x09\x2a\x5f\x2a\x57\x2a\x4f\x2a\x47\x2a\x66\x6f"
+        + b"\xcd"
+        + _symbol(symbols, "CopyVideoData").address.to_bytes(2, "little")
+        + b"\xc1\x3e\x06\x81\x4f\xe1\xf1\x3d\x20\xe4\xc9",
+    )
+    for target in ("FacilitySpinnerArrows", "GymSpinnerArrows"):
+        _require_reference(
+            spinner, symbols, "LoadSpinnerArrowTiles", target, opcodes=(0x21,)
+        )
+    _require_reference(
+        spinner,
+        symbols,
+        "LoadSpinnerArrowTiles",
+        "CopyVideoData",
+        opcodes=(0xCD,),
+    )
+    _require_sequence(spinner, "LoadSpinnerArrowTiles", "four-tile bound", b"\x3e\x04")
+
+    replace, replace_record = _routine_bytes(
+        rom,
+        symbols,
+        "ReplaceTileBlock",
+        "RedrawMapView",
+        b"",
+    )
+    _require_reference(
+        replace,
+        symbols,
+        "ReplaceTileBlock",
+        "GetPredefRegisters",
+        opcodes=(0xCD,),
+    )
+    _require_reference(
+        replace, symbols, "ReplaceTileBlock", "wOverworldMap", opcodes=(0x21,)
+    )
+    _require_sequence(
+        replace,
+        "ReplaceTileBlock",
+        "map block writer",
+        b"\xfa" + _symbol(symbols, "wNewTileBlockID").address.to_bytes(2, "little") + b"\x77",
+    )
+    predef, predef_record = _read(rom, symbols, "ReplaceTileBlockPredef", 3)
+    expected_predef = bytes(
+        (
+            _symbol(symbols, "ReplaceTileBlock").bank,
+            _symbol(symbols, "ReplaceTileBlock").address & 0xFF,
+            _symbol(symbols, "ReplaceTileBlock").address >> 8,
+        )
+    )
+    if predef != expected_predef:
+        raise MapBackgroundSnapshotError(
+            "ReplaceTileBlockPredef: linked caller identity does not bind ReplaceTileBlock"
+        )
+
+    cut, cut_record = _routine_bytes(
+        rom, symbols, "UsedCut", "UsedCutText", b""
+    )
+    cut_writer, cut_writer_record = _routine_bytes(
+        rom,
+        symbols,
+        "ReplaceTreeTileBlock",
+        "ReplaceTreeTileBlock.loop",
+        b"\x1a\x13\x13\xfe\xff\xc8\xb9\x20\xf7\x1b\x1a\x77\xc9",
+    )
+    _require_reference(
+        cut, symbols, "UsedCut", "CutTreeBlockSwaps", opcodes=(0x11,)
+    )
+    _require_reference(
+        cut, symbols, "UsedCut", "ReplaceTreeTileBlock", opcodes=(0xCD,)
+    )
+    _require_reference(
+        cut_writer,
+        symbols,
+        "ReplaceTreeTileBlock",
+        "wCurrentTileBlockMapViewPointer",
+        opcodes=(0x21,),
+    )
+    _require_sequence(cut_writer, "ReplaceTreeTileBlock", "map block writer", b"\x1b\x1a\x77\xc9")
+
+    cinnabar, cinnabar_record = _routine_bytes(
+        rom,
+        symbols,
+        "UpdateCinnabarGymGateTileBlocks_",
+        "UpdateCinnabarGymGateTileBlocks_.next",
+        b"\xc1\xea"
+        + _symbol(symbols, "wNewTileBlockID").address.to_bytes(2, "little")
+        + b"\xcd"
+        + _symbol(symbols, "CinnabarGym_ReplaceTileBlock").address.to_bytes(2, "little")
+        + b"\x21\xdb\xff\x35\x20\xc9\x21"
+        + _symbol(symbols, "RedrawMapView").address.to_bytes(2, "little")
+        + b"\x06"
+        + bytes((_symbol(symbols, "RedrawMapView").bank,))
+        + b"\xcd"
+        + _symbol(symbols, "Bankswitch").address.to_bytes(2, "little")
+        + b"\xc9",
+    )
+    cinnabar_writer, cinnabar_writer_record = _routine_bytes(
+        rom,
+        symbols,
+        "CinnabarGym_ReplaceTileBlock",
+        "CinnabarGym_ReplaceTileBlock.addX",
+        b"\x09\xfa"
+        + _symbol(symbols, "wNewTileBlockID").address.to_bytes(2, "little")
+        + b"\x77\xc9",
+    )
+    cinnabar_entry, cinnabar_entry_record = _routine_bytes(
+        rom,
+        symbols,
+        "UpdateCinnabarGymGateTileBlocks",
+        "UpdateCinnabarGymGateTileBlocks",
+        b"\x06"
+        + bytes((_symbol(symbols, "UpdateCinnabarGymGateTileBlocks_").bank,))
+        + b"\x21"
+        + _symbol(symbols, "UpdateCinnabarGymGateTileBlocks_").address.to_bytes(2, "little")
+        + b"\xcd"
+        + _symbol(symbols, "Bankswitch").address.to_bytes(2, "little")
+        + b"\xc9",
+    )
+    _require_reference(
+        cinnabar,
+        symbols,
+        "UpdateCinnabarGymGateTileBlocks_",
+        "CinnabarGymGateCoords",
+        opcodes=(0x21,),
+    )
+    _require_reference(
+        cinnabar,
+        symbols,
+        "UpdateCinnabarGymGateTileBlocks_",
+        "CinnabarGym_ReplaceTileBlock",
+        opcodes=(0xCD,),
+    )
+    _require_sequence(
+        cinnabar_writer,
+        "CinnabarGym_ReplaceTileBlock",
+        "map block writer",
+        b"\xfa" + _symbol(symbols, "wNewTileBlockID").address.to_bytes(2, "little") + b"\x77\xc9",
+    )
+    _require_reference(
+        cinnabar_writer,
+        symbols,
+        "CinnabarGym_ReplaceTileBlock",
+        "wOverworldMap",
+        opcodes=(0x21,),
+    )
+
+    return {
+        "MAP_ATTRIBUTE_OVERRIDES": {
+            "routines": [override_record],
+            "edges": [
+                "FullColorMapAttributeOverrides->PassiveFullColorResolveAttributeForIdentity",
+                "PassiveFullColorResolveAttributeForIdentity->FullColorTileAttributePointers",
+            ],
+        },
+        "ROOF_REGION_RULES": {
+            "routines": [roof_rule_record, roof_select_record, roof_invalidate_record],
+            "edges": [
+                "FullColorOverworldRoofRegionRules->PassiveFullColorCurrentRoofRegion",
+                "PassiveFullColorCurrentRoofRegion->PassiveFullColorRoofPaletteForMap",
+                "PassiveFullColorCurrentRoofRegion->PassiveFullColorRoofRegionChanged",
+            ],
+        },
+        "SPINNER_ARROW_TILES": {
+            "routines": [spinner_record],
+            "edges": [
+                "FacilitySpinnerArrows->LoadSpinnerArrowTiles",
+                "GymSpinnerArrows->LoadSpinnerArrowTiles",
+                "LoadSpinnerArrowTiles->CopyVideoData",
+            ],
+        },
+        "REPLACE_TILE_BLOCK": {
+            "routines": [replace_record, predef_record],
+            "edges": ["ReplaceTileBlockPredef->ReplaceTileBlock->wOverworldMap"],
+        },
+        "CUT_TREE": {
+            "routines": [cut_record, cut_writer_record],
+            "edges": ["CutTreeBlockSwaps->UsedCut->ReplaceTreeTileBlock->wOverworldMap"],
+        },
+        "CINNABAR_GYM_GATE_BLOCKS": {
+            "routines": [cinnabar_entry_record, cinnabar_record, cinnabar_writer_record],
+            "edges": [
+                "UpdateCinnabarGymGateTileBlocks->UpdateCinnabarGymGateTileBlocks_",
+                "CinnabarGymGateCoords->UpdateCinnabarGymGateTileBlocks_->CinnabarGym_ReplaceTileBlock->wOverworldMap",
+            ],
+        },
+    }
+
+
+def _validate_map_override_data(
     rom: bytes,
     symbols: SymbolTable,
     authority: MapBackgroundAuthority,
     rules: tuple[dict[str, object], ...],
 ) -> None:
-    """Bind semantic override rules to the exact linked instruction stream.
-
-    The source contract deliberately does not try to emulate arbitrary RGBDS
-    macro expansion.  This independent check instead synthesizes the one
-    production routine that may implement the two reviewed rules and compares
-    it byte-for-byte with the linked product.
-    """
+    """Bind semantic override rules to the exact compact linked records."""
     if len(rules) != 2:
         raise MapBackgroundSnapshotError(
             "map override semantics must define exactly two production rules"
@@ -193,140 +544,69 @@ def _validate_map_override_routine(
             )
 
     map_ids = {row.name: row.id for row in authority.maps}
+    expected = bytearray()
+    for rule in rules:
+        map_name = str(rule["map"])
+        try:
+            map_id = map_ids[map_name]
+        except KeyError as exc:
+            raise MapBackgroundSnapshotError(
+                f"map override semantics name an unknown map: {map_name}"
+            ) from exc
+        tiles = rule["tiles"]
+        palette_value = rule["palette_value"]
+        assert isinstance(tiles, list) and isinstance(palette_value, int)
+        if not 0 <= map_id <= 0xFF or not 1 <= len(tiles) <= 0xFF:
+            raise MapBackgroundSnapshotError(
+                f"{map_name}: override identity or tile count exceeds one byte"
+            )
+        expected.extend((map_id, len(tiles), palette_value, *tiles))
+
+    actual, _ = _read(
+        rom,
+        symbols,
+        "FullColorMapAttributeOverrides",
+        len(expected),
+        end="FullColorMapAttributeOverridesEnd",
+    )
+    if actual != expected:
+        raise MapBackgroundSnapshotError(
+            "linked map override data contradicts semantic rules or exact values"
+        )
+
+
+def _validate_roof_region_data(
+    rom: bytes, symbols: SymbolTable, authority: MapBackgroundAuthority
+) -> None:
+    """Require Route 6 palette selection and invalidation to share one record."""
+    map_ids = {row.name: row.id for row in authority.maps}
     try:
-        roof_map = map_ids[str(roof["map"])]
-        first_floor_map = map_ids[str(first_floor["map"])]
+        route_6 = map_ids["ROUTE_6"]
+        saffron_city = map_ids["SAFFRON_CITY"]
     except KeyError as exc:
         raise MapBackgroundSnapshotError(
-            f"map override semantics name an unknown map: {exc.args[0]}"
+            f"roof-region semantics name an unknown map: {exc.args[0]}"
         ) from exc
-    if not 0 <= roof_map <= 0xFF or not 0 <= first_floor_map <= 0xFF:
-        raise MapBackgroundSnapshotError(
-            "map override identity exceeds an 8-bit map ID"
-        )
-
-    start = _symbol(symbols, "PassiveFullColorResolveAttributeForIdentity")
-    pointer_table = _symbol(symbols, "FullColorTileAttributePointers")
-    if start.bank != pointer_table.bank:
-        raise MapBackgroundSnapshotError(
-            "map override lookup and attribute pointer table are not in one ROM bank"
-        )
-
-    labels = {
-        "not_roof": 18,
-        "first_floor_match": 39,
-        "lookup": 43,
-        "done": 59,
-    }
-    symbol_names = {
-        "not_roof": (
-            "PassiveFullColorResolveAttributeForIdentity.not_celadon_mart_roof"
-        ),
-        "first_floor_match": (
-            "PassiveFullColorResolveAttributeForIdentity.celadon_mart_1f"
-        ),
-        "lookup": "PassiveFullColorResolveAttributeForIdentity.lookup",
-        "done": "PassiveFullColorResolveAttributeForIdentity.done",
-    }
-    for label, offset in labels.items():
-        target = _symbol(symbols, symbol_names[label])
-        if (target.bank, target.address) != (start.bank, start.address + offset):
-            raise MapBackgroundSnapshotError(
-                f"map override linked label {symbol_names[label]} has an invalid offset"
-            )
-
-    expected = bytearray(
-        (
-            0x7B,  # ld a, e
-            0xFE,
-            roof_map,
-            0x20,
-            0,  # jr nz, not_roof
-            0x79,  # ld a, c
-            0xFE,
-            0x4B,
-            0x38,
-            0,  # jr c, lookup
-            0xFE,
-            0x50,
-            0x30,
-            0,  # jr nc, lookup
-            0x3E,
-            int(roof["palette_value"]),
-            0x18,
-            0,  # jr done
-            0xFE,
-            first_floor_map,
-            0x20,
-            0,  # jr nz, lookup
-            0x79,
-            0xFE,
-            0x07,
-            0x28,
-            0,  # jr z, first_floor_match
-            0xFE,
-            0x08,
-            0x28,
-            0,
-            0xFE,
-            0x17,
-            0x28,
-            0,
-            0xFE,
-            0x18,
-            0x20,
-            0,  # jr nz, lookup
-            0x3E,
-            int(first_floor["palette_value"]),
-            0x18,
-            0,  # jr done
-            0x7C,  # ld a, h
-            0x87,  # add a
-            0x5F,  # ld e, a
-            0x16,
-            0x00,
-            0x21,
-            pointer_table.address & 0xFF,
-            pointer_table.address >> 8,
-            0x19,  # add hl, de
-            0x2A,  # ld a, [hli]
-            0x66,  # ld h, [hl]
-            0x6F,  # ld l, a
-            0x06,
-            0x00,
-            0x09,  # add hl, bc
-            0x7E,  # ld a, [hl]
-            0xC1,  # pop bc
-            0xD1,  # pop de
-            0xE1,  # pop hl
-            0xC9,  # ret
-        )
+    assignments, _ = _read(
+        rom,
+        symbols,
+        "FullColorOverworldRoofAssignments",
+        37,
+        end="FullColorOverworldRoofAssignmentsEnd",
     )
-    for operand, target in (
-        (4, labels["not_roof"]),
-        (9, labels["lookup"]),
-        (13, labels["lookup"]),
-        (17, labels["done"]),
-        (21, labels["lookup"]),
-        (26, labels["first_floor_match"]),
-        (30, labels["first_floor_match"]),
-        (34, labels["first_floor_match"]),
-        (38, labels["lookup"]),
-        (42, labels["done"]),
-    ):
-        expected[operand] = _relative_jump(operand, target)
-
-    actual = rom[start.rom_offset : start.rom_offset + len(expected)]
-    if len(actual) != len(expected) or actual != expected:
-        differences = [
-            f"+0x{index:02x}: expected {wanted:02x}, linked {found:02x}"
-            for index, (wanted, found) in enumerate(zip(expected, actual, strict=False))
-            if wanted != found
-        ]
-        detail = differences[0] if differences else "routine is truncated"
+    expected = bytes(
+        (route_6, 2, assignments[saffron_city], assignments[route_6])
+    )
+    actual, _ = _read(
+        rom,
+        symbols,
+        "FullColorOverworldRoofRegionRules",
+        len(expected),
+        end="FullColorOverworldRoofRegionRulesEnd",
+    )
+    if actual != expected:
         raise MapBackgroundSnapshotError(
-            "linked map override routine contradicts semantic rules or exact "
-            f"instruction contract ({detail})"
+            "linked roof-region data contradicts Route 6 reviewed semantics"
         )
 
 
@@ -348,7 +628,9 @@ def _product_snapshot(
             f"{product}: invalid linked artifacts: {exc}"
         ) from exc
 
-    _validate_map_override_routine(rom, symbols, authority, override_rules)
+    _validate_map_override_data(rom, symbols, authority, override_rules)
+    _validate_roof_region_data(rom, symbols, authority)
+    linked_consumers = _consumer_contracts(rom, symbols)
 
     payloads: dict[str, dict[str, object]] = {}
     unique_payloads = sorted(
@@ -415,8 +697,7 @@ def _product_snapshot(
 
     fixed: dict[str, object] = {}
     for key, name, size in FIXED_PAYLOADS:
-        end = None if key == "map_overrides" else f"{name}End"
-        payload, record = _read(rom, symbols, name, size, end=end)
+        payload, record = _read(rom, symbols, name, size, end=f"{name}End")
         if key == "roof_assignments" and any(value >= 11 for value in payload):
             raise MapBackgroundSnapshotError(
                 "roof assignment exceeds reviewed roof identity"
@@ -432,6 +713,7 @@ def _product_snapshot(
         },
         "pointer_tables": pointer_tables,
         "payloads": payloads,
+        "linked_consumers": linked_consumers,
         **fixed,
     }
 
@@ -459,18 +741,31 @@ def _parity_view(product: dict[str, object]) -> dict[str, object]:
         "roof_assignments": {
             key: product["roof_assignments"][key] for key in ("size", "sha256", "bytes")
         },
+        "roof_region_rules": {
+            key: product["roof_region_rules"][key]
+            for key in ("size", "sha256", "bytes")
+        },
         "roof_palettes": {
             key: product["roof_palettes"][key] for key in ("size", "sha256", "bytes")
         },
         "map_overrides": {
             key: product["map_overrides"][key] for key in ("size", "sha256", "bytes")
         },
+        "linked_consumers": product["linked_consumers"],
     }
 
 
 def _cross_product_view(product: dict[str, object]) -> dict[str, object]:
     view = _parity_view(product)
-    view.pop("map_overrides")
+    consumers = view["linked_consumers"]
+    assert isinstance(consumers, dict)
+    view["linked_consumers"] = {
+        identity: {
+            "routines": [row["symbol"] for row in contract["routines"]],
+            "edges": contract["edges"],
+        }
+        for identity, contract in consumers.items()
+    }
     return view
 
 

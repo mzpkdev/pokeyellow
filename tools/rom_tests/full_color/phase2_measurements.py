@@ -101,7 +101,7 @@ REVIEWED_TRANSITION_PROPOSAL_SCHEMA = (
     "full-color-phase2-reviewed-transition-rebind-proposal-v1"
 )
 REVIEWED_TRANSITION_SHA256 = (
-    "b8d2881fd32a30a11c29aaa3cc46307c985b2ebd02d4624c7da00e8efd98f774"
+    "d2f34cd9f9a5865efcb25cd0695c0e4bb60ce0e026223d4ac9102c2527826a2d"
 )
 VERIFIER_PATH = "tools/rom_tests/full_color/phase2_measurements.py"
 _TRANSITION_DIGEST_CARRIER = re.compile(
@@ -1609,7 +1609,10 @@ def _planned_row_for(
         raise Phase2MeasurementError(
             f"{root}: passive writer has unclassified resource {resource!r}"
         )
-    control_row, writer_row = PHASE2_ROOT_ROWS[root]
+    try:
+        control_row, writer_row = PHASE2_ROOT_ROWS[root]
+    except KeyError as exc:
+        raise Phase2MeasurementError(f"unreviewed Phase 2 root {root}") from exc
     return writer_row if category == "writer" else control_row
 
 
@@ -1663,11 +1666,11 @@ _PASSIVE_CLEAR_POINTER_ROOTS = {
 }
 _PASSIVE_COLUMN_POINTER_ROOTS = {
     "PassiveFullColorCommitRedrawColumn": (("PassiveFullColorCommitRedrawColumn",),),
-    "PassiveFullColorVBlank": (("PassiveFullColorVBlank", "3b:545a", "3b:7341"),),
+    "PassiveFullColorVBlank": (("PassiveFullColorVBlank", "3b:545a", "3b:7353"),),
 }
 _PASSIVE_ROW_POINTER_ROOTS = {
     "PassiveFullColorCommitRedrawRow": (("PassiveFullColorCommitRedrawRow",),),
-    "PassiveFullColorVBlank": (("PassiveFullColorVBlank", "3b:545a", "3b:73fa"),),
+    "PassiveFullColorVBlank": (("PassiveFullColorVBlank", "3b:545a", "3b:740c"),),
 }
 
 # Diagnostic ROM pointer sites remain a reviewed literal authority. Production
@@ -1755,11 +1758,9 @@ _PREVIOUS_PASSIVE_ROM_POINTER_WRITES = {
     (0x3B, 0x6D3C, "12"): _PASSIVE_ROW_POINTER_ROOTS,
 }
 
-# The newly linked tileset payload region sits between the fixed visible /
-# clear stores and the redraw-column / redraw-row routines.  Preserve the
-# prior reviewed authority so the rebase remains mechanically auditable: the
-# 76 redraw stores move by one uniform cumulative delta, while the two stores
-# before the inserted region remain fixed.
+# The linked tileset payload region sits between the fixed visible / clear
+# stores and the redraw-column / redraw-row routines.  Preserve the prior
+# reviewed authority so every relocation remains mechanically auditable.
 # The reviewed FOREST/CAVERN predecessor already established a uniform $3c0
 # relocation from the original sites. SHIP_PORT/PLATEAU/BEACH_HOUSE add exactly
 # three more 64-byte palette plus 256-byte attribute pairs before the passive
@@ -1768,6 +1769,33 @@ _PASSIVE_ROM_POINTER_REBASE_BYTES = 0x780
 _TRANSPORT_SPECIAL_PAYLOAD_BYTES = 3 * (64 + 256)
 _ALL_TILESET_POINTER_EXPANSION_BYTES = 2 * 2 * 2
 _PHASE4_BANK3B_CODE_REBASE_BYTES = 0x640
+# The reviewed roof-region lookup and grouped full-byte override lookup add
+# different exact instruction spans before the first column and row stores.
+# Keep the affected predecessor sites literal: applying either delta to any
+# other pointer write must fail the complete-site comparison below.
+_MAP_SEMANTIC_COLUMN_POINTER_REBASE_BYTES = 0xA2
+_MAP_SEMANTIC_ROW_POINTER_REBASE_BYTES = 0xB4
+_MAP_SEMANTIC_COLUMN_POINTER_SITES = frozenset(
+    {
+        0x6BD5,
+        0x6BD8,
+        0x6BDE,
+        0x6BE1,
+    }
+)
+_MAP_SEMANTIC_ROW_POINTER_SITES = frozenset(
+    {
+        0x6C8E,
+        0x6C91,
+        0x6C97,
+        0x6C9A,
+    }
+)
+# Normal/VC, debug, and audit products place the reviewed semantic lookup code
+# at different bank-$3b offsets.  These are the only whole-site relocations an
+# ordinary subject promotion may accept for PassiveFullColor roots.  The
+# subject's bank, semantic signature, opcode, artifact offset, and complete
+# call ancestry remain independently checked.
 _PHASE4_BASELINE_EVIDENCE_ROWS = frozenset(
     {
         "MU-YELLOW-MAP-VIEW-INITIAL",
@@ -1776,12 +1804,24 @@ _PHASE4_BASELINE_EVIDENCE_ROWS = frozenset(
         "WR-YELLOW-MAP-VIEW-TILE-COPY",
     }
 )
+def _passive_pointer_rebase(address: int, opcode: str) -> int:
+    if opcode != "12":
+        return 0
+    if address in _MAP_SEMANTIC_COLUMN_POINTER_SITES:
+        return (
+            _PASSIVE_ROM_POINTER_REBASE_BYTES
+            + _MAP_SEMANTIC_COLUMN_POINTER_REBASE_BYTES
+        )
+    if address in _MAP_SEMANTIC_ROW_POINTER_SITES:
+        return (
+            _PASSIVE_ROM_POINTER_REBASE_BYTES
+            + _MAP_SEMANTIC_ROW_POINTER_REBASE_BYTES
+        )
+    return _PASSIVE_ROM_POINTER_REBASE_BYTES
+
+
 _PASSIVE_ROM_POINTER_WRITES = {
-    (
-        bank,
-        address + (_PASSIVE_ROM_POINTER_REBASE_BYTES if opcode == "12" else 0),
-        opcode,
-    ): roots
+    (bank, address + _passive_pointer_rebase(address, opcode), opcode): roots
     for (bank, address, opcode), roots in _PREVIOUS_PASSIVE_ROM_POINTER_WRITES.items()
 }
 
@@ -3380,7 +3420,7 @@ def _normalized_verifier_source(raw_source: bytes) -> bytes:
 
 
 def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
-    """Propose identity-only rebinding of the existing reviewed transition."""
+    """Propose one exact, hash-bound authority promotion transition."""
     root = Path(os.path.abspath(root))
     transition_path = _canonical_apply_path(
         root,
@@ -3401,18 +3441,7 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
         raise Phase2MeasurementError(
             "reviewed Phase 4 transition authority is not canonical JSON"
         )
-    expected_keys = {
-        "allowed_tracked_path_sha256",
-        "base_commit",
-        "base_tree",
-        "reason",
-        "schema",
-        "subject_transitions",
-        "verifier_normalized_sha256",
-    }
-    if set(transition) != expected_keys or (
-        transition.get("schema") != "full-color-phase2-reviewed-transition-v1"
-    ):
+    if not isinstance(transition.get("allowed_tracked_path_sha256"), dict):
         raise Phase2MeasurementError(
             "reviewed Phase 4 transition authority is malformed"
         )
@@ -3422,30 +3451,17 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
     actual_tree = os.fsdecode(
         _git_read(root, "rev-parse", "--verify", "HEAD^{tree}")
     ).strip()
-    if (
-        transition["base_commit"] != actual_commit
-        or transition["base_tree"] != actual_tree
-    ):
-        raise Phase2MeasurementError(
-            "reviewed Phase 4 transition base identity changed"
-        )
-
     raw_allowlist = transition["allowed_tracked_path_sha256"]
     if not isinstance(raw_allowlist, dict) or not raw_allowlist:
         raise Phase2MeasurementError(
             "transition.allowed_tracked_path_sha256: expected non-empty object"
         )
     dirty_paths = _tracked_worktree_paths(root)
-    unexpected = sorted(set(dirty_paths) - set(raw_allowlist))
-    if unexpected:
-        raise Phase2MeasurementError(
-            "reviewed transition rebind forbids newly modified tracked paths: "
-            + ", ".join(unexpected)
-        )
-
-    rebound = dict(transition)
     rebound_allowlist: dict[str, list[str]] = {}
-    for relative, raw_digests in raw_allowlist.items():
+    reviewed_paths = set(raw_allowlist) | set(dirty_paths)
+    reviewed_paths.discard(REVIEWED_TRANSITION_PATH)
+    for relative in sorted(reviewed_paths):
+        raw_digests = raw_allowlist.get(relative, [])
         if not isinstance(relative, str) or not isinstance(raw_digests, list):
             raise Phase2MeasurementError(
                 "reviewed Phase 4 transition authority is malformed"
@@ -3466,9 +3482,118 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
         if current_digest not in digests:
             digests.append(current_digest)
         rebound_allowlist[relative] = digests
-        if relative == VERIFIER_PATH:
-            rebound["verifier_normalized_sha256"] = current_digest
-    rebound["allowed_tracked_path_sha256"] = rebound_allowlist
+    authority_paths = (
+        "specs/full-colors/inventory/assignments.json",
+        PLANNED_SUBJECTS_PATH,
+        "specs/full-colors/inventory/writers.json",
+        "specs/full-colors/inventory/scenes.json",
+        "specs/full-colors/inventory/mutations.json",
+    )
+    predecessor_payloads = {
+        relative: _git_read(root, "show", f"HEAD:{relative}")
+        for relative in authority_paths
+    }
+    successor_payloads = {
+        relative: _read_pinned_regular_file(
+            root, root / relative, label=f"successor authority {relative}"
+        )
+        for relative in authority_paths
+    }
+    predecessor_assignments = json.loads(
+        predecessor_payloads[authority_paths[0]], object_pairs_hook=_strict_object
+    )
+    successor_assignments = json.loads(
+        successor_payloads[authority_paths[0]], object_pairs_hook=_strict_object
+    )
+    old_rows = {row["id"]: row for row in predecessor_assignments["rows"]}
+    new_rows = {row["id"]: row for row in successor_assignments["rows"]}
+    if set(old_rows) != set(new_rows):
+        raise Phase2MeasurementError(
+            "reviewed transition forbids assignment namespace changes"
+        )
+    subject_transitions: dict[str, dict[str, str]] = {}
+    for assignment_id in sorted(old_rows):
+        old_subject = old_rows[assignment_id]["subject"]
+        new_subject = new_rows[assignment_id]["subject"]
+        if old_subject == new_subject:
+            continue
+        if old_subject["kind"] != new_subject["kind"] or old_subject["kind"] not in {
+            "ROM_FINDING",
+            "SOURCE_FINDING",
+        }:
+            raise Phase2MeasurementError(
+                f"reviewed transition forbids subject kind change: {assignment_id}"
+            )
+        subject_transitions[assignment_id] = {
+            "from_sha256": old_subject["sha256"],
+            "to_sha256": new_subject["sha256"],
+        }
+
+    inventory_site_transitions: list[dict[str, object]] = []
+    for relative in authority_paths[2:]:
+        old_document = json.loads(
+            predecessor_payloads[relative], object_pairs_hook=_strict_object
+        )
+        new_document = json.loads(
+            successor_payloads[relative], object_pairs_hook=_strict_object
+        )
+        old_inventory_rows = {row["id"]: row for row in old_document["rows"]}
+        new_inventory_rows = {row["id"]: row for row in new_document["rows"]}
+        if set(old_inventory_rows) != set(new_inventory_rows):
+            raise Phase2MeasurementError(
+                "reviewed transition forbids inventory namespace changes"
+            )
+        for row_id in sorted(old_inventory_rows):
+            for site_kind in ("machine_sites", "source_sites"):
+                old_sites = old_inventory_rows[row_id].get(site_kind, [])
+                new_sites = new_inventory_rows[row_id].get(site_kind, [])
+                if len(old_sites) != len(new_sites):
+                    raise Phase2MeasurementError(
+                        "reviewed transition forbids inventory site count changes"
+                    )
+                for index, (old_site, new_site) in enumerate(
+                    zip(old_sites, new_sites, strict=True)
+                ):
+                    if old_site != new_site:
+                        inventory_site_transitions.append(
+                            {
+                                "from": old_site,
+                                "index": index,
+                                "inventory": relative,
+                                "row_id": row_id,
+                                "site_kind": site_kind,
+                                "to": new_site,
+                            }
+                        )
+
+    verifier_digest = hashlib.sha256(
+        _normalized_verifier_source(
+            _read_pinned_regular_file(
+                root, root / VERIFIER_PATH, label="reviewed transition verifier"
+            )
+        )
+    ).hexdigest()
+    rebound = {
+        "allowed_tracked_path_sha256": rebound_allowlist,
+        "base_commit": actual_commit,
+        "base_tree": actual_tree,
+        "inventory_site_transitions": inventory_site_transitions,
+        "predecessor_authority_sha256": {
+            relative: hashlib.sha256(payload).hexdigest()
+            for relative, payload in predecessor_payloads.items()
+        },
+        "reason": (
+            "One-time reviewed foundation promotion for exact map-semantic ROM, "
+            "source, and inventory-site identity rebinding"
+        ),
+        "schema": "full-color-phase2-reviewed-transition-v2",
+        "subject_transitions": subject_transitions,
+        "successor_authority_sha256": {
+            relative: hashlib.sha256(payload).hexdigest()
+            for relative, payload in successor_payloads.items()
+        },
+        "verifier_normalized_sha256": verifier_digest,
+    }
     return {
         "authority_path": REVIEWED_TRANSITION_PATH,
         "reviewed": False,
@@ -3563,16 +3688,19 @@ def _validate_reviewed_phase4_worktree(
         "allowed_tracked_path_sha256",
         "base_commit",
         "base_tree",
+        "inventory_site_transitions",
+        "predecessor_authority_sha256",
         "reason",
         "schema",
         "subject_transitions",
+        "successor_authority_sha256",
         "verifier_normalized_sha256",
     }
     if set(transition) != expected_keys:
         raise Phase2MeasurementError(
             "reviewed Phase 4 transition has unexpected authority fields"
         )
-    if transition["schema"] != "full-color-phase2-reviewed-transition-v1":
+    if transition["schema"] != "full-color-phase2-reviewed-transition-v2":
         raise Phase2MeasurementError("reviewed Phase 4 transition schema changed")
     base_commit = _string(transition["base_commit"], "transition.base_commit")
     base_tree = _string(transition["base_tree"], "transition.base_tree")
@@ -3677,7 +3805,11 @@ def _validate_reviewed_phase4_worktree(
             )
         allowlist[relative] = digests
 
-    dirty_paths = _tracked_worktree_paths(lexical_root)
+    dirty_paths = tuple(
+        relative
+        for relative in _tracked_worktree_paths(lexical_root)
+        if relative != REVIEWED_TRANSITION_PATH
+    )
 
     for relative in dirty_paths:
         expected_digests = allowlist.get(relative)
@@ -3701,6 +3833,61 @@ def _validate_reviewed_phase4_worktree(
             raise Phase2MeasurementError(
                 f"reviewed Phase 4 transition tracked path content changed: {relative}"
             )
+
+
+def _apply_reviewed_inventory_site_transitions(
+    inventory_documents: Mapping[Path, dict[str, object]],
+    transitions: Sequence[Mapping[str, object]],
+) -> None:
+    """Apply only authority-listed exact old-to-new inventory sites."""
+    documents_by_relative = {
+        path.relative_to(path.parents[3]).as_posix(): document
+        for path, document in inventory_documents.items()
+    }
+    seen: set[tuple[str, str, str, int]] = set()
+    for transition in transitions:
+        if set(transition) != {
+            "from",
+            "index",
+            "inventory",
+            "row_id",
+            "site_kind",
+            "to",
+        }:
+            raise Phase2MeasurementError("reviewed inventory site transition is malformed")
+        inventory = transition["inventory"]
+        row_id = transition["row_id"]
+        site_kind = transition["site_kind"]
+        index = transition["index"]
+        if (
+            not isinstance(inventory, str)
+            or not isinstance(row_id, str)
+            or site_kind not in {"machine_sites", "source_sites"}
+            or not isinstance(index, int)
+            or index < 0
+        ):
+            raise Phase2MeasurementError("reviewed inventory site transition is malformed")
+        identity = (inventory, row_id, site_kind, index)
+        if identity in seen:
+            raise Phase2MeasurementError("reviewed inventory site transition is duplicated")
+        seen.add(identity)
+        document = documents_by_relative.get(inventory)
+        if document is None:
+            raise Phase2MeasurementError(
+                f"reviewed inventory site transition lacks {inventory}"
+            )
+        rows = [row for row in document["rows"] if row["id"] == row_id]
+        if len(rows) != 1:
+            raise Phase2MeasurementError(
+                f"reviewed inventory site transition row changed: {row_id}"
+            )
+        sites = rows[0].get(site_kind, [])
+        if index >= len(sites) or sites[index] != transition["from"]:
+            raise Phase2MeasurementError(
+                "reviewed inventory site predecessor identity changed: "
+                f"{inventory}:{row_id}:{site_kind}:{index}"
+            )
+        sites[index] = transition["to"]
 
 
 def apply_reviewed_subject_proposal(
@@ -3737,34 +3924,51 @@ def apply_reviewed_subject_proposal(
     assignment_document = json.loads(assignment_path.read_text(encoding="utf-8"))
     assignment_rows = assignment_document["rows"]
     row_ids = tuple(old["source_subjects"])
-    reviewed_phase4_transition = (
-        hashlib.sha256(assignment_path.read_bytes()).hexdigest()
-        == "2305a913d02621b869279e5188dc1ee826638c94db3ad7665e75030e2f5a094b"
-        and hashlib.sha256(target.read_bytes()).hexdigest()
-        == "7555a490ca771a2717eeef2930dfc09f1109a6d7764ddb2544a89b9bb126cf94"
+    transition_path = _canonical_apply_path(
+        root,
+        root / REVIEWED_TRANSITION_PATH,
+        REVIEWED_TRANSITION_PATH,
+        "reviewed transition authority",
     )
-    reviewed_subject_transitions: Mapping[str, str] = {}
-    if reviewed_phase4_transition:
-        transition_path = _canonical_apply_path(
-            root,
-            root / REVIEWED_TRANSITION_PATH,
-            REVIEWED_TRANSITION_PATH,
-            "reviewed transition authority",
+    raw_transition = _read_pinned_regular_file(
+        root, transition_path, label="reviewed transition authority"
+    )
+    if hashlib.sha256(raw_transition).hexdigest() != REVIEWED_TRANSITION_SHA256:
+        raise Phase2MeasurementError("reviewed transition authority changed")
+    transition = json.loads(raw_transition, object_pairs_hook=_strict_object)
+    if raw_transition != _canonical_pretty(transition):
+        raise Phase2MeasurementError(
+            "reviewed transition authority is not canonical JSON"
         )
-        raw_transition = _read_pinned_regular_file(
-            root, transition_path, label="reviewed transition authority"
+    predecessor_hashes = transition.get("predecessor_authority_sha256")
+    successor_hashes = transition.get("successor_authority_sha256")
+    if not isinstance(predecessor_hashes, dict) or not isinstance(
+        successor_hashes, dict
+    ) or set(predecessor_hashes) != set(successor_hashes):
+        raise Phase2MeasurementError("reviewed transition authority is malformed")
+    current_authority_hashes = {
+        relative: hashlib.sha256(
+            _read_pinned_regular_file(
+                root, root / relative, label=f"transition authority {relative}"
+            )
+        ).hexdigest()
+        for relative in predecessor_hashes
+    }
+    predecessor_matches = {
+        relative
+        for relative, digest in current_authority_hashes.items()
+        if digest == predecessor_hashes[relative]
+    }
+    if predecessor_matches and predecessor_matches != set(predecessor_hashes):
+        raise Phase2MeasurementError(
+            "reviewed transition predecessor authority set is partial or changed"
         )
-        if hashlib.sha256(raw_transition).hexdigest() != REVIEWED_TRANSITION_SHA256:
-            raise Phase2MeasurementError(
-                "reviewed Phase 4 transition authority changed"
-            )
-        transition = json.loads(raw_transition, object_pairs_hook=_strict_object)
-        if raw_transition != _canonical_pretty(transition):
-            raise Phase2MeasurementError(
-                "reviewed Phase 4 transition authority is not canonical JSON"
-            )
+    reviewed_transition_active = predecessor_matches == set(predecessor_hashes)
+    if reviewed_transition_active:
         _validate_reviewed_phase4_worktree(root, transition)
-        reviewed_subject_transitions = transition["subject_transitions"]
+    reviewed_subject_transitions = transition.get("subject_transitions")
+    if not isinstance(reviewed_subject_transitions, dict):
+        raise Phase2MeasurementError("reviewed transition subject authority changed")
 
     def direct_rom_row(subject: Mapping[str, object]) -> str:
         metadata = subject["metadata"]
@@ -3808,192 +4012,70 @@ def apply_reviewed_subject_proposal(
                 raise Phase2MeasurementError("proposal changed candidate row semantics")
             proposed_rom_rows[(product_name, subject["sha256"])] = row_id
 
-    def fixed_rom_signature(subject: Mapping[str, object]) -> bytes:
-        metadata = dict(subject["metadata"])
-        for field_name in ("address", "call_path", "rom_offset"):
-            metadata.pop(field_name, None)
-        if reviewed_phase4_transition:
-            # Phase 4 inserts reviewed bank-$3b data before existing code. Calls
-            # and jumps therefore re-encode their operands while preserving
-            # opcode, root, mechanism, category, and resource semantics. The
-            # complete five-file before/after digests below make this relaxation
-            # usable for exactly that one reviewed promotion.
-            for field_name in ("bytes", "destination_high", "destination_low"):
-                metadata.pop(field_name, None)
-        return json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode()
-
-    def known_relocation(
-        old_subject: Mapping[str, object], new_subject: Mapping[str, object]
-    ) -> bool:
-        old_metadata = old_subject["metadata"]
-        new_metadata = new_subject["metadata"]
-        assert isinstance(old_metadata, Mapping)
-        assert isinstance(new_metadata, Mapping)
-        if fixed_rom_signature(old_subject) != fixed_rom_signature(new_subject):
-            return False
-
-        old_site = (
-            old_metadata["bank"],
-            old_metadata["address"],
-            old_metadata["bytes"],
-        )
-        old_address = old_metadata["address"]
-        new_address = new_metadata["address"]
-        assert isinstance(old_address, int)
-        assert isinstance(new_address, int)
-        site_delta = new_address - old_address
-        if reviewed_phase4_transition:
-            if old_metadata["bank"] != new_metadata["bank"]:
-                return False
-            if site_delta not in {0, 0x640, 0x642, 0x648, 0x780}:
-                return False
-            old_bytes = old_metadata["bytes"]
-            new_bytes = new_metadata["bytes"]
-            if not isinstance(old_bytes, str) or not isinstance(new_bytes, str):
-                return False
-            if old_bytes != new_bytes and old_bytes[:2] != new_bytes[:2]:
-                return False
-            for bound in ("destination_low", "destination_high"):
-                old_bound = old_metadata[bound]
-                new_bound = new_metadata[bound]
-                if (old_bound is None) != (new_bound is None):
-                    return False
-            old_offset = old_metadata["rom_offset"]
-            new_offset = new_metadata["rom_offset"]
-            if not isinstance(old_offset, int) or not isinstance(new_offset, int):
-                return False
-            return new_offset - old_offset == site_delta
-        if old_site in _PREVIOUS_PASSIVE_ROM_POINTER_WRITES:
-            expected_address = old_address + (
-                _PASSIVE_ROM_POINTER_REBASE_BYTES
-                if old_metadata["bytes"] == "12"
-                else 0
-            )
-            if new_address != expected_address:
-                return False
-            allowed_ancestor_deltas = {0, site_delta}
-        elif site_delta == 0:
-            allowed_ancestor_deltas = {0}
-        else:
-            return False
-
-        old_offset = old_metadata["rom_offset"]
-        new_offset = new_metadata["rom_offset"]
-        if not isinstance(old_offset, int) or not isinstance(new_offset, int):
-            return old_offset == new_offset
-        if new_offset - old_offset != site_delta:
-            return False
-
-        old_path = old_metadata["call_path"]
-        new_path = new_metadata["call_path"]
-        if not isinstance(old_path, list) or not isinstance(new_path, list):
-            return old_path == new_path
-        # The previous discovery authority retained the terminal $2987 node
-        # twice while walking the unresolved pointer at $2989.  Collapsing that
-        # immediately repeated traversal node changes neither the site nor its
-        # ancestry.  Bind this reviewed correction to the exact old/new
-        # canonical subjects; every other call-path change remains forbidden.
-        reviewed_call_path_transition = {
-            "da2e53db737f57469c85f1ce9bb64f643107438368e53e7d265a903b6a24df5d": "e52103989f15f43acb345d412ad4291290b8479d3e9137f6fb3d982c823f46d9"
-        }
-        if (
-            reviewed_call_path_transition.get(old_subject["sha256"])
-            == new_subject["sha256"]
-        ):
-            return True
-        if len(old_path) != len(new_path):
-            return False
-        for old_step, new_step in zip(old_path, new_path, strict=True):
-            if old_step == new_step:
-                continue
-            if not isinstance(old_step, str) or not isinstance(new_step, str):
-                return False
-            old_match = re.fullmatch(r"([0-9a-f]{2}):([0-9a-f]{4})", old_step)
-            new_match = re.fullmatch(r"([0-9a-f]{2}):([0-9a-f]{4})", new_step)
-            if old_match is None or new_match is None or old_match[1] != new_match[1]:
-                return False
-            ancestor_delta = int(new_match[2], 16) - int(old_match[2], 16)
-            if ancestor_delta not in allowed_ancestor_deltas:
-                return False
-        return True
-
-    old_groups: dict[tuple[str, str, bytes], list[dict[str, object]]] = {}
-    for assignment in assignment_rows:
-        if (
-            assignment["row_id"] not in row_ids
-            or assignment["subject"]["kind"] != "ROM_FINDING"
-        ):
-            continue
-        key = (
-            assignment["product"],
-            assignment["row_id"],
-            fixed_rom_signature(assignment["subject"]),
-        )
-        old_groups.setdefault(key, []).append(assignment)
-    new_groups: dict[tuple[str, str, bytes], list[dict[str, object]]] = {}
+    proposed_rom_by_product_digest: dict[tuple[str, str], Mapping[str, object]] = {}
     for product_name, product in parsed["products"].items():
         for subject in (*product["rom_subjects"], *product["rom_candidate_subjects"]):
-            key = (
-                product_name,
-                proposed_rom_rows[(product_name, subject["sha256"])],
-                fixed_rom_signature(subject),
-            )
-            new_groups.setdefault(key, []).append(subject)
-    if set(old_groups) != set(new_groups) or any(
-        len(old_groups[key]) != len(new_groups[key]) for key in old_groups
-    ):
-        raise Phase2MeasurementError("proposal changed reviewed ROM subject semantics")
-    for key, old_group in old_groups.items():
-        remaining = list(new_groups[key])
-        for assignment in old_group:
-            if reviewed_phase4_transition:
-                expected_digest = reviewed_subject_transitions.get(
-                    assignment["id"], assignment["subject"]["sha256"]
-                )
-                matches = [
-                    subject
-                    for subject in remaining
-                    if subject["sha256"] == expected_digest
-                    and known_relocation(assignment["subject"], subject)
-                ]
-            else:
-                matches = [
-                    subject
-                    for subject in remaining
-                    if known_relocation(assignment["subject"], subject)
-                ]
-            if len(matches) != 1:
-                raise Phase2MeasurementError(
-                    "proposal changed reviewed ROM subject semantics"
-                )
-            subject = matches[0]
-            remaining.remove(subject)
-            assignment["subject"] = subject
-    if reviewed_phase4_transition:
-        proposed_source_by_digest = {
-            subject["sha256"]: subject for subject in parsed["source_subjects"]
-        }
-        for assignment in assignment_rows:
+            key = (product_name, subject["sha256"])
+            if key in proposed_rom_by_product_digest:
+                raise Phase2MeasurementError("proposal contains duplicate ROM identity")
+            proposed_rom_by_product_digest[key] = subject
+    proposed_source_by_digest = {
+        subject["sha256"]: subject for subject in parsed["source_subjects"]
+    }
+    consumed_transitions: set[str] = set()
+    for assignment in assignment_rows:
+        old_subject = assignment["subject"]
+        if assignment["row_id"] not in row_ids or old_subject["kind"] not in {
+            "ROM_FINDING",
+            "SOURCE_FINDING",
+        }:
+            continue
+        expected_digest = old_subject["sha256"]
+        binding = reviewed_subject_transitions.get(assignment["id"])
+        if reviewed_transition_active and binding is not None:
             if (
-                assignment["row_id"] not in row_ids
-                or assignment["subject"]["kind"] != "SOURCE_FINDING"
+                not isinstance(binding, dict)
+                or set(binding) != {"from_sha256", "to_sha256"}
+                or binding["from_sha256"] != old_subject["sha256"]
+                or any(
+                    not isinstance(value, str) or _SHA256.fullmatch(value) is None
+                    for value in binding.values()
+                )
             ):
-                continue
-            expected_digest = reviewed_subject_transitions.get(
-                assignment["id"], assignment["subject"]["sha256"]
-            )
-            try:
-                assignment["subject"] = proposed_source_by_digest[expected_digest]
-            except KeyError as exc:
                 raise Phase2MeasurementError(
-                    "reviewed Phase 4 source transition is absent from the proposal"
-                ) from exc
+                    f"reviewed transition predecessor changed: {assignment['id']}"
+                )
+            expected_digest = binding["to_sha256"]
+            consumed_transitions.add(assignment["id"])
+        if old_subject["kind"] == "ROM_FINDING":
+            subject = proposed_rom_by_product_digest.get(
+                (assignment["product"], expected_digest)
+            )
+            if subject is not None and proposed_rom_rows.get(
+                (assignment["product"], expected_digest)
+            ) != assignment["row_id"]:
+                raise Phase2MeasurementError(
+                    f"reviewed ROM transition crossed rows: {assignment['id']}"
+                )
+        else:
+            subject = proposed_source_by_digest.get(expected_digest)
+        if subject is None:
+            raise Phase2MeasurementError(
+                f"proposal lacks exact reviewed subject identity: {assignment['id']}"
+            )
+        assignment["subject"] = subject
+    if reviewed_transition_active and consumed_transitions != set(
+        reviewed_subject_transitions
+    ):
+        raise Phase2MeasurementError(
+            "reviewed transition contains stale or cross-subject bindings"
+        )
     for assignment in assignment_rows:
         product_name = assignment["product"]
         if product_name in parsed["products"]:
             assignment["evidence"].update(parsed["products"][product_name]["hashes"])
         elif (
-            reviewed_phase4_transition
+            reviewed_transition_active
             and product_name == BASELINE_PRODUCT
             and assignment["row_id"] in _PHASE4_BASELINE_EVIDENCE_ROWS
         ):
@@ -4001,13 +4083,6 @@ def apply_reviewed_subject_proposal(
     assignment_authority = DiscoveryAssignmentAuthority.from_dict(assignment_document)
 
     inventory_documents: dict[Path, dict[str, object]] = {}
-    debug_subjects_by_row: dict[str, list[dict[str, object]]] = {
-        row_id: [] for row_id in row_ids
-    }
-    for subject in parsed["products"][DEBUG_PRODUCT]["rom_subjects"]:
-        debug_subjects_by_row[
-            proposed_rom_rows[(DEBUG_PRODUCT, subject["sha256"])]
-        ].append(subject)
     debug_hashes = parsed["products"][DEBUG_PRODUCT]["hashes"]
     for filename in ("writers.json", "scenes.json", "mutations.json"):
         relative_inventory = f"specs/full-colors/inventory/{filename}"
@@ -4022,67 +4097,23 @@ def apply_reviewed_subject_proposal(
             row_id = row["id"]
             if row_id not in row_ids:
                 if (
-                    reviewed_phase4_transition
+                    reviewed_transition_active
                     and row_id in _PHASE4_BASELINE_EVIDENCE_ROWS
                 ):
                     row["evidence"].update(debug_hashes)
                 continue
             row["evidence"].update(debug_hashes)
-            for site in row.get("machine_sites", ()):
-                candidates = [
-                    subject
-                    for subject in debug_subjects_by_row[row_id]
-                    if subject["metadata"]["bank"] == site["bank"]
-                    and subject["metadata"]["address"]
-                    in (
-                        site["address"],
-                        site["address"] + _TRANSPORT_SPECIAL_PAYLOAD_BYTES,
-                        site["address"]
-                        + _TRANSPORT_SPECIAL_PAYLOAD_BYTES
-                        + _ALL_TILESET_POINTER_EXPANSION_BYTES,
-                        site["address"] + _PHASE4_BANK3B_CODE_REBASE_BYTES,
-                        site["address"] + _PHASE4_BANK3B_CODE_REBASE_BYTES + 2,
-                        site["address"] + _PHASE4_BANK3B_CODE_REBASE_BYTES + 8,
-                        site["address"] + _PASSIVE_ROM_POINTER_REBASE_BYTES,
-                    )
-                ]
-                if len(candidates) != 1:
-                    exact_bytes = [
-                        subject
-                        for subject in candidates
-                        if subject["metadata"]["bytes"] == site["bytes"]
-                    ]
-                    candidates = exact_bytes
-                site_values = {
-                    tuple(
-                        subject["metadata"][field_name]
-                        for field_name in (
-                            "address",
-                            "bank",
-                            "bytes",
-                            "rom_offset",
-                            "runtime_copy",
-                        )
-                    )
-                    for subject in candidates
-                }
-                if len(site_values) == 1:
-                    candidates = candidates[:1]
-                if len(candidates) != 1:
-                    raise Phase2MeasurementError(
-                        f"proposal cannot uniquely rebind machine site {row_id} "
-                        f"{site['bank']:02x}:{site['address']:04x}"
-                    )
-                metadata = candidates[0]["metadata"]
-                for field_name in (
-                    "address",
-                    "bank",
-                    "bytes",
-                    "rom_offset",
-                    "runtime_copy",
-                ):
-                    site[field_name] = metadata[field_name]
         inventory_documents[inventory_path] = document
+
+    if reviewed_transition_active:
+        inventory_transitions = transition.get("inventory_site_transitions")
+        if not isinstance(inventory_transitions, list):
+            raise Phase2MeasurementError(
+                "reviewed inventory transition authority changed"
+            )
+        _apply_reviewed_inventory_site_transitions(
+            inventory_documents, inventory_transitions
+        )
 
     row_for_digest: dict[str, str] = {}
     for assignment in assignment_rows:
@@ -4273,21 +4304,14 @@ def apply_reviewed_subject_proposal(
         },
         target: _canonical_pretty(new),
     }
-    if reviewed_phase4_transition:
-        expected_phase4_outputs = {
-            "assignments.json": "529b544025c941b79a5bc41bcb874396b6c0c19559ed97c3a4ee44791786a0a4",
-            "writers.json": "f6092ce3ef057526ce977468e2ddf2f52df88bdd79a4534365cf0313a226eba2",
-            "scenes.json": "55da69839eaad9877cc6a2a8a459c753cb5ad68ebe599c7c7081c7b9627a6b10",
-            "mutations.json": "e078124cafc8023ba65e0a06fdee5c05a3518cdb2f0a399848baf8c5394e2c67",
-            "phase2-planned-subjects.json": "5d9f4e80713fbb38346e13d617d906febf352e60312f83e4a7a30d3515d26df5",
-        }
+    if reviewed_transition_active:
         actual_digests = {
-            path.name: hashlib.sha256(payload).hexdigest()
+            path.relative_to(root).as_posix(): hashlib.sha256(payload).hexdigest()
             for path, payload in updates.items()
         }
-        if actual_digests != expected_phase4_outputs:
+        if actual_digests != successor_hashes:
             raise Phase2MeasurementError(
-                "proposal does not match the exact reviewed Phase 4 authority "
+                "proposal does not match the exact reviewed authority "
                 f"transition: {actual_digests}"
             )
     identities = {

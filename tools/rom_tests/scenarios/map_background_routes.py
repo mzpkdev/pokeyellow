@@ -90,6 +90,7 @@ class RouteCheckpoint:
     yellow_palette_ids: tuple[int, int, int, int, int, int, int, int]
     palette_authority: str
     tile_samples: tuple[TileSample, ...]
+    replacements: tuple[str, ...]
     retained_screenshot: str
     retained_frame_strip: str
 
@@ -139,6 +140,7 @@ def _checkpoint(
     samples: tuple[tuple[int, int, str], ...],
     *,
     yellow_palette_ids: tuple[int, int, int, int, int, int, int, int] | None = None,
+    replacements: tuple[str, ...] = (),
 ) -> RouteCheckpoint:
     base = f"{batch}/{name}"
     return RouteCheckpoint(
@@ -156,6 +158,7 @@ def _checkpoint(
             TileSample(tile_id, attributes, expected_attribute, purpose)
             for tile_id, expected_attribute, purpose in samples
         ),
+        replacements=replacements,
         retained_screenshot=f"{base}/screenshot.png",
         retained_frame_strip=f"{base}/frame-strip.png",
     )
@@ -179,6 +182,7 @@ BATCH_ROUTES = (
                 1,
                 ((0x03, 1, "animated flower"), (0x2C, 2, "vegetation")),
                 yellow_palette_ids=(1, 0, 0, 0, 1, 1, 1, 1),
+                replacements=("CUT_TREE",),
             ),
             _checkpoint(
                 "overworld",
@@ -192,6 +196,7 @@ BATCH_ROUTES = (
                 0,
                 ((0x03, 1, "animated flower"), (0x52, 2, "grass edge")),
                 yellow_palette_ids=(0, 0, 0, 0, 1, 1, 1, 1),
+                replacements=("CUT_TREE",),
             ),
             _checkpoint(
                 "overworld",
@@ -205,6 +210,7 @@ BATCH_ROUTES = (
                 2,
                 ((0x2C, 2, "vegetation"), (0x55, 5, "building detail")),
                 yellow_palette_ids=(2, 0, 0, 0, 1, 1, 1, 1),
+                replacements=("CUT_TREE",),
             ),
         ),
     ),
@@ -420,6 +426,10 @@ def validate_route(route: BatchRoute) -> None:
                 raise ValueError(
                     f"{route.batch}/{checkpoint.name}: sample purpose is not exact"
                 )
+        if checkpoint.replacements not in {(), ("CUT_TREE",)}:
+            raise ValueError(
+                f"{route.batch}/{checkpoint.name}: replacement identities are not exact"
+            )
         if not checkpoint.retained_screenshot.endswith("/screenshot.png"):
             raise ValueError("checkpoint screenshot identity is not durable")
         if not checkpoint.retained_frame_strip.endswith("/frame-strip.png"):

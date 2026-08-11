@@ -18,6 +18,7 @@ from tools.rom_tests.full_color.map_background_content import (
     Presentation,
     _INCLUDE_DIRECTIVE_RE,
     production_map_override_rules,
+    production_roof_region_rules,
 )
 
 
@@ -123,9 +124,46 @@ def copy_map_source_universe(target_root: Path) -> None:
         "data/tilesets/full_color_overworld.asm",
         "data/tilesets/tileset_headers.asm",
         "data/tilesets/cut_tree_blocks.asm",
+        "data/events/card_key_maps.asm",
+        "engine/events/card_key.asm",
+        "engine/events/hidden_events/cinnabar_gym_quiz.asm",
+        "engine/overworld/cut.asm",
         "engine/full_color/passive_overworld.asm",
+        "home/overworld.asm",
+        "maps.asm",
     ):
         target = target_root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPOSITORY_ROOT / relative, target)
+    for relative in (
+        "scripts/AgathasRoom.asm",
+        "scripts/BrunosRoom.asm",
+        "scripts/GameCorner.asm",
+        "scripts/LancesRoom.asm",
+        "scripts/LoreleisRoom.asm",
+        "scripts/PokemonMansion1F.asm",
+        "scripts/PokemonMansion2F.asm",
+        "scripts/RocketHideoutB1F.asm",
+        "scripts/RocketHideoutB2F.asm",
+        "scripts/RocketHideoutB3F.asm",
+        "scripts/SilphCo2F.asm",
+        "scripts/SilphCo3F.asm",
+        "scripts/SilphCo4F.asm",
+        "scripts/SilphCo5F.asm",
+        "scripts/SilphCo6F.asm",
+        "scripts/SilphCo7F.asm",
+        "scripts/SilphCo8F.asm",
+        "scripts/SilphCo9F.asm",
+        "scripts/SilphCo10F.asm",
+        "scripts/SilphCo11F.asm",
+        "scripts/VermilionGym.asm",
+        "scripts/VictoryRoad1F.asm",
+        "scripts/VictoryRoad2F.asm",
+        "scripts/VictoryRoad3F.asm",
+        "scripts/ViridianGym.asm",
+    ):
+        target = target_root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(REPOSITORY_ROOT / relative, target)
     shutil.copytree(
         REPOSITORY_ROOT / "data/maps/headers",
@@ -324,13 +362,135 @@ def test_production_override_exact_values_are_closed_source_authority(
     tmp_path: Path,
 ) -> None:
     copy_map_source_universe(tmp_path)
-    path = tmp_path / "engine/full_color/passive_overworld.asm"
+    path = tmp_path / "data/tilesets/full_color_interiors.asm"
     source = path.read_text(encoding="utf-8")
-    assert "\tcp $4b" in source
-    path.write_text(source.replace("\tcp $4b", "\tcp $4c", 1), encoding="utf-8")
+    assert "\tdb $4b, $4c, $4d, $4e, $4f" in source
+    path.write_text(
+        source.replace(
+            "\tdb $4b, $4c, $4d, $4e, $4f",
+            "\tdb $4c, $4d, $4e, $4f, $50",
+            1,
+        ),
+        encoding="utf-8",
+    )
     authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
-    with pytest.raises(MapBackgroundContentError, match="exact values drifted"):
+    with pytest.raises(
+        MapBackgroundContentError,
+        match="override identities, data shape, or exact values drifted",
+    ):
         authority.reconcile(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("relative", "original", "replacement", "message"),
+    [
+        (
+            "data/tilesets/full_color_interiors.asm",
+            "db CELADON_MART_ROOF, 5, FULL_COLOR_INTERIOR_BLUE",
+            "db CELADON_MART_ROOF, 4, FULL_COLOR_INTERIOR_BLUE",
+            "override identities, data shape, or exact values drifted",
+        ),
+        (
+            "data/tilesets/full_color_interiors.asm",
+            "db $07, $08, $17, $18",
+            "db $07, $08, $17, $18, $19",
+            "override identities, data shape, or exact values drifted",
+        ),
+        (
+            "data/tilesets/full_color_overworld.asm",
+            "db ROUTE_6, 2, FULL_COLOR_ROOF_SAFFRON, FULL_COLOR_ROOF_VERMILION",
+            "db ROUTE_6, 3, FULL_COLOR_ROOF_SAFFRON, FULL_COLOR_ROOF_VERMILION",
+            "roof-region identities, data shape, or exact values drifted",
+        ),
+    ],
+)
+def test_reviewed_semantic_tables_reject_bad_shape_or_full_byte_values(
+    tmp_path: Path,
+    relative: str,
+    original: str,
+    replacement: str,
+    message: str,
+) -> None:
+    copy_map_source_universe(tmp_path)
+    path = tmp_path / relative
+    source = path.read_text(encoding="utf-8")
+    assert original in source
+    path.write_text(source.replace(original, replacement, 1), encoding="utf-8")
+
+    with pytest.raises(MapBackgroundContentError, match=message):
+        if "roof-region" in message:
+            production_roof_region_rules(tmp_path)
+        else:
+            production_map_override_rules(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("relative", "needle", "message"),
+    [
+        (
+            "scripts/GameCorner.asm",
+            "\tpredef ReplaceTileBlock",
+            "REPLACE_TILE_BLOCK: concrete caller identities or dependencies drifted",
+        ),
+        (
+            "scripts/RocketHideoutB2F.asm",
+            "\tjr nz, LoadSpinnerArrowTiles",
+            "SPINNER_ARROW_TILES: concrete caller identities or dependencies drifted",
+        ),
+        (
+            "maps.asm",
+            'INCLUDE "scripts/ViridianGym.asm"',
+            "replacement caller dependency is stale or absent",
+        ),
+        (
+            "data/events/card_key_maps.asm",
+            "\tdb SILPH_CO_11F",
+            "Card Key ReplaceTileBlock map identities drifted",
+        ),
+    ],
+)
+def test_replacement_discovery_rejects_missing_callers_and_stale_dependencies(
+    tmp_path: Path, relative: str, needle: str, message: str
+) -> None:
+    copy_map_source_universe(tmp_path)
+    path = tmp_path / relative
+    source = path.read_text(encoding="utf-8")
+    assert needle in source
+    path.write_text(source.replace(needle, "; removed by mutation", 1), encoding="utf-8")
+
+    with pytest.raises(MapBackgroundContentError, match=message):
+        MapBackgroundAuthority.load(REPOSITORY_ROOT).reconcile(tmp_path)
+
+
+def test_extra_replace_tile_block_caller_is_not_silently_inferred_from_tileset(
+    tmp_path: Path,
+) -> None:
+    copy_map_source_universe(tmp_path)
+    path = tmp_path / "scripts/RocketHideoutB2F.asm"
+    path.write_text(
+        path.read_text(encoding="utf-8") + "\n\tpredef ReplaceTileBlock\n",
+        encoding="utf-8",
+    )
+    authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    with pytest.raises(
+        MapBackgroundContentError,
+        match="REPLACE_TILE_BLOCK: concrete caller identities or dependencies drifted",
+    ):
+        authority.reconcile(tmp_path)
+
+
+def test_replacement_rows_are_exactly_map_callable_not_tileset_inferred() -> None:
+    authority = MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    maps = {row.name: row for row in authority.maps}
+    assert maps["ROCKET_HIDEOUT_B1F"].replacements == ("REPLACE_TILE_BLOCK",)
+    assert maps["ROCKET_HIDEOUT_B2F"].replacements == ("SPINNER_ARROW_TILES",)
+    assert maps["ROCKET_HIDEOUT_B4F"].replacements == ()
+    assert maps["CINNABAR_GYM"].replacements == ("CINNABAR_GYM_GATE_BLOCKS",)
+    assert maps["VIRIDIAN_GYM"].replacements == (
+        "CUT_TREE",
+        "SPINNER_ARROW_TILES",
+    )
+    assert maps["ROUTE_23"].replacements == ()
 
 
 @pytest.mark.parametrize(

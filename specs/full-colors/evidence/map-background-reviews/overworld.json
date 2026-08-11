@@ -567,10 +567,10 @@
     "route": "phase3-overworld-pallet-route1-viridian"
   },
   "reviewed_candidate": {
-    "ledger_canonical_sha256": "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
+    "ledger_canonical_sha256": "3dcc146ab480219846f18eea232170ecf4716cfdf321599f16888d724c8ccedd",
     "path": "test-results/full-color-proposals/map-background-content.proposal.json",
-    "sha256": "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
-    "source_semantic_sha256": "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c"
+    "sha256": "2447aef2be0eb1f891b4eb83758ad8e4b4f17c531d0fc4de9d431ff3014fb302",
+    "source_semantic_sha256": "7aa5dbd60715e553b26c1a9ce3f81ff28d420b6c109cd28b6ff41414de2a1009"
   },
   "reviews": {
     "map-0": {

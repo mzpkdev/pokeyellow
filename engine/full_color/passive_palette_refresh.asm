@@ -355,20 +355,38 @@ PassiveFullColorCompleteAttributeRestore:
 	restore_renderer_state_e
 	ret
 
-; A stable byte identity makes Route 6's coordinate-dependent palette an
-; ordinary invalidation source instead of a special case hidden in rendering.
+; Return the selected coordinate-region token in A and its roof identity in C.
+; Maps without a coordinate rule return $ff. The fixed record count bounds the
+; scan, and palette selection shares this exact authority with invalidation.
 PassiveFullColorCurrentRoofRegion:
+	push hl
 	ld a, [wCurMap]
-	cp ROUTE_6
-	jr nz, .not_route_6
-	ld a, [wYCoord]
-	cp 2
-	ld a, 0
-	ret c
-	inc a
-	ret
-.not_route_6
+	ld c, a
+	ld hl, FullColorOverworldRoofRegionRules
+	ld b, NUM_FULL_COLOR_ROOF_REGION_RULES
+.find
+	ld a, [hli]
+	cp c
+	jr z, .matched
+	inc hl
+	inc hl
+	inc hl
+	dec b
+	jr nz, .find
 	ld a, $ff
+	pop hl
+	ret
+.matched
+	ld a, [wYCoord]
+	cp [hl]
+	inc hl
+	ld a, 0
+	jr c, .resolved
+	inc hl
+	inc a
+.resolved
+	ld c, [hl]
+	pop hl
 	ret
 
 ; Carry means the currently visible Route 6 region no longer matches the last

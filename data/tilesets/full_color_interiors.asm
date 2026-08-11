@@ -78,8 +78,21 @@ FullColorTileAttributePointers::
 	dw FullColorBeachHouseTileAttributes ; BEACH_HOUSE
 FullColorTileAttributePointersEnd::
 
+DEF NUM_FULL_COLOR_MAP_ATTRIBUTE_OVERRIDE_GROUPS EQU 2
+
+; Complete byte overrides are grouped by map. Each group is map ID, bounded
+; tile count, exact result byte, then that many tile IDs. Runtime checks these
+; reviewed identities before consulting the tileset's 256-byte authority.
+FullColorMapAttributeOverrides::
+	db CELADON_MART_ROOF, 5, FULL_COLOR_INTERIOR_BLUE
+	db $4b, $4c, $4d, $4e, $4f
+	db CELADON_MART_1F, 4, FULL_COLOR_INTERIOR_YELLOW
+	db $07, $08, $17, $18
+FullColorMapAttributeOverridesEnd::
+
 ASSERT FullColorBGPalettePointersEnd - FullColorBGPalettePointers == NUM_TILESETS * 2
 ASSERT FullColorTileAttributePointersEnd - FullColorTileAttributePointers == NUM_TILESETS * 2
+ASSERT FullColorMapAttributeOverridesEnd - FullColorMapAttributeOverrides == 3 * NUM_FULL_COLOR_MAP_ATTRIBUTE_OVERRIDE_GROUPS + 9
 
 POPS
 

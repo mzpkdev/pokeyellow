@@ -17,6 +17,7 @@ from tools.rom_tests.tests.unit.full_color.test_phase2_scheduler_rom import (
 
 
 PRODUCTS = ("pokeyellow", "pokeyellow_debug", "pokeyellow_vc")
+ALL_PRODUCTS = (*PRODUCTS, "pokeyellow_phase2_audit")
 PRODUCTION_RENDERER_SURFACE = frozenset(
     {
         "RouteRendererOwnershipVBlank",
@@ -219,6 +220,36 @@ def _linked_payload(product: str, start: str, size: int) -> bytes:
     payload = (REPOSITORY_ROOT / f"{product}.gbc").read_bytes()[offset : offset + size]
     assert len(payload) == size
     return payload
+
+
+def test_all_products_link_identical_compact_runtime_foundation_data() -> None:
+    expected = {
+        "FullColorOverworldRoofRegionRules": bytes((0x11, 2, 10, 5)),
+        "FullColorMapAttributeOverrides": bytes(
+            (
+                0x7E,
+                5,
+                3,
+                0x4B,
+                0x4C,
+                0x4D,
+                0x4E,
+                0x4F,
+                0x7A,
+                4,
+                4,
+                0x07,
+                0x08,
+                0x17,
+                0x18,
+            )
+        ),
+    }
+    for product in ALL_PRODUCTS:
+        symbols, _ = _symbols(product)
+        for start, payload in expected.items():
+            assert symbols[f"{start}End"][1] - symbols[start][1] == len(payload)
+            assert _linked_payload(product, start, len(payload)) == payload
 
 
 @pytest.mark.parametrize("product", PRODUCTS)

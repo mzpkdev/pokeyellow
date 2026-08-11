@@ -173,6 +173,10 @@ def test_palette_and_attribute_mutations_change_rendered_pixels() -> None:
 def test_complete_review_manifest_binds_every_tileset_map_and_source(
     atlas_manifest: dict[str, object],
 ) -> None:
+    authority = map_background_atlas.MapBackgroundAuthority.load(REPOSITORY_ROOT)
+    expected_replacements = {
+        row.name: list(row.replacements) for row in authority.tilesets
+    }
     assert atlas_manifest["schema"] == SCHEMA
     unhashed = dict(atlas_manifest)
     content_sha256 = unhashed.pop("content_sha256")
@@ -196,6 +200,7 @@ def test_complete_review_manifest_binds_every_tileset_map_and_source(
         assert row["blockset_source"]["sha256"] == row["blockset_linked"]["sha256"]
         assert row["palette"]["size"] == 64
         assert row["attributes"]["size"] == TILE_COUNT
+        assert row["replacement_identities"] == expected_replacements[row["name"]]
         assert row["maps"] == sorted(
             row["maps"], key=lambda item: (item["name"], item["id"])
         )
@@ -211,6 +216,19 @@ def test_complete_review_manifest_binds_every_tileset_map_and_source(
     assert set(overrides) == {"CELADON_MART_1F", "CELADON_MART_ROOF"}
     assert len(overrides["CELADON_MART_1F"]) == 4
     assert len(overrides["CELADON_MART_ROOF"]) == 5
+    maps = {
+        item["name"]: item
+        for tileset in tilesets
+        for item in tileset["maps"]
+    }
+    assert maps["ROCKET_HIDEOUT_B1F"]["replacements"] == ["REPLACE_TILE_BLOCK"]
+    assert maps["ROCKET_HIDEOUT_B2F"]["replacements"] == ["SPINNER_ARROW_TILES"]
+    assert maps["ROCKET_HIDEOUT_B4F"]["replacements"] == []
+    assert maps["CINNABAR_GYM"]["replacements"] == [
+        "CINNABAR_GYM_GATE_BLOCKS"
+    ]
+    assert atlas_manifest["semantic_tables"]["roof_region_rules"]["size"] == 4
+    assert atlas_manifest["semantic_tables"]["map_attribute_overrides"]["size"] == 15
 
 
 def test_animation_and_replacement_review_surfaces_are_explicit(
@@ -227,13 +245,32 @@ def test_animation_and_replacement_review_surfaces_are_explicit(
     assert {item["tile_id"] for item in animations} == {0x03, 0x14}
     assert all(item["artifact"]["sha256"] for item in animations)
     assert all(item["observation"].startswith("artifact-only-") for item in animations)
-    assert len(overworld["replacements"]) == 9
+    assert len(overworld["replacements"]) == 5
     assert all(item["identity"] == "CUT_TREE" for item in overworld["replacements"])
     assert all(
         item["observation"] == "artifact-only-rendered-pair"
         for item in overworld["replacements"]
     )
     assert all(item["artifact"]["sha256"] for item in overworld["replacements"])
+    gym = next(row for row in atlas_manifest["tilesets"] if row["name"] == "GYM")
+    facility = next(
+        row for row in atlas_manifest["tilesets"] if row["name"] == "FACILITY"
+    )
+    gym_cut = [item for item in gym["replacements"] if item["identity"] == "CUT_TREE"]
+    gym_spinners = [
+        item
+        for item in gym["replacements"]
+        if item["identity"] == "SPINNER_ARROW_TILES"
+    ]
+    facility_spinners = [
+        item
+        for item in facility["replacements"]
+        if item["identity"] == "SPINNER_ARROW_TILES"
+    ]
+    assert len(gym_cut) == 4
+    assert len(gym_spinners) == len(facility_spinners) == 8
+    assert {item["phase"] for item in gym_spinners} == {"animated", "restored"}
+    assert all(item["artifact"]["sha256"] for item in gym_spinners + facility_spinners)
     expected_animations = {
         "OVERWORLD": "TILEANIM_WATER_FLOWER",
         "FOREST": "TILEANIM_WATER",
@@ -1777,6 +1814,7 @@ def test_retained_manifest_is_canonical_complete_and_reproducible(
             "kind",
             "map_name",
             "natural_driver",
+            "replacements",
             "tile_sample_purposes",
             "tile_samples",
         }
@@ -1798,6 +1836,7 @@ def test_retained_manifest_is_canonical_complete_and_reproducible(
         }
         for sample in first_checkpoint.tile_samples
     ]
+    assert first_artifact["replacements"] == list(first_checkpoint.replacements)
     unlisted = tmp_path / "first" / "unlisted.png"
     unlisted.write_bytes(b"not declared")
     with pytest.raises(AssertionError, match="unlisted or missing"):
@@ -1807,7 +1846,16 @@ def test_retained_manifest_is_canonical_complete_and_reproducible(
 
 
 @pytest.mark.parametrize(
-    "field", ("route", "checkpoint", "tileset", "purpose", "map_name", "natural_driver")
+    "field",
+    (
+        "route",
+        "checkpoint",
+        "tileset",
+        "purpose",
+        "map_name",
+        "replacements",
+        "natural_driver",
+    ),
 )
 def test_route_evidence_claim_mutations_fail_closed(field: str) -> None:
     route = BATCH_ROUTES[0]
@@ -1830,6 +1878,9 @@ def test_route_evidence_claim_mutations_fail_closed(field: str) -> None:
         )
     elif field == "map_name":
         checkpoint = replace(route.checkpoints[0], map_name="VIRIDIAN_CITY")
+        mutated = replace(route, checkpoints=(checkpoint, *route.checkpoints[1:]))
+    elif field == "replacements":
+        checkpoint = replace(route.checkpoints[0], replacements=("REPLACE_TILE_BLOCK",))
         mutated = replace(route, checkpoints=(checkpoint, *route.checkpoints[1:]))
     else:
         mutated = replace(route, natural_driver=("teleport_to_checkpoint",))
