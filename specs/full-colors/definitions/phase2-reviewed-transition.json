@@ -63,7 +63,8 @@
       "f3b8804c082d41396b1f9186174229af9ee8dbd36d75a984367d17c54fe91e91"
     ],
     "specs/full-colors/evidence/phase1-ownership-placement.json": [
-      "047b34214065596c3cd74bfbeb6632ce77c54de750b4ccf3922ccbfa3df0304b"
+      "047b34214065596c3cd74bfbeb6632ce77c54de750b4ccf3922ccbfa3df0304b",
+      "db7698937a5614c465660e495d156c818b2fa6ed8f9ee582f8af41140a048099"
     ],
     "specs/full-colors/evidence/phase2-hostile-slice-representation.json": [
       "76c235532392c2eac5841c7daadb59566b73d4717db3d0a146b7519b390a8cb3",
@@ -131,7 +132,8 @@
       "8f0024f6a9073e29c570497e1d2582fcf539fa4804d18fff09e488d726fdf684",
       "3ed1ef85651ecbd68289f1d4c3aa9a87f9caefeaee1d8f67abe290d92616f76d",
       "e97477114fbb062d3e629f5e5d8b02d3057899d25c811374ecfba08b4f1d3993",
-      "ace23a1ac2b2df7ea5d5c66aa9a05da74134fec58624c5a7f31d265160530c83"
+      "ace23a1ac2b2df7ea5d5c66aa9a05da74134fec58624c5a7f31d265160530c83",
+      "5ff5dc8170b5266eb787aabf4510c10e7d6566bd2085fe4f6f9962b727b366f7"
     ],
     "tools/rom_tests/scenarios/map_background_routes.py": [
       "b407f4b4f10158b37891dd852135b2c95faaf47d5fdd9d3c9fe4bf00fb39a5d2",
@@ -196,6 +198,13 @@
   },
   "base_commit": "1fe39464be71d7ddaf378c689b40f33faf5c9290",
   "base_tree": "d915abf57fcdec79e45e723dd278c7a697d2e0f9",
+  "consumed_extension": {
+    "path": "specs/full-colors/evidence/phase1-ownership-placement.json",
+    "predecessor_sha256": "047b34214065596c3cd74bfbeb6632ce77c54de750b4ccf3922ccbfa3df0304b",
+    "schema": "full-color-phase2-consumed-transition-extension-v1",
+    "successor_sha256": "db7698937a5614c465660e495d156c818b2fa6ed8f9ee582f8af41140a048099",
+    "verifier_normalized_sha256": "5ff5dc8170b5266eb787aabf4510c10e7d6566bd2085fe4f6f9962b727b366f7"
+  },
   "inventory_site_transitions": [
     {
       "from": {
@@ -7692,5 +7701,5 @@
     "specs/full-colors/inventory/scenes.json": "2365d8845e9f38378b088ed8d58a385c2d53c27c1a7b6dee6f9ad09c3848ab2e",
     "specs/full-colors/inventory/writers.json": "1712c11ba66f023dcbc22127fa51b20257382595e6f8c3aeab3859bfe17bdecb"
   },
-  "verifier_normalized_sha256": "ace23a1ac2b2df7ea5d5c66aa9a05da74134fec58624c5a7f31d265160530c83"
+  "verifier_normalized_sha256": "5ff5dc8170b5266eb787aabf4510c10e7d6566bd2085fe4f6f9962b727b366f7"
 }

@@ -61,6 +61,9 @@ from .phase1_measurements import (
     FORBIDDEN_ROM_BANKS,
     MINIMUM_STACK_MARGIN,
     PHASE1_STATE_BYTES,
+    PlacementError,
+    generate as generate_phase1_placement,
+    verify_evidence as verify_phase1_placement_evidence,
 )
 from .rom_discovery import (
     discover_rom_batched,
@@ -101,9 +104,15 @@ REVIEWED_TRANSITION_PROPOSAL_SCHEMA = (
     "full-color-phase2-reviewed-transition-rebind-proposal-v1"
 )
 REVIEWED_TRANSITION_SHA256 = (
-    "d2f34cd9f9a5865efcb25cd0695c0e4bb60ce0e026223d4ac9102c2527826a2d"
+    "8c2716c4a5d8ada1a12e7e8cdd94047948b87af78152b277d8eaf537a14231e9"
 )
 VERIFIER_PATH = "tools/rom_tests/full_color/phase2_measurements.py"
+REVIEWED_TRANSITION_EXTENSION_PATH = (
+    "specs/full-colors/evidence/phase1-ownership-placement.json"
+)
+REVIEWED_TRANSITION_EXTENSION_SCHEMA = (
+    "full-color-phase2-consumed-transition-extension-v1"
+)
 _TRANSITION_DIGEST_CARRIER = re.compile(
     rb'REVIEWED_TRANSITION_SHA256 = \(\n    "[0-9a-f]{64}"\n\)'
 )
@@ -2938,6 +2947,7 @@ class _PublishedAuthority:
     backup_identity: _AuthorityIdentity
     backup_sha256: str
     identity: _AuthorityIdentity
+    published_sha256: str
 
 
 def _identity(value: os.stat_result) -> _AuthorityIdentity:
@@ -3062,10 +3072,28 @@ def _read_authority_at(
         raise
 
 
-def _read_pinned_backup(publication: _PublishedAuthority) -> bytes:
+def _read_pinned_backup(
+    publication: _PublishedAuthority, *, allow_unlinked: bool = False
+) -> bytes:
     """Validate and read the exact backup object retained by the transaction."""
-    _validate_backup_name(publication)
     try:
+        before = os.fstat(publication.backup_fd)
+        unlinked = allow_unlinked and before.st_nlink == 0
+        if unlinked:
+            try:
+                os.stat(
+                    publication.backup_name,
+                    dir_fd=publication.directory_fd,
+                    follow_symlinks=False,
+                )
+            except FileNotFoundError:
+                pass
+            else:
+                raise Phase2MeasurementError(
+                    f"reviewed authority backup changed during apply: {publication.path}"
+                )
+        else:
+            _validate_backup_name(publication)
         os.lseek(publication.backup_fd, 0, os.SEEK_SET)
         with os.fdopen(publication.backup_fd, "rb", closefd=False) as stream:
             payload = stream.read()
@@ -3074,9 +3102,15 @@ def _read_pinned_backup(publication: _PublishedAuthority) -> bytes:
         raise Phase2MeasurementError(
             f"reviewed authority backup changed during apply: {publication.path}"
         ) from exc
-    _validate_backup_name(publication)
+    if not unlinked:
+        _validate_backup_name(publication)
+    expected_identity = (
+        replace(publication.backup_identity, links=0)
+        if unlinked
+        else publication.backup_identity
+    )
     if (
-        _identity(current) != publication.backup_identity
+        _identity(current) != expected_identity
         or not stat.S_ISREG(current.st_mode)
         or hashlib.sha256(payload).hexdigest() != publication.backup_sha256
     ):
@@ -3237,6 +3271,7 @@ def _atomic_replace(
             backup_identity=backup_identity,
             backup_sha256=hashlib.sha256(backup_payload).hexdigest(),
             identity=staged_identity,
+            published_sha256=hashlib.sha256(payload).hexdigest(),
         )
         if rollback_ledger is not None:
             rollback_ledger.append(publication)
@@ -3283,7 +3318,7 @@ def _atomic_replace(
 def _restore_publication(publication: _PublishedAuthority) -> _AuthorityIdentity:
     temporary_name: str | None = None
     try:
-        backup_payload = _read_pinned_backup(publication)
+        backup_payload = _read_pinned_backup(publication, allow_unlinked=True)
         _authority_identity_at(
             publication.path, publication.directory_fd, publication.identity
         )
@@ -3320,8 +3355,9 @@ def _restore_publication(publication: _PublishedAuthority) -> _AuthorityIdentity
             raise Phase2MeasurementError(
                 f"restored reviewed authority changed during apply: {publication.path}"
             )
-        _read_pinned_backup(publication)
-        _unlink_pinned_backup(publication)
+        _read_pinned_backup(publication, allow_unlinked=True)
+        if os.fstat(publication.backup_fd).st_nlink != 0:
+            _unlink_pinned_backup(publication)
         return _identity(restored)
     finally:
         if temporary_name is not None:
@@ -3334,23 +3370,96 @@ def _restore_publication(publication: _PublishedAuthority) -> _AuthorityIdentity
 
 
 def _validate_publication(publication: _PublishedAuthority) -> None:
-    """Prove the published inode remains connected to its public path."""
+    """Prove the published inode and reviewed bytes remain at the public path."""
     _directory_identity(publication.path.parent, publication.directory_fd)
     _authority_identity_at(
         publication.path, publication.directory_fd, publication.identity
     )
+    descriptor, _ = _read_authority_at(
+        publication.path.name,
+        publication.directory_fd,
+        publication.identity,
+        expected_sha256=publication.published_sha256,
+        label=f"published reviewed authority {publication.path}",
+    )
+    os.close(descriptor)
+
+
+def _restore_failed_publication_transaction(
+    publications: Sequence[_PublishedAuthority], failure: Exception
+) -> None:
+    rollback_errors: list[str] = []
+    for publication in reversed(publications):
+        try:
+            _restore_publication(publication)
+        except Exception as restore_failure:
+            rollback_errors.append(f"{publication.path}: {restore_failure}")
+    if rollback_errors:
+        raise Phase2MeasurementError(
+            "reviewed authority transaction changed before finalize and rollback "
+            "failed: " + "; ".join(rollback_errors)
+        ) from failure
+    raise Phase2MeasurementError(
+        "reviewed authority transaction changed before finalize; original authorities "
+        "restored"
+    ) from failure
+
+
+def _close_publication_descriptors(
+    publications: Sequence[_PublishedAuthority],
+) -> None:
+    close_errors: list[str] = []
+    for publication in publications:
+        for label, descriptor in (
+            ("backup", publication.backup_fd),
+            ("directory", publication.directory_fd),
+        ):
+            try:
+                os.close(descriptor)
+            except OSError as exc:
+                close_errors.append(f"{publication.path} {label}: {exc}")
+                try:
+                    os.fstat(descriptor)
+                except OSError:
+                    continue
+                try:
+                    os.close(descriptor)
+                except OSError as retry_exc:
+                    close_errors.append(
+                        f"{publication.path} {label} retry: {retry_exc}"
+                    )
+    if close_errors:
+        raise Phase2MeasurementError(
+            "reviewed authority transaction committed but descriptor cleanup failed: "
+            + "; ".join(close_errors)
+        )
+
+
+def _finalize_publications(publications: Sequence[_PublishedAuthority]) -> None:
+    publications = tuple(publications)
+    try:
+        for publication in publications:
+            _validate_publication(publication)
+        for publication in publications:
+            _read_pinned_backup(publication)
+        for publication in publications:
+            _validate_publication(publication)
+    except Exception as exc:
+        _restore_failed_publication_transaction(publications, exc)
+    try:
+        for publication in publications:
+            _unlink_pinned_backup(publication)
+        for publication in publications:
+            _validate_publication(publication)
+        for publication in publications:
+            os.fsync(publication.directory_fd)
+    except Exception as exc:
+        _restore_failed_publication_transaction(publications, exc)
+    _close_publication_descriptors(publications)
 
 
 def _finalize_publication(publication: _PublishedAuthority) -> None:
-    try:
-        _validate_publication(publication)
-        _read_pinned_backup(publication)
-        _validate_publication(publication)
-        _unlink_pinned_backup(publication)
-        os.fsync(publication.directory_fd)
-    finally:
-        os.close(publication.backup_fd)
-        os.close(publication.directory_fd)
+    _finalize_publications((publication,))
 
 
 def _git_read(root: Path, *arguments: str) -> bytes:
@@ -3419,6 +3528,70 @@ def _normalized_verifier_source(raw_source: bytes) -> bytes:
     return normalized
 
 
+def _reviewed_phase1_extension_digest(root: Path) -> str:
+    """Return the current canonical Phase 1 evidence identity, or refuse it."""
+    relative = REVIEWED_TRANSITION_EXTENSION_PATH
+    path = _canonical_apply_path(
+        root, root / relative, relative, "reviewed Phase 1 evidence extension"
+    )
+    raw_evidence = _read_pinned_regular_file(
+        root, path, label="reviewed Phase 1 evidence extension"
+    )
+    try:
+        generated = generate_phase1_placement(root)
+        expected = generated.to_json().encode("utf-8")
+        if raw_evidence != expected:
+            raise Phase2MeasurementError(
+                "reviewed Phase 1 evidence extension is stale or edited"
+            )
+        verified = verify_phase1_placement_evidence(root, path)
+        if verified != generated:
+            raise Phase2MeasurementError(
+                "reviewed Phase 1 evidence extension verification changed"
+            )
+    except (OSError, PlacementError) as exc:
+        raise Phase2MeasurementError(
+            "reviewed Phase 1 evidence extension is not current for this build"
+        ) from exc
+    return hashlib.sha256(raw_evidence).hexdigest()
+
+
+def _reviewed_consumed_extension(
+    transition: Mapping[str, object],
+) -> tuple[str, str, str]:
+    """Load the one path and exact verifier identity reviewed after consumption."""
+    extension = transition.get("consumed_extension")
+    if not isinstance(extension, Mapping) or set(extension) != {
+        "path",
+        "predecessor_sha256",
+        "schema",
+        "successor_sha256",
+        "verifier_normalized_sha256",
+    }:
+        raise Phase2MeasurementError(
+            "reviewed transition consumed-extension authority is malformed"
+        )
+    if extension.get("schema") != REVIEWED_TRANSITION_EXTENSION_SCHEMA:
+        raise Phase2MeasurementError(
+            "reviewed transition consumed-extension schema changed"
+        )
+    if extension.get("path") != REVIEWED_TRANSITION_EXTENSION_PATH:
+        raise Phase2MeasurementError(
+            "reviewed transition consumed-extension path changed"
+        )
+    verifier_digest = extension.get("verifier_normalized_sha256")
+    predecessor_digest = extension.get("predecessor_sha256")
+    successor_digest = extension.get("successor_sha256")
+    if any(
+        not isinstance(digest, str) or _SHA256.fullmatch(digest) is None
+        for digest in (predecessor_digest, successor_digest, verifier_digest)
+    ) or predecessor_digest == successor_digest:
+        raise Phase2MeasurementError(
+            "reviewed transition consumed-extension identities changed"
+        )
+    return predecessor_digest, successor_digest, verifier_digest
+
+
 def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
     """Propose one exact, hash-bound authority promotion transition."""
     root = Path(os.path.abspath(root))
@@ -3431,6 +3604,8 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
     raw_transition = _read_pinned_regular_file(
         root, transition_path, label="reviewed transition authority"
     )
+    if hashlib.sha256(raw_transition).hexdigest() != REVIEWED_TRANSITION_SHA256:
+        raise Phase2MeasurementError("reviewed transition authority changed")
     try:
         transition = json.loads(raw_transition, object_pairs_hook=_strict_object)
     except json.JSONDecodeError as exc:
@@ -3445,12 +3620,18 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
         raise Phase2MeasurementError(
             "reviewed Phase 4 transition authority is malformed"
         )
+    (
+        reviewed_extension_predecessor,
+        reviewed_extension_successor,
+        reviewed_extension_verifier,
+    ) = _reviewed_consumed_extension(transition)
     actual_commit = os.fsdecode(
         _git_read(root, "rev-parse", "--verify", "HEAD")
     ).strip()
     actual_tree = os.fsdecode(
         _git_read(root, "rev-parse", "--verify", "HEAD^{tree}")
     ).strip()
+    transition_consumed = actual_commit != transition.get("base_commit")
     raw_allowlist = transition["allowed_tracked_path_sha256"]
     if not isinstance(raw_allowlist, dict) or not raw_allowlist:
         raise Phase2MeasurementError(
@@ -3458,8 +3639,10 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
         )
     dirty_paths = _tracked_worktree_paths(root)
     rebound_allowlist: dict[str, list[str]] = {}
-    reviewed_paths = set(raw_allowlist) | set(dirty_paths)
-    reviewed_paths.discard(REVIEWED_TRANSITION_PATH)
+    reviewed_paths = set(raw_allowlist)
+    if not transition_consumed:
+        reviewed_paths.update(dirty_paths)
+        reviewed_paths.discard(REVIEWED_TRANSITION_PATH)
     for relative in sorted(reviewed_paths):
         raw_digests = raw_allowlist.get(relative, [])
         if not isinstance(relative, str) or not isinstance(raw_digests, list):
@@ -3479,7 +3662,11 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
         )
         current_digest = hashlib.sha256(digest_content).hexdigest()
         digests = list(raw_digests)
-        if current_digest not in digests:
+        if (
+            not transition_consumed
+            and relative not in {REVIEWED_TRANSITION_EXTENSION_PATH, VERIFIER_PATH}
+            and current_digest not in digests
+        ):
             digests.append(current_digest)
         rebound_allowlist[relative] = digests
     authority_paths = (
@@ -3499,6 +3686,86 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
         )
         for relative in authority_paths
     }
+    existing_successor_hashes = transition.get("successor_authority_sha256")
+    current_authority_hashes = {
+        relative: hashlib.sha256(payload).hexdigest()
+        for relative, payload in successor_payloads.items()
+    }
+    if transition_consumed and current_authority_hashes != existing_successor_hashes:
+        raise Phase2MeasurementError(
+            "reviewed transition successor authority set is partial or changed"
+        )
+
+    verifier_digest = hashlib.sha256(
+        _normalized_verifier_source(
+            _read_pinned_regular_file(
+                root, root / VERIFIER_PATH, label="reviewed transition verifier"
+            )
+        )
+    ).hexdigest()
+    if verifier_digest != reviewed_extension_verifier:
+        raise Phase2MeasurementError(
+            "reviewed transition extension forbids verifier source rotation"
+        )
+    phase1_digests = rebound_allowlist.get(REVIEWED_TRANSITION_EXTENSION_PATH)
+    if not isinstance(phase1_digests, list) or not phase1_digests:
+        raise Phase2MeasurementError(
+            "reviewed transition lacks its Phase 1 evidence extension authority"
+        )
+    if phase1_digests not in (
+        [reviewed_extension_predecessor],
+        [reviewed_extension_predecessor, reviewed_extension_successor],
+    ):
+        raise Phase2MeasurementError(
+            "reviewed transition Phase 1 extension is partial or replayed"
+        )
+    phase1_digest = _reviewed_phase1_extension_digest(root)
+    if phase1_digest not in {
+        reviewed_extension_predecessor,
+        reviewed_extension_successor,
+    }:
+        raise Phase2MeasurementError(
+            "reviewed transition forbids an unreviewed Phase 1 successor"
+        )
+    if transition_consumed and phase1_digest != reviewed_extension_successor:
+        raise Phase2MeasurementError(
+            "reviewed transition consumed extension requires its exact successor"
+        )
+    if (
+        phase1_digest == reviewed_extension_successor
+        and phase1_digests == [reviewed_extension_predecessor]
+    ):
+        phase1_digests.append(reviewed_extension_successor)
+    verifier_digests = rebound_allowlist.get(VERIFIER_PATH)
+    if not isinstance(verifier_digests, list) or not verifier_digests:
+        raise Phase2MeasurementError(
+            "reviewed transition lacks its verifier authority"
+        )
+    if verifier_digest not in verifier_digests:
+        verifier_digests.append(verifier_digest)
+    if transition_consumed:
+        allowed_dirty = {
+            REVIEWED_TRANSITION_PATH,
+            REVIEWED_TRANSITION_EXTENSION_PATH,
+            VERIFIER_PATH,
+        }
+        for relative in dirty_paths:
+            if relative in allowed_dirty:
+                continue
+            raise Phase2MeasurementError(
+                "reviewed transition extension forbids modified tracked path "
+                f"{relative}"
+            )
+        rebound = dict(transition)
+        rebound["allowed_tracked_path_sha256"] = rebound_allowlist
+        rebound["verifier_normalized_sha256"] = verifier_digest
+        return {
+            "authority_path": REVIEWED_TRANSITION_PATH,
+            "reviewed": False,
+            "schema": REVIEWED_TRANSITION_PROPOSAL_SCHEMA,
+            "transition": rebound,
+        }
+
     predecessor_assignments = json.loads(
         predecessor_payloads[authority_paths[0]], object_pairs_hook=_strict_object
     )
@@ -3566,17 +3833,11 @@ def propose_reviewed_transition_rebind(root: Path) -> dict[str, object]:
                             }
                         )
 
-    verifier_digest = hashlib.sha256(
-        _normalized_verifier_source(
-            _read_pinned_regular_file(
-                root, root / VERIFIER_PATH, label="reviewed transition verifier"
-            )
-        )
-    ).hexdigest()
     rebound = {
         "allowed_tracked_path_sha256": rebound_allowlist,
         "base_commit": actual_commit,
         "base_tree": actual_tree,
+        "consumed_extension": transition["consumed_extension"],
         "inventory_site_transitions": inventory_site_transitions,
         "predecessor_authority_sha256": {
             relative: hashlib.sha256(payload).hexdigest()
@@ -3677,8 +3938,7 @@ def apply_reviewed_transition_rebind(root: Path, proposal_path: Path) -> None:
             _restore_publication(publication)
         raise
     else:
-        for publication in publications:
-            _finalize_publication(publication)
+        _finalize_publications(publications)
 
 
 def _validate_reviewed_phase4_worktree(
@@ -3688,6 +3948,7 @@ def _validate_reviewed_phase4_worktree(
         "allowed_tracked_path_sha256",
         "base_commit",
         "base_tree",
+        "consumed_extension",
         "inventory_site_transitions",
         "predecessor_authority_sha256",
         "reason",
@@ -3702,6 +3963,7 @@ def _validate_reviewed_phase4_worktree(
         )
     if transition["schema"] != "full-color-phase2-reviewed-transition-v2":
         raise Phase2MeasurementError("reviewed Phase 4 transition schema changed")
+    _reviewed_consumed_extension(transition)
     base_commit = _string(transition["base_commit"], "transition.base_commit")
     base_tree = _string(transition["base_tree"], "transition.base_tree")
     if re.fullmatch(r"[0-9a-f]{40}", base_commit) is None:
@@ -4350,17 +4612,7 @@ def apply_reviewed_subject_proposal(
             "restored in their pinned parents; the public namespace remains refused"
         ) from exc
     else:
-        finalize_errors: list[str] = []
-        for publication in publications:
-            try:
-                _finalize_publication(publication)
-            except (OSError, Phase2MeasurementError) as finalize_exc:
-                finalize_errors.append(f"{publication.path}: {finalize_exc}")
-        if finalize_errors:
-            raise Phase2MeasurementError(
-                "Phase 2 authority transaction committed but backup cleanup failed: "
-                + "; ".join(finalize_errors)
-            )
+        _finalize_publications(publications)
 
 
 def _parser() -> argparse.ArgumentParser:
