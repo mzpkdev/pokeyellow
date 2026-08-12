@@ -26,6 +26,7 @@ RunFullColorOwnershipVBlank::
 	restore_renderer_state_e
 	ret
 
+
 ClearVramBanked::
 	ld hl, STARTOF(VRAM)
 	ld bc, SIZEOF(VRAM)
@@ -163,6 +164,7 @@ EnqueueFullColorMapColumn::
 	ld a, FULL_COLOR_REQUEST_MAP_COLUMN_PAIRED
 	jp EnqueueFullColorPairedSemantic
 EnqueueFullColorMapConnection::
+FullColorPhase5NorthConnectionStart::
 	ld a, FULL_COLOR_REQUEST_MAP_CONNECTION_PAIRED
 	jp EnqueueFullColorPairedSemantic
 EnqueueFullColorMapRectangle::
@@ -172,9 +174,12 @@ EnqueueFullColorMapOverlay::
 	ld a, FULL_COLOR_REQUEST_MAP_OVERLAY_PAIRED
 	; fallthrough
 EnqueueFullColorPairedSemantic:
-	push af
+	; The Yellow stack occupies switchable WRAM1, so AF cannot cross the
+	; bank-2 selection on the stack. The audit-only carrier is fixed WRAM0 and
+	; has no other reader or writer, including before IE is masked below.
+	ld [wFullColorPhase5PairedClassScratch], a
 	select_renderer_state_e
-	pop af
+	ld a, [wFullColorPhase5PairedClassScratch]
 	ld [wFullColorProducerClass], a
 	bit 7, a
 	ld a, 0
@@ -213,7 +218,6 @@ EnqueueFullColorPairedSemantic:
 	ld a, [wFullColorProducerClass]
 	cp FULL_COLOR_REQUEST_MAP_ROW_PAIRED
 	jr nz, .not_row
-	ld a, c
 	ld d, 1
 	ld a, [wFullColorProducerFlags]
 	and FULL_COLOR_FLAG_MOVEMENT_STRIP
@@ -227,7 +231,6 @@ EnqueueFullColorPairedSemantic:
 	ld a, [wFullColorProducerClass]
 	cp FULL_COLOR_REQUEST_MAP_COLUMN_PAIRED
 	jr nz, .geometry_ok
-	ld a, b
 	ld d, 1
 	ld a, [wFullColorProducerFlags]
 	and FULL_COLOR_FLAG_MOVEMENT_STRIP
@@ -267,7 +270,7 @@ EnqueueFullColorPairedSemantic:
 	add hl, bc
 	ld a, h
 	cp $d0
-	jp c, .source_extent_ok
+	jr c, .source_extent_ok
 	jp nz, EnqueueFullColorSemantic_defer
 	ld a, l
 	and a
@@ -419,6 +422,14 @@ BuildAndPrepareFullColorPairedDescriptorSelected:
 	ld [hli], a
 	xor a
 	ld [hli], a
+	IF DEF(PHASE2_AUDIT)
+		; Retry may run after a completed fast writer has reused scheduler
+		; staging. Rebuild extent and reservation only from the immutable
+		; producer geometry; stale staging is never admission authority.
+	farcall FullColorPhase5WriteProducerExtentSelected
+	jp c, RetainFullColorSemanticSelected
+	ld hl, wFullColorSchedulerEnqueueDescriptor + FULL_COLOR_DESCRIPTOR_FLAGS
+	ELSE
 	ld a, [wFullColorRequestStaging]
 	ld [hli], a
 	ld a, [wFullColorRequestStaging + 1]
@@ -429,6 +440,7 @@ BuildAndPrepareFullColorPairedDescriptorSelected:
 	ld a, [wFullColorRequestStaging + 1]
 	rla
 	ld [hli], a
+	ENDC
 	ld a, [wFullColorProducerFlags]
 	ld b, a
 	ld a, [wFullColorProducerClass]
@@ -577,7 +589,16 @@ RetryFullColorProducer::
 	ld a, [wRendererAdmissionOpen]
 	and a
 	jr z, .done
+	IF DEF(PHASE2_AUDIT)
+		; Audit direct-OAM admission may reuse the shared enqueue descriptor while
+		; this immutable natural movement job waits. Rebuild the paired candidate
+		; from private producer authority before every retry. Audit animation
+		; pressure uses its independent direct-admission retry route.
+	farcall RetireFullColorPhase5SupersededMovementSelected
+	call BuildAndPrepareFullColorPairedDescriptorSelected
+	ELSE
 	call AdmitPreparedFullColorSemanticSelected
+	ENDC
 	cp ACCEPTED
 	jr nz, .publish
 	xor a
@@ -605,6 +626,7 @@ FinishFullColorSemanticSelected:
 	restore_renderer_state_e
 	ld a, b
 	cp ACCEPTED
+FullColorPhase5NorthConnectionEnd::
 	ret z
 	scf
 	ret
@@ -637,11 +659,16 @@ EnqueueFullColorOAMBatch::
 	ld a, [wFullColorRequestCount]
 	cp FULL_COLOR_REQUEST_CAPACITY
 	jp nc, .defer
+	IF !DEF(PHASE2_AUDIT)
+		; Production OAM snapshots share singleton preparation scratch. Audit
+		; declares the complete fixed wShadowOAM batch and cannot clobber the
+		; retained paired producer slot.
 	ld a, [wFullColorProducerPending]
 	and a
 	jp nz, .defer
-	; Reject a duplicate OAM resident. A non-OAM PREPARED descriptor owns the
-	; shared scratch tail, so defer before snapshotting over it.
+	ENDC
+	; Reject a duplicate OAM resident.  Audit OAM declares the already-complete
+	; fixed wShadowOAM batch, so one non-OAM PREPARED scratch owner may coexist.
 	ld hl, wFullColorRequestDescriptors
 	ld d, FULL_COLOR_REQUEST_CAPACITY
 .resident
@@ -660,7 +687,9 @@ EnqueueFullColorOAMBatch::
 	jp z, .defer
 	ld a, c
 	cp PREPARED << FULL_COLOR_DESCRIPTOR_STATE_SHIFT
-	jp z, .defer
+	IF !DEF(PHASE2_AUDIT)
+		jp z, .defer
+	ENDC
 .next
 	ld a, l
 	add FULL_COLOR_REQUEST_DESCRIPTOR_BYTES
@@ -719,7 +748,14 @@ EnqueueFullColorOAMBatch::
 	ld [hli], a
 	ld a, FULL_COLOR_FLAG_OAM_FINISHED
 	ld [hli], a
+	IF DEF(PHASE2_AUDIT)
+		; Audit direct-wShadowOAM descriptors carry the exact authority epoch
+		; invalidated before their batch was built. Generic request retry tokens
+		; and all production products retain their literal scheduler ABI.
+	ld a, [wFullColorPhase5OAMAuthorityEpoch]
+	ELSE
 	ld a, [wFullColorRetryCounter]
+	ENDC
 	ld [hl], a
 	ld de, wFullColorSchedulerEnqueueDescriptor
 	call ValidateFullColorRequestResourcesSelected
@@ -737,8 +773,10 @@ EnqueueFullColorOAMBatch::
 	pop hl
 	ld a, PREPARED << FULL_COLOR_DESCRIPTOR_STATE_SHIFT | FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA
 	ld [hl], a
-	; Snapshot before return so later sprite authority mutations are irrelevant.
-	call PrepareFullColorOAMBatchSelected
+	IF !DEF(PHASE2_AUDIT)
+		; Snapshot before return so later sprite authority mutations are irrelevant.
+		call PrepareFullColorOAMBatchSelected
+	ENDC
 	ld hl, wFullColorRequestCount
 	inc [hl]
 	ld a, PREPARED
@@ -985,6 +1023,11 @@ ValidateFullColorRequestResourcesSelected:
 	ld a, [hl]
 	cp HIGH(FULL_COLOR_OAM_DESTINATION)
 	jr nz, .invalid
+	IF DEF(PHASE2_AUDIT)
+		; The audit-only declaration check lives outside this fixed ROM window.
+		farcall FullColorPhase5ValidateOAMDeclarationSelectedFar
+		jr c, .invalid
+	ENDC
 	ld hl, FULL_COLOR_DESCRIPTOR_EXTENT
 	add hl, de
 	ld a, [hli]
@@ -1224,9 +1267,15 @@ PrepareNextFullColorRequestSelected:
 	ld b, FULL_COLOR_REQUEST_CAPACITY
 .prepared_scan
 	ld a, [hl]
+	IF DEF(PHASE2_AUDIT)
+		cp PREPARED << FULL_COLOR_DESCRIPTOR_STATE_SHIFT | FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA
+		jr z, .prepared_next
+	ENDC
 	and FULL_COLOR_DESCRIPTOR_STATE_MASK
 	cp PREPARED << FULL_COLOR_DESCRIPTOR_STATE_SHIFT
-	jr z, .busy
+	jr nz, .prepared_next
+	jr .busy
+.prepared_next
 	call AdvanceFullColorDescriptorPointerSelected
 	dec b
 	jr nz, .prepared_scan
@@ -1293,7 +1342,11 @@ RunFullColorSchedulerSelected::
 .revalidate
 	ld a, [wRendererOwner]
 	cp RENDERER_FULL_COLOR_OVERWORLD
-	jr nz, CancelFullColorDescriptorStaleSelected
+	IF DEF(PHASE2_AUDIT)
+		jp nz, CancelFullColorDescriptorStaleSelected
+	ELSE
+		jr nz, CancelFullColorDescriptorStaleSelected
+	ENDC
 	push hl
 	ld de, FULL_COLOR_DESCRIPTOR_OWNER
 	add hl, de
@@ -1349,6 +1402,16 @@ RunFullColorSchedulerSelected::
 	jr c, .defer_pop
 .budget_ok
 	pop hl
+	IF DEF(PHASE2_AUDIT)
+		; Phase 5 uses independent measured CPU cycles, never the descriptor's
+		; byte/write reservation, for the final visibility decision.
+		push hl
+		ld d, h
+		ld e, l
+		farcall FullColorPhase5ReserveDescriptorCyclesSelectedFar
+		pop hl
+		ret c
+	ENDC
 	ld a, [hl]
 	and FULL_COLOR_DESCRIPTOR_CLASS_MASK
 	ld b, a

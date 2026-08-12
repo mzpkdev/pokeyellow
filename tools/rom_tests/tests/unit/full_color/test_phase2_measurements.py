@@ -2516,8 +2516,8 @@ def test_passive_rom_pointer_authority_has_exact_site_and_root_coverage() -> Non
 
 def test_passive_rom_pointer_authority_has_exact_reviewed_rebases() -> None:
     previous = phase2_measurements._PREVIOUS_PASSIVE_ROM_POINTER_WRITES
-    current = phase2_measurements._PASSIVE_ROM_POINTER_WRITES
-    assert len(previous) == len(current) == 78
+    phase4 = phase2_measurements._PHASE4_PASSIVE_ROM_POINTER_WRITES
+    assert len(previous) == len(phase4) == 78
 
     payload_delta = phase2_measurements._PASSIVE_ROM_POINTER_REBASE_BYTES
     column_delta = phase2_measurements._MAP_SEMANTIC_COLUMN_POINTER_REBASE_BYTES
@@ -2542,15 +2542,322 @@ def test_passive_rom_pointer_authority_has_exact_reviewed_rebases() -> None:
     for (old_bank, old_address, opcode), roots in previous.items():
         delta = phase2_measurements._passive_pointer_rebase(old_address, opcode)
         rebased = (old_bank, old_address + delta, opcode)
-        assert current[rebased] is roots
+        assert phase4[rebased] is roots
         deltas.append(delta)
         expected_sites.append(rebased)
 
-    assert list(current) == expected_sites
+    assert list(phase4) == expected_sites
     assert deltas.count(0) == 2
     assert deltas.count(payload_delta) == 68
     assert deltas.count(payload_delta + column_delta) == 4
     assert deltas.count(payload_delta + row_delta) == 4
+
+
+def test_phase5_passive_rom_pointer_authority_is_relocation_only() -> None:
+    phase4 = phase2_measurements._PHASE4_PASSIVE_ROM_POINTER_WRITES
+    current = phase2_measurements._PASSIVE_ROM_POINTER_WRITES
+    assert len(phase4) == len(current) == 78
+
+    clear_delta = phase2_measurements._PHASE5_CLEAR_POINTER_REBASE_BYTES
+    redraw_delta = phase2_measurements._PHASE5_REDRAW_POINTER_REBASE_BYTES
+    assert clear_delta == -0xAA
+    assert redraw_delta == 0x419
+
+    deltas = []
+    expected_sites = []
+    for (bank, address, opcode), roots in phase4.items():
+        delta = phase2_measurements._phase5_passive_pointer_rebase(opcode)
+        rebased = (bank, address + delta, opcode)
+        assert current[rebased] == phase2_measurements._phase5_passive_pointer_roots(
+            roots
+        )
+        deltas.append(delta)
+        expected_sites.append(rebased)
+
+    assert list(current) == expected_sites
+    assert deltas.count(clear_delta) == 2
+    assert deltas.count(redraw_delta) == 76
+    assert min(address for _, address, _ in current) == 21541
+    assert max(address for _, address, _ in current) == 30951
+
+
+@pytest.mark.parametrize(
+    ("opcode", "expected"),
+    [("72", -0xAA), ("22", -0xAA), ("12", 0x419)],
+)
+def test_phase5_passive_pointer_rebase_is_opcode_bound(
+    opcode: str, expected: int
+) -> None:
+    assert phase2_measurements._phase5_passive_pointer_rebase(opcode) == expected
+
+
+def test_phase5_passive_pointer_rebase_refuses_unknown_opcode() -> None:
+    with pytest.raises(
+        Phase2MeasurementError, match="unreviewed Phase 5 passive pointer opcode"
+    ):
+        phase2_measurements._phase5_passive_pointer_rebase("ea")
+
+
+def test_phase5_passive_pointer_ancestry_is_exact_symbol_preserving_rebase() -> None:
+    assert phase2_measurements._PHASE5_CLEAR_ANCESTRY_SITES == {
+        0x5378,
+        0x545A,
+        0x549A,
+        0x54AD,
+        0x54BA,
+        0x54BD,
+        0x54EC,
+        0x5513,
+    }
+    assert phase2_measurements._PHASE5_REDRAW_ANCESTRY_SITES == {0x7353, 0x740C}
+    assert phase2_measurements._phase5_passive_ancestry_rebase(
+        "PassiveFullColorVBlank"
+    ) == "PassiveFullColorVBlank"
+    assert phase2_measurements._phase5_passive_ancestry_rebase("3b:545a") == (
+        "3b:53b0"
+    )
+    assert phase2_measurements._phase5_passive_ancestry_rebase("3b:7353") == (
+        "3b:776c"
+    )
+
+
+def test_phase5_passive_pointer_ancestry_refuses_unknown_linked_site() -> None:
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="unreviewed Phase 5 passive pointer ancestry site",
+    ):
+        phase2_measurements._phase5_passive_ancestry_rebase("3b:6000")
+
+
+def test_phase5_relocation_extension_is_complete_and_production_neutral() -> None:
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    assert proposal["schema"] == (
+        "full-color-phase2-phase5-audit-relocation-proposal-v1"
+    )
+    assert proposal["reviewed"] is False
+    extension = proposal["extension"]
+    assert extension["previous_transition_sha256"] == (
+        phase2_measurements.REVIEWED_TRANSITION_SHA256
+    )
+    assert len(extension["relocation_sites"]) == 78
+    assert len(extension["subject_transitions"]) == 253
+    assert len(extension["shared_candidate_transitions"]) == 15
+    assert set(extension["predecessor_authority_sha256"]) == set(
+        extension["successor_authority_sha256"]
+    ) == set(phase2_measurements._PHASE2_AUTHORITY_PATHS)
+
+    evidence = json.loads(
+        (
+            ROOT
+            / "specs/full-colors/evidence/phase2-hostile-slice-representation.json"
+        ).read_text()
+    )
+    assert extension["production_artifact_sha256"] == {
+        name: evidence["inputs"][name]["sha256"]
+        for product in phase2_measurements.PRODUCTION_PRODUCTS
+        for name in (
+            f"{phase2_measurements.PRODUCT_ARTIFACTS[product]}.gbc",
+            f"{phase2_measurements.PRODUCT_ARTIFACTS[product]}.map",
+            f"{phase2_measurements.PRODUCT_ARTIFACTS[product]}.sym",
+        )
+    }
+
+
+def test_phase5_relocation_extension_successors_match_pinned_hashes() -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_relocation_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    extension = proposal["extension"]
+    assert {
+        relative: hashlib.sha256(payload).hexdigest()
+        for relative, payload in payloads.items()
+    } == extension["successor_authority_sha256"]
+    assert details["subject_transitions"] == extension["subject_transitions"]
+    assert details["shared_candidate_transitions"] == extension[
+        "shared_candidate_transitions"
+    ]
+
+
+def test_phase5_relocation_extension_refuses_replay(tmp_path, monkeypatch) -> None:
+    relative = phase2_measurements.REVIEWED_TRANSITION_PATH
+    transition = json.loads((ROOT / relative).read_text())
+    transition[phase2_measurements.PHASE5_RELOCATION_EXTENSION_KEY] = {
+        "schema": phase2_measurements.PHASE5_RELOCATION_EXTENSION_SCHEMA
+    }
+    payload = phase2_measurements._canonical_pretty(transition)
+    destination = tmp_path / relative
+    destination.parent.mkdir(parents=True)
+    destination.write_bytes(payload)
+    monkeypatch.setattr(
+        phase2_measurements,
+        "REVIEWED_TRANSITION_SHA256",
+        hashlib.sha256(payload).hexdigest(),
+    )
+    with pytest.raises(
+        Phase2MeasurementError, match="relocation extension is already consumed"
+    ):
+        phase2_measurements.propose_phase5_relocation_extension(tmp_path)
+
+
+def test_phase5_shared_candidate_relocation_is_exact() -> None:
+    assert phase2_measurements._PHASE5_SHARED_CANDIDATE_REBASE_BYTES == -0x18
+
+
+def test_phase5_relocation_apply_publishes_all_authorities_atomically(
+    tmp_path, monkeypatch
+) -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_relocation_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    for relative in (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+    ):
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+    proposal_path = tmp_path / "phase5-relocation.proposal.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+
+    monkeypatch.setattr(
+        phase2_measurements,
+        "propose_phase5_relocation_extension",
+        lambda root: proposal,
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: measured
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "_phase5_relocation_successor_payloads",
+        lambda root, current: (payloads, details),
+    )
+    phase2_measurements.apply_phase5_relocation_extension(
+        tmp_path, proposal_path
+    )
+
+    extension = proposal["extension"]
+    assert {
+        relative: hashlib.sha256((tmp_path / relative).read_bytes()).hexdigest()
+        for relative in phase2_measurements._PHASE2_AUTHORITY_PATHS
+    } == extension["successor_authority_sha256"]
+    transition = json.loads(
+        (tmp_path / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    assert transition[phase2_measurements.PHASE5_RELOCATION_EXTENSION_KEY] == (
+        extension
+    )
+    assert phase2_measurements._TRANSITION_DIGEST_CARRIER.search(
+        (tmp_path / phase2_measurements.VERIFIER_PATH).read_bytes()
+    )
+
+
+@pytest.mark.parametrize(
+    "relative",
+    (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+    ),
+)
+@pytest.mark.parametrize("mutation", ("same-inode-restore", "inode-swap"))
+@pytest.mark.parametrize("stage", ("after-recompute", "before-replace"))
+def test_phase5_relocation_apply_rejects_concurrent_predecessor_mutation(
+    tmp_path, monkeypatch, relative, mutation, stage
+) -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_relocation_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    relatives = (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+    )
+    before = {}
+    for copied_relative in relatives:
+        destination = tmp_path / copied_relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / copied_relative, destination)
+        before[copied_relative] = destination.read_bytes()
+    proposal_path = tmp_path / "phase5-relocation.proposal.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+
+    monkeypatch.setattr(
+        phase2_measurements,
+        "propose_phase5_relocation_extension",
+        lambda root: proposal,
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: measured
+    )
+    target = tmp_path / relative
+
+    def mutate_target() -> None:
+        original = target.read_bytes()
+        if mutation == "same-inode-restore":
+            with target.open("r+b") as stream:
+                stream.seek(0)
+                stream.write(bytes([original[0] ^ 1]))
+                stream.flush()
+                os.fsync(stream.fileno())
+                stream.seek(0)
+                stream.write(original)
+                stream.truncate()
+                stream.flush()
+                os.fsync(stream.fileno())
+        else:
+            replacement = target.with_name(f".{target.name}.concurrent")
+            replacement.write_bytes(original)
+            os.replace(replacement, target)
+
+    def mutate_after_recompute(root, current):
+        mutate_target()
+        return payloads, details
+
+    if stage == "after-recompute":
+        monkeypatch.setattr(
+            phase2_measurements,
+            "_phase5_relocation_successor_payloads",
+            mutate_after_recompute,
+        )
+        message = "pinned authority changed during recomputation"
+    else:
+        monkeypatch.setattr(
+            phase2_measurements,
+            "_phase5_relocation_successor_payloads",
+            lambda root, current: (payloads, details),
+        )
+        real_atomic_replace = phase2_measurements._atomic_replace
+        mutated = False
+
+        def mutate_before_replace(path, payload, expected, ledger, **kwargs):
+            nonlocal mutated
+            if path == target and not mutated:
+                mutate_target()
+                mutated = True
+            return real_atomic_replace(path, payload, expected, ledger, **kwargs)
+
+        monkeypatch.setattr(
+            phase2_measurements, "_atomic_replace", mutate_before_replace
+        )
+        message = "Phase 5 relocation apply failed; predecessor authorities restored"
+    with pytest.raises(
+        Phase2MeasurementError, match=message
+    ):
+        phase2_measurements.apply_phase5_relocation_extension(
+            tmp_path, proposal_path
+        )
+    assert {
+        copied_relative: (tmp_path / copied_relative).read_bytes()
+        for copied_relative in relatives
+    } == before
 
 
 @pytest.mark.parametrize(
@@ -3012,3 +3319,303 @@ def test_normal_link_products_expose_no_phase2_audit_entries(
     path.write_bytes(path.read_bytes() + b"Phase2AuditForbidden")
     with pytest.raises(Phase2MeasurementError, match="forbidden Phase 2"):
         _verify_audit_product(tmp_path)
+
+
+def test_phase5_closure_proposal_has_truthful_complete_cardinality() -> None:
+    proposal = phase2_measurements.propose_phase5_closure_extension(ROOT)
+    extension = proposal["extension"]
+    assert len(extension["additions"]) == 56
+    assert len(extension["retirements"]) == 105
+    assert len(extension["audit_splits"]) == 21
+    assert sum(
+        item["type"] == "cross_row_reroot"
+        for item in extension["subject_transitions"].values()
+    ) == 0
+    for product in (
+        *phase2_measurements.PRODUCTION_PRODUCTS,
+        phase2_measurements.PHASE2_AUDIT_PRODUCT,
+    ):
+        assert extension["cardinality"]["by_product"][product] == {
+            "source_additions": 14,
+            "source_equation": "263 - 25 + 14 = 252",
+            "source_predecessor": 263,
+            "source_retirements": 25,
+            "source_successor": 252,
+        }
+
+
+def test_phase5_closure_proposal_does_not_fabricate_source_pairings() -> None:
+    extension = phase2_measurements.propose_phase5_closure_extension(ROOT)["extension"]
+    assert not any(
+        item.get("reason") == "phase5_source_control_flow_replacement"
+        for item in extension["subject_transitions"].values()
+    )
+    assert all(
+        item["added_subject"]["sha256"] == item["added_sha256"]
+        for item in extension["additions"].values()
+    )
+    assert all(
+        item["retired_subject"]["sha256"] == item["retired_sha256"]
+        for item in extension["retirements"].values()
+    )
+
+
+def test_phase5_closure_apply_rejects_production_artifact_mutation(
+    tmp_path, monkeypatch
+) -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_closure_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_closure_extension(ROOT)
+    relatives = (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+        *proposal["extension"]["production_artifact_sha256"],
+    )
+    for relative in relatives:
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+    proposal_path = tmp_path / "closure.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase5_closure_extension", lambda root: proposal
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: measured
+    )
+    artifact = tmp_path / next(
+        iter(proposal["extension"]["production_artifact_sha256"])
+    )
+
+    def mutate_after_recompute(root, current):
+        artifact.write_bytes(artifact.read_bytes() + b"tamper")
+        return payloads, details
+
+    monkeypatch.setattr(
+        phase2_measurements,
+        "_phase5_closure_successor_payloads",
+        mutate_after_recompute,
+    )
+    with pytest.raises(Phase2MeasurementError, match="changed during recomputation"):
+        phase2_measurements.apply_phase5_closure_extension(tmp_path, proposal_path)
+
+
+def test_phase5_product_split_restores_production_and_bounds_audit() -> None:
+    proposal = phase2_measurements.propose_phase5_product_split_extension(ROOT)
+    extension = proposal["extension"]
+    assert proposal["schema"] == phase2_measurements.PHASE5_PRODUCT_SPLIT_PROPOSAL_SCHEMA
+    assert extension["conditional_region_count"] == 17
+    assert {key: len(value) for key, value in extension["restored_production_predecessors"].items()} == {
+        product: 25 for product in phase2_measurements.PRODUCTION_PRODUCTS
+    }
+    assert {key: len(value) for key, value in extension["removed_assignments_by_product"].items()} == {
+        "pokeyellow": 14,
+        "pokeyellow_debug": 14,
+        "pokeyellow_vc": 14,
+        phase2_measurements.PHASE2_AUDIT_PRODUCT: 9,
+    }
+    assert len(extension["production_artifact_sha256"]) == 9
+
+
+@pytest.mark.parametrize(
+    "attack", ("product-swap", "other-audit-swap", "omission", "resurrection")
+)
+def test_phase5_product_split_rejects_hostile_partition_edits(attack) -> None:
+    payloads, _ = phase2_measurements._phase5_product_split_successor_payloads(ROOT)
+    authority = json.loads(
+        payloads["specs/full-colors/inventory/assignments.json"]
+    )
+    if attack == "product-swap":
+        row = next(
+            row
+            for row in authority["rows"]
+            if row["product"] == phase2_measurements.PHASE2_AUDIT_PRODUCT
+            and row["subject"]["kind"] == "SOURCE_FINDING"
+            and phase2_measurements._assignment_source_edge(row)
+            == phase2_measurements._PHASE5_AUDIT_ONLY_EDGE
+        )
+        row["product"] = "pokeyellow"
+    elif attack == "other-audit-swap":
+        row = next(
+            row
+            for row in authority["rows"]
+            if row["product"] == phase2_measurements.PHASE2_AUDIT_PRODUCT
+            and row["subject"]["kind"] == "SOURCE_FINDING"
+            and row["subject"]["metadata"]["symbol"] == "DisplayPartyMenu"
+            and row["subject"]["metadata"]["destination"] == "ClearSprites"
+        )
+        row["product"] = "pokeyellow"
+    elif attack == "omission":
+        authority["rows"] = [
+            row
+            for row in authority["rows"]
+            if not (
+                row["product"] == "pokeyellow"
+                and row["subject"]["kind"] == "SOURCE_FINDING"
+                and phase2_measurements._assignment_source_edge(row)
+                == ("LoadMapData", "RunPaletteCommand")
+            )
+        ]
+    else:
+        row = next(
+            row
+            for row in authority["rows"]
+            if row["product"] == phase2_measurements.PHASE2_AUDIT_PRODUCT
+            and row["subject"]["kind"] == "SOURCE_FINDING"
+            and phase2_measurements._assignment_source_edge(row)
+            == phase2_measurements._PHASE5_AUDIT_ONLY_EDGE
+        )
+        resurrected = json.loads(json.dumps(row))
+        resurrected["id"] += "-RESURRECTED"
+        resurrected["product"] = "pokeyellow_debug"
+        authority["rows"].append(resurrected)
+    with pytest.raises(phase2_measurements.Phase2MeasurementError):
+        phase2_measurements._validate_product_source_partition(ROOT, authority)
+
+
+def test_phase5_product_split_refuses_inventory_line_drift() -> None:
+    document = {
+        "path": "home/overworld.asm",
+        "symbol": "LoadMapData",
+        "line": 1942,
+    }
+    counts = phase2_measurements._relocate_inventory_lines(document)
+    assert not any(counts.values())
+
+    duplicate = {
+        "rows": [
+            {
+                "path": "home/overworld.asm",
+                "symbol": "LoadMapData",
+                "line": 1941,
+            },
+            {
+                "path": "home/overworld.asm",
+                "symbol": "LoadMapData",
+                "line": 1941,
+            },
+        ]
+    }
+    counts = phase2_measurements._relocate_inventory_lines(duplicate)
+    relocation = (
+        "home/overworld.asm",
+        "LoadMapData",
+        1941,
+        1977,
+    )
+    assert counts[relocation] == 2
+
+
+def test_phase5_product_split_requires_exact_closure_successor_history(
+    monkeypatch,
+) -> None:
+    real_read = phase2_measurements._read_pinned_regular_file
+
+    def corrupt_history(root, path, *, label):
+        payload = real_read(root, path, label=label)
+        if Path(path) == ROOT / phase2_measurements.REVIEWED_TRANSITION_PATH:
+            transition = json.loads(payload)
+            transition[phase2_measurements.PHASE5_CLOSURE_EXTENSION_KEY][
+                "successor_authority_sha256"
+            ][phase2_measurements._PHASE2_AUTHORITY_PATHS[0]] = "0" * 64
+            return phase2_measurements._canonical_pretty(transition)
+        return payload
+
+    monkeypatch.setattr(
+        phase2_measurements, "_read_pinned_regular_file", corrupt_history
+    )
+    with pytest.raises(
+        phase2_measurements.Phase2MeasurementError,
+        match="lost exact closure predecessor",
+    ):
+        phase2_measurements._phase5_product_split_successor_payloads(ROOT)
+
+
+def test_phase5_product_split_refuses_replay(tmp_path, monkeypatch) -> None:
+    relative = phase2_measurements.REVIEWED_TRANSITION_PATH
+    transition = json.loads((ROOT / relative).read_text())
+    transition[phase2_measurements.PHASE5_PRODUCT_SPLIT_EXTENSION_KEY] = {
+        "schema": phase2_measurements.PHASE5_PRODUCT_SPLIT_EXTENSION_SCHEMA
+    }
+    payload = phase2_measurements._canonical_pretty(transition)
+    destination = tmp_path / relative
+    destination.parent.mkdir(parents=True)
+    destination.write_bytes(payload)
+    monkeypatch.setattr(
+        phase2_measurements,
+        "REVIEWED_TRANSITION_SHA256",
+        hashlib.sha256(payload).hexdigest(),
+    )
+    with pytest.raises(
+        phase2_measurements.Phase2MeasurementError,
+        match="product split extension is already consumed",
+    ):
+        phase2_measurements.propose_phase5_product_split_extension(tmp_path)
+
+
+def test_phase5_product_split_rolls_back_on_late_production_artifact_swap(
+    tmp_path, monkeypatch
+) -> None:
+    proposal = phase2_measurements.propose_phase5_product_split_extension(ROOT)
+    successors, details = phase2_measurements._phase5_product_split_successor_payloads(
+        ROOT
+    )
+    relatives = (
+        *phase2_measurements._PHASE5_PRODUCT_SPLIT_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+        *proposal["extension"]["production_artifact_sha256"],
+    )
+    before = {}
+    for relative in relatives:
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+        before[relative] = destination.read_bytes()
+    proposal_path = tmp_path / "phase5-product-split.proposal.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+    monkeypatch.setattr(
+        phase2_measurements,
+        "propose_phase5_product_split_extension",
+        lambda root: proposal,
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "_phase5_product_split_successor_payloads",
+        lambda root: (successors, details),
+    )
+    source_transition = json.loads(successors[phase2_measurements.SOURCE_TRANSITION_PATH])
+    monkeypatch.setattr(
+        phase2_measurements.phase1_source_transition,
+        "generate",
+        lambda root: source_transition,
+    )
+    target = tmp_path / next(
+        iter(proposal["extension"]["production_artifact_sha256"])
+    )
+    real_replace = phase2_measurements._atomic_replace
+    replacement_count = 0
+
+    def swap_after_last(path, payload, expected, ledger, **kwargs):
+        nonlocal replacement_count
+        result = real_replace(path, payload, expected, ledger, **kwargs)
+        replacement_count += 1
+        if replacement_count == len(successors) + 2:
+            replacement = target.with_name(f".{target.name}.late-swap")
+            replacement.write_bytes(target.read_bytes())
+            os.replace(replacement, target)
+        return result
+
+    monkeypatch.setattr(phase2_measurements, "_atomic_replace", swap_after_last)
+    with pytest.raises(
+        phase2_measurements.Phase2MeasurementError,
+        match="production artifact changed during apply",
+    ):
+        phase2_measurements.apply_phase5_product_split_extension(
+            tmp_path, proposal_path
+        )
+    for relative in phase2_measurements._PHASE5_PRODUCT_SPLIT_AUTHORITY_PATHS:
+        assert (tmp_path / relative).read_bytes() == before[relative]

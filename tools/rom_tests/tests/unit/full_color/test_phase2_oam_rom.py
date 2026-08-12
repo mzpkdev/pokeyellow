@@ -107,7 +107,7 @@ def test_farcall_mapper_uses_only_preserved_identity_and_attribute_pointer(
         ))
 
 
-def test_owned_vblank_reaches_producer_then_scheduler_dma_through_real_bankswitch(
+def test_owned_mainline_producer_reaches_one_scheduler_dma_through_real_bankswitch(
     phase2_rom: Phase2Rom,
 ) -> None:
     emu = phase2_rom.emulator.pyboy
@@ -119,9 +119,34 @@ def test_owned_vblank_reaches_producer_then_scheduler_dma_through_real_bankswitc
     # owned producer must still enqueue the already-finished full batch.
     emu.memory[phase2_rom.emulator.symbols["wUpdateSpritesEnabled"]] = 0xFF
 
-    _, flags = _farcall_from_wram(phase2_rom, "FullColorVBlankOwnerConsumed")
+    _, producer_flags = _farcall_from_wram(
+        phase2_rom, "FullColorPhase5PrepareOwnedMainlineFrame"
+    )
+    assert producer_flags & 0x10 == 0
+    assert phase2_rom.read_wram2("wFullColorRequestCount") == b"\x01"
+
+    dma_calls = [0]
+
+    def record_dma(_: object) -> None:
+        dma_calls[0] += 1
+
+    key = (
+        phase2_rom.emulator.symbol_banks["FullColorPhase5OAMDMAStart"],
+        phase2_rom.emulator.symbols["FullColorPhase5OAMDMAStart"],
+    )
+    emu.hook_register(*key, record_dma, None)
+    try:
+        _, flags = _farcall_from_wram(
+            phase2_rom, "FullColorVBlankOwnerConsumed"
+        )
+        # Re-entering without another producer build must retain the exact
+        # hardware batch and must not replay DMA.
+        _farcall_from_wram(phase2_rom, "FullColorVBlankOwnerConsumed")
+    finally:
+        emu.hook_deregister(*key)
 
     assert flags & 0x10 == 0
+    assert dma_calls == [1]
     assert phase2_rom.read_wram2("wFullColorRequestCount") == b"\x00"
     assert bytes(emu.memory[0xFE00 + i] for i in range(160)) == bytes(
         emu.memory[shadow + i] for i in range(160)
@@ -157,48 +182,24 @@ def test_no_arg_overlay_farcall_rebuilds_semantic_abi_after_bankswitch(
         )
 
 
-def test_oam_commits_full_shadow_batch_and_dma_with_fallback(phase2_rom: Phase2Rom) -> None:
-    batch = bytearray(160)
-    for index in range(40):
-        batch[index * 4:index * 4 + 4] = bytes((16 + index, 8 + index, index, 0xF8 | 7))
-    identities = bytes((3, 0xFF, 9, 0x80) + (0,) * 36)
-    phase2_rom.write_fixed(0xC900, bytes(batch) + identities)
-    assert phase2_rom.admit(phase2_rom.descriptor(
-        "FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA", source=0xC900,
-    ))[0] == phase2_rom.constants["ACCEPTED"]
-    phase2_rom.call("RunFullColorOwnershipVBlank")
-    expected = bytearray(batch)
-    for index, palette in enumerate((3, 0, 0, 0) + (0,) * 36):
-        expected[index * 4 + 3] = 0xF8 | palette
-    shadow = bytes(phase2_rom.emulator.pyboy.memory[0xC300 + i] for i in range(160))
-    hardware = bytes(phase2_rom.emulator.pyboy.memory[0xFE00 + i] for i in range(160))
-    assert shadow == expected
-    assert hardware == expected
-    assert phase2_rom.read_wram2("wFullColorReconstructionItems", 4) == bytes((
-        39,
-        phase2_rom.constants["FULL_COLOR_FALLBACK_UNMAPPED"],
-        0,
-        39,
-    ))
-
-
 def test_route1_youngster_identity_falls_back_without_losing_oam_control_bits(
     phase2_rom: Phase2Rom,
 ) -> None:
     """Route 1's authored SPRITE_YOUNGSTER ($04) is not a palette number."""
-    batch = bytearray(160)
-    for index in range(40):
-        batch[index * 4:index * 4 + 4] = bytes((32, 24, index, 0xD8 | 7))
-    identities = bytes((4, 1, 3, 13, 47, 61) + (0xFF,) * 34)
-    phase2_rom.write_fixed(0xC900, bytes(batch) + identities)
-    assert phase2_rom.admit(phase2_rom.descriptor(
-        "FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA", source=0xC900,
-    ))[0] == phase2_rom.constants["ACCEPTED"]
-
-    phase2_rom.call("RunFullColorOwnershipVBlank")
+    shadow = phase2_rom.emulator.symbols["wShadowOAM"]
+    identities = (4, 1, 3, 13, 47, 61)
+    for index, identity in enumerate(identities):
+        attribute = shadow + index * 4 + 3
+        phase2_rom.emulator.pyboy.memory[attribute] = 0xD8 | 7
+        _farcall_from_wram(
+            phase2_rom,
+            "MapFullColorOAMAttributeFar",
+            c=identity,
+            de=attribute,
+        )
 
     attributes = bytes(
-        phase2_rom.emulator.pyboy.memory[0xC300 + index * 4 + 3]
+        phase2_rom.emulator.pyboy.memory[shadow + index * 4 + 3]
         for index in range(6)
     )
     assert attributes == bytes((0xD8, 0xD9, 0xDB, 0xDC, 0xDD, 0xDA))
@@ -206,12 +207,16 @@ def test_route1_youngster_identity_falls_back_without_losing_oam_control_bits(
 
 
 def test_oam_fallback_ledger_is_bounded_exact_and_marks_overflow(phase2_rom: Phase2Rom) -> None:
-    payload = bytes(160) + b"\xff" * 40
-    phase2_rom.write_fixed(0xC900, payload)
-    request = phase2_rom.descriptor("FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA", source=0xC900)
+    shadow = phase2_rom.emulator.symbols["wShadowOAM"]
     for _ in range(7):
-        assert phase2_rom.admit(request)[0] == phase2_rom.constants["ACCEPTED"]
-        phase2_rom.call("RunFullColorOwnershipVBlank")
+        for index in range(40):
+            attribute = shadow + index * 4 + 3
+            _farcall_from_wram(
+                phase2_rom,
+                "MapFullColorOAMAttributeFar",
+                c=0xFF,
+                de=attribute,
+            )
     assert phase2_rom.read_wram2("wFullColorReconstructionItems", 4) == bytes((
         0xFF,
         phase2_rom.constants["FULL_COLOR_FALLBACK_MISSING_IDENTITY"],
@@ -228,8 +233,11 @@ def test_phase2_oam_never_touches_write_only_sram_controls(phase2_rom: Phase2Rom
         phase2_rom.emulator.pyboy.memory[0x4000] = bank
         phase2_rom.emulator.pyboy.memory[0xA000] = value
     phase2_rom.emulator.pyboy.memory[0x4000] = 1
-    payload = bytes(160) + b"\xff" * 40
-    phase2_rom.write_fixed(0xC900, payload)
-    phase2_rom.admit(phase2_rom.descriptor("FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA", source=0xC900))
-    phase2_rom.call("RunFullColorOwnershipVBlank")
+    attribute = phase2_rom.emulator.symbols["wShadowOAM"] + 3
+    _farcall_from_wram(
+        phase2_rom,
+        "MapFullColorOAMAttributeFar",
+        c=0xFF,
+        de=attribute,
+    )
     assert phase2_rom.emulator.pyboy.memory[0xA000] == 0x51

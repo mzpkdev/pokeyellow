@@ -319,6 +319,55 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  phase5-stress:
+    name: Phase 5 / Stress & Timing
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      FULL_COLOR_PHASE5_RESULTS: test-results/full-color-phase5
+      FULL_COLOR_PHASE5_TOOLS: test-results/full-color-tools/sameboy-v1.0.3
+      FULL_COLOR_PHASE5_PROPOSAL: test-results/full-color-proposals/phase5-stress.proposal.json
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up build dependencies
+        uses: ./.github/actions/setup-build
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/rom_tests/requirements.txt
+
+      - name: Install ROM test dependencies
+        run: make test-full-color-setup
+
+      - name: Download same-revision test products
+        uses: actions/download-artifact@v7
+        with:
+          name: pokeyellow-test-products
+          path: .
+
+      - name: Set up pinned SameBoy timing authority
+        run: make test-full-color-phase5-setup
+
+      - name: Capture and verify Phase 5 proposal
+        run: make test-full-color-phase5-stress ROM_TEST_PREBUILT_PRODUCTS=1
+
+      - name: Upload Phase 5 proposal and captures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: phase5-stress-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.FULL_COLOR_PHASE5_RESULTS }}/
+            ${{ env.FULL_COLOR_PHASE5_PROPOSAL }}
+          if-no-files-found: error
+          retention-days: 14
+
   renderer-runtime:
     name: Renderer / Runtime Ownership
     needs: build
@@ -469,6 +518,7 @@ jobs:
       - renderer-contracts
       - renderer-runtime
       - audit-evidence
+      - phase5-stress
       - e2e
     if: always()
     runs-on: ubuntu-latest
@@ -485,6 +535,7 @@ jobs:
           RENDERER_CONTRACTS: ${{ needs.renderer-contracts.result }}
           RENDERER_RUNTIME: ${{ needs.renderer-runtime.result }}
           AUDIT_EVIDENCE: ${{ needs.audit-evidence.result }}
+          PHASE5_STRESS: ${{ needs.phase5-stress.result }}
           E2E: ${{ needs.e2e.result }}
         run: |
           for result in \
@@ -497,6 +548,7 @@ jobs:
             "$RENDERER_CONTRACTS" \
             "$RENDERER_RUNTIME" \
             "$AUDIT_EVIDENCE" \
+            "$PHASE5_STRESS" \
             "$E2E"; do
             if [ "$result" != success ]; then
               echo "::error::verification job finished as $result"

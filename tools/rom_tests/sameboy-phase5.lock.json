@@ -1,0 +1,8 @@
+{
+  "archive_sha256": "aca79238ef23c220b6332abb28b6a4bbe467995ff7a26073dcb3070a7054eab6",
+  "archive_url": "https://github.com/LIJI32/SameBoy/archive/208ba4afabffab9edde416f2dbb8ae459e34adb8.tar.gz",
+  "commit": "208ba4afabffab9edde416f2dbb8ae459e34adb8",
+  "repository": "https://github.com/LIJI32/SameBoy",
+  "schema": "sameboy-phase5-tool-lock-v1",
+  "tag": "v1.0.3"
+}

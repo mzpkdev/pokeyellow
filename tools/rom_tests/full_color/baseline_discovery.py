@@ -21,6 +21,10 @@ from .rom_discovery import (
     load_sym,
 )
 from .source_discovery import SourceDiscoveryReport, discover_sources
+from .conditional_source_authority import (
+    ConditionalSourceAuthorityError,
+    validate_regions,
+)
 
 SOURCE_ROOTS = (
     "audio.asm",
@@ -111,11 +115,11 @@ def _manifest_sha256(manifest: dict[str, str]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def _validated_audit_only_added_paths(
+def _validated_audit_only_authority(
     repository: Path,
     report: SourceDiscoveryReport,
-) -> frozenset[str]:
-    """Return hash-bound files added after the reviewed baseline."""
+) -> tuple[frozenset[str], frozenset[tuple[str, str]]]:
+    """Return exact added-file and conditional-symbol audit authority."""
     path = repository / SOURCE_TRANSITION_PATH
     try:
         transition = json.loads(
@@ -134,9 +138,11 @@ def _validated_audit_only_added_paths(
         "reviewed_delta_paths",
         "subject_rebindings",
         "rom_subject_rebindings",
+        "audit_only_source_regions",
+        "product_identities",
     }
     if set(transition) != expected_keys or transition["schema"] != (
-        "full-color-production-source-transition-v3"
+        "full-color-production-source-transition-v4"
     ):
         raise RomDiscoveryError("malformed reviewed source transition")
     if transition["current_source_sha256"] != report.source_sha256:
@@ -194,7 +200,24 @@ def _validated_audit_only_added_paths(
         raise RomDiscoveryError(
             "current source changed outside the hash-bound audit-only partition"
         )
-    return frozenset(added)
+    try:
+        symbols = validate_regions(
+            repository,
+            transition["audit_only_source_regions"],
+            transition["product_identities"],
+            bindings,
+        )
+    except (ConditionalSourceAuthorityError, OSError, UnicodeError, ValueError) as exc:
+        raise RomDiscoveryError(str(exc)) from exc
+    return frozenset(added), symbols
+
+
+def _validated_audit_only_added_paths(
+    repository: Path,
+    report: SourceDiscoveryReport,
+) -> frozenset[str]:
+    """Compatibility helper returning only reviewed added-file authority."""
+    return _validated_audit_only_authority(repository, report)[0]
 
 
 def load_predef_targets(
@@ -238,7 +261,9 @@ def discover_baseline_rom(
     source_writers = set(writer_roots(report))
     missing_writers = source_writers - symbols.by_name.keys()
     if missing_writers:
-        audit_only_paths = _validated_audit_only_added_paths(root, report)
+        audit_only_paths, audit_only_symbols = _validated_audit_only_authority(
+            root, report
+        )
         unproven = sorted(
             {
                 finding.symbol
@@ -246,12 +271,14 @@ def discover_baseline_rom(
                 if finding.category == "writer"
                 and finding.symbol in missing_writers
                 and finding.path not in audit_only_paths
+                and (finding.path, finding.symbol) not in audit_only_symbols
             }
         )
         if unproven:
             raise RomDiscoveryError(
                 "source-discovered writer is absent from the baseline ROM and is not "
-                "in the exact hash-bound audit-only partition: "
+                "in the exact hash-bound audit-only partition or reviewed "
+                "conditional region: "
                 + ", ".join(unproven)
             )
     linked_writer_roots = source_writers - missing_writers

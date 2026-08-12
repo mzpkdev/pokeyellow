@@ -31,6 +31,32 @@ StartMenu_Pokemon::
 	xor a
 	ld [wMenuItemToSwap], a
 	ld [wPartyMenuTypeOrMessageID], a
+	IF DEF(PHASE2_AUDIT)
+		; A one-shot Phase 5 scenario closes admission and hides presentation
+		; before DisplayPartyMenu reaches its first Yellow-owned writer.
+	.phase5Entry
+		farcall BeginFullColorPhase5PartyHandoffToYellow
+		jr nc, .phase5EntryReady
+		farcall IsFullColorPhase5PartyDeferred
+		jr nc, .phase5Entry
+	.phase5EntryReady
+		farcall IsFullColorPhase5PartyYellowReconstructing
+		jr c, .phase5TilesReady
+		; The full poison erased all text tile data. Rebuild from linked ROM
+		; while the lifecycle-owned LCD-off boundary is closed. Textbox tiles
+		; precede PartyMenuInit so its overlapping HP/status patterns win.
+		farcall ShouldSkipFullColorPhase5PartyFontProducer
+		jr nc, .phase5FontSkipped
+		call LoadFontTilePatterns
+		ld c, FULL_COLOR_PHASE5_PARTY_STEP_FONT
+		farcall RecordFullColorPhase5PartyYellowProducerStep
+	.phase5FontSkipped
+		call LoadTextBoxTilePatterns
+		ld c, FULL_COLOR_PHASE5_PARTY_STEP_TEXTBOX
+		farcall RecordFullColorPhase5PartyYellowProducerStep
+	.phase5TilesReady
+		xor a
+	ENDC
 	ld [wUpdateSpritesEnabled], a
 	call DisplayPartyMenu
 	jr .checkIfPokemonChosen
@@ -42,6 +68,28 @@ StartMenu_Pokemon::
 .checkIfPokemonChosen
 	jr nc, .chosePokemon
 .exitMenu
+	IF DEF(PHASE2_AUDIT)
+		; The audit return is a real Yellow-to-Color handoff.  It deliberately
+		; bypasses every saved-screen and passive repair below, reloads map
+		; authority from its logical producers, and returns directly to gameplay.
+	.phase5ColorHandoff
+		farcall BeginFullColorPhase5PartyHandoffToColor
+		jr nc, .phase5ColorReady
+		farcall IsFullColorPhase5PartyDeferred
+		jr nc, .phase5ColorHandoff
+		jr .ordinaryExit
+	.phase5ColorReady
+		farcall FullColorPhase5ReloadMapFromAuthority
+		jr c, .phase5Failed
+		farcall FullColorAuditLoadMapDataHomeAuthority
+		jr c, .phase5Failed
+		pop af
+		call BankswitchCommon
+		jp UpdateSprites
+.phase5Failed
+		jr .phase5Failed
+.ordinaryExit
+	ENDC
 	call GBPalWhiteOutWithDelay3
 	call RestoreScreenTilesAndReloadTilePatterns
 	call LoadGBPal

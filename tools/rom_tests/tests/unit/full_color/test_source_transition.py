@@ -12,7 +12,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from tools.rom_tests.full_color import audit_evidence_identities, source_transition
+from tools.rom_tests.full_color import (
+    audit_evidence_identities,
+    baseline_discovery,
+    source_transition,
+)
 from tools.rom_tests.full_color.discovery_assignment import (
     BASELINE_PRODUCT,
     DiscoveryAssignmentAuthority,
@@ -35,12 +39,44 @@ def _proposal_envelope(proposal: dict[str, object]) -> dict[str, object]:
 
 
 def test_source_transition_generation_is_idempotent_and_preserves_authority(
-    monkeypatch,
+    monkeypatch, tmp_path,
 ) -> None:
     first = source_transition.generate_json(REPOSITORY_ROOT)
     second = source_transition.generate_json(REPOSITORY_ROOT)
     assert second == first
     generated = json.loads(first)
+    assert generated["schema"] == "full-color-production-source-transition-v4"
+    assert len(generated["audit_only_source_regions"]) == 17
+    assert {
+        row["symbol"] for row in generated["audit_only_source_regions"]
+    } == {
+        "DrawPartyMenu_.clearLogicalTileMap",
+        "EnsureFreeFullColorPhase5DescriptorSelected.reclaim",
+        "FullColorPhase5BeginVBlankBudgetFar",
+        "FullColorPhase5PrepareOwnedMainlineFrame",
+        "FullColorPhase5PrepareOwnedMainlineFrame.done",
+        "FullColorPhase5PrepareOwnedMainlineFrame.nextResident",
+        "FullColorPhase5PrepareOwnedMainlineFrame.pressureSelected",
+        "FullColorPhase5PrepareOwnedMainlineFrame.skip",
+        "FullColorPhase5PressureMainline",
+        "FullColorPhase5PressureMainline.activeNext",
+        "FullColorPhase5PressureMainline.admissionFailedSelected",
+        "FullColorPhase5PressureMainline.admittedSelected",
+        "FullColorPhase5PressureMainline.copyDescriptor",
+        "FullColorPhase5PressureMainline.generation",
+        "FullColorPhase5PressureMainline.restore",
+        "FullColorPhase5YellowOwner",
+        "FullColorPhase5YellowOwner.skipDec",
+    }
+    reviewed_path = tmp_path / "reviewed-v4.json"
+    reviewed_path.write_text(source_transition._canonical(generated), encoding="utf-8")
+    monkeypatch.setattr(baseline_discovery, "SOURCE_TRANSITION_PATH", reviewed_path)
+    added, conditional = baseline_discovery._validated_audit_only_authority(
+        REPOSITORY_ROOT,
+        baseline_discovery.discover_baseline_sources(REPOSITORY_ROOT),
+    )
+    assert len(conditional) == 17
+    assert "engine/full_color/phase5_audit.asm" in added
     authority = json.loads(
         (REPOSITORY_ROOT / source_transition.TRANSITION_PATH).read_text(
             encoding="utf-8"
@@ -93,6 +129,19 @@ def test_source_transition_rejects_v2_compatibility_authority(tmp_path) -> None:
     with pytest.raises(
         source_transition.SourceTransitionError,
         match="source-transition authority is malformed",
+    ):
+        source_transition.generate(REPOSITORY_ROOT, authority_path=path)
+
+
+@pytest.mark.parametrize("payload", ('{"schema":"x","schema":"y"}', '{"x":NaN}'))
+def test_source_transition_rejects_duplicate_or_nonfinite_json(
+    tmp_path, payload: str
+) -> None:
+    path = tmp_path / "hostile-transition.json"
+    path.write_text(payload, encoding="utf-8")
+    with pytest.raises(
+        source_transition.SourceTransitionError,
+        match="source-transition authority is unreadable",
     ):
         source_transition.generate(REPOSITORY_ROOT, authority_path=path)
 
@@ -326,6 +375,8 @@ def test_audit_identity_rebinding_proposes_hashes_without_approving_or_writing(
                     "reviewed_delta_paths": {},
                     "subject_rebindings": {},
                     "rom_subject_rebindings": {},
+                    "audit_only_source_regions": [],
+                    "product_identities": {},
                 }
             )
         )
@@ -342,8 +393,8 @@ def test_audit_identity_rebinding_proposes_hashes_without_approving_or_writing(
     )
     monkeypatch.setattr(
         source_transition,
-        "generate",
-        lambda root, *, authority_path=None: json.loads(
+        "generate_from_authority",
+        lambda root, authority: json.loads(
             transition.read_text(encoding="utf-8")
         )["proposal"],
     )
@@ -399,7 +450,7 @@ def test_reviewed_identity_apply_requires_exact_canonical_proposal(
     monkeypatch.setattr(
         audit_evidence_identities,
         "propose",
-        lambda root, transition: {**proposal, "reviewed": True},
+        lambda root, transition, **kwargs: {**proposal, "reviewed": True},
     )
     with pytest.raises(
         audit_evidence_identities.AuditEvidenceIdentityError,
@@ -408,6 +459,19 @@ def test_reviewed_identity_apply_requires_exact_canonical_proposal(
         audit_evidence_identities.apply_reviewed_proposal(
             tmp_path, transition_path, proposal_path
         )
+
+
+@pytest.mark.parametrize("payload", ('{"schema":"x","schema":"y"}', '{"x":Infinity}'))
+def test_audit_proposal_reader_rejects_duplicate_or_nonfinite_json(
+    tmp_path, payload: str
+) -> None:
+    transition_path = tmp_path / "transition.json"
+    transition_path.write_text(payload, encoding="utf-8")
+    with pytest.raises(
+        audit_evidence_identities.AuditEvidenceIdentityError,
+        match="not strict JSON",
+    ):
+        audit_evidence_identities.propose(tmp_path, transition_path)
 
 
 def test_reviewed_apply_installs_exact_canonical_transition(
@@ -424,6 +488,8 @@ def test_reviewed_apply_installs_exact_canonical_transition(
         "reviewed_delta_paths": {},
         "subject_rebindings": {},
         "rom_subject_rebindings": {},
+        "audit_only_source_regions": [],
+        "product_identities": {},
     }
     transition_proposal = tmp_path / "transition.proposal.json"
     transition_proposal.write_text(
@@ -440,10 +506,19 @@ def test_reviewed_apply_installs_exact_canonical_transition(
     proposal_path.write_text(
         audit_evidence_identities._canonical(proposal), encoding="utf-8"
     )
+
+    def swap_transition_after_snapshot(root, path, *, transition_envelope_text):
+        assert json.loads(transition_envelope_text)["proposal"] == transition
+        replacement = _proposal_envelope(
+            {**transition, "current_source_sha256": "d" * 64}
+        )
+        transition_proposal.write_text(
+            audit_evidence_identities._canonical(replacement), encoding="utf-8"
+        )
+        return proposal
+
     monkeypatch.setattr(
-        audit_evidence_identities,
-        "propose",
-        lambda root, path: proposal,
+        audit_evidence_identities, "propose", swap_transition_after_snapshot
     )
 
     audit_evidence_identities.apply_reviewed_proposal(
@@ -477,7 +552,7 @@ def test_reviewed_apply_rejects_noncanonical_json_and_noncanonical_target(
     monkeypatch.setattr(
         audit_evidence_identities,
         "propose",
-        lambda root, path: proposal,
+        lambda root, path, **kwargs: proposal,
     )
     with pytest.raises(
         audit_evidence_identities.AuditEvidenceIdentityError,
@@ -497,6 +572,33 @@ def test_reviewed_apply_rejects_noncanonical_json_and_noncanonical_target(
     with pytest.raises(
         audit_evidence_identities.AuditEvidenceIdentityError,
         match="canonical authority",
+    ):
+        audit_evidence_identities.apply_reviewed_proposal(
+            tmp_path, transition_proposal, proposal_path
+        )
+
+
+def test_reviewed_apply_rejects_duplicate_audit_proposal_keys(
+    tmp_path, monkeypatch
+) -> None:
+    transition_target = tmp_path / audit_evidence_identities.TRANSITION_PATH
+    transition_target.parent.mkdir(parents=True)
+    transition_target.write_text("{}\n", encoding="utf-8")
+    transition_proposal = tmp_path / "transition.proposal.json"
+    transition_proposal.write_text(
+        audit_evidence_identities._canonical(_proposal_envelope({"identity": "x"})),
+        encoding="utf-8",
+    )
+    proposal_path = tmp_path / "audit.proposal.json"
+    proposal_path.write_text('{"schema":"x","schema":"y"}', encoding="utf-8")
+    monkeypatch.setattr(
+        audit_evidence_identities,
+        "propose",
+        lambda root, path, **kwargs: {},
+    )
+    with pytest.raises(
+        audit_evidence_identities.AuditEvidenceIdentityError,
+        match="not strict JSON",
     ):
         audit_evidence_identities.apply_reviewed_proposal(
             tmp_path, transition_proposal, proposal_path
@@ -739,6 +841,8 @@ def test_audit_identity_rebinding_rejects_untrusted_transition(
         "reviewed_delta_paths": {},
         "subject_rebindings": {},
         "rom_subject_rebindings": {},
+        "audit_only_source_regions": [],
+        "product_identities": {},
     }
     if mutation == "schema":
         authority["schema"] = "fabricated-source-transition-schema"
@@ -780,6 +884,8 @@ def test_audit_identity_rebinding_rejects_fabricated_nondigest_authority(
         "reviewed_delta_paths": {},
         "subject_rebindings": {},
         "rom_subject_rebindings": {},
+        "audit_only_source_regions": [],
+        "product_identities": {},
     }
     authority = json.loads(json.dumps(canonical))
     if mutation in {"reviewed_source_sha256", "baseline_manifest_sha256"}:
@@ -794,8 +900,8 @@ def test_audit_identity_rebinding_rejects_fabricated_nondigest_authority(
     )
     monkeypatch.setattr(
         source_transition,
-        "generate",
-        lambda root, *, authority_path=None: json.loads(json.dumps(canonical)),
+        "generate_from_authority",
+        lambda root, authority: json.loads(json.dumps(canonical)),
     )
 
     with pytest.raises(

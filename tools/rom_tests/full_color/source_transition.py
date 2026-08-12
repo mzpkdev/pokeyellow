@@ -11,6 +11,11 @@ import re
 from typing import Any, Callable, Collection, Iterable, Sequence
 
 from . import baseline_discovery as baseline
+from .conditional_source_authority import (
+    ConditionalSourceAuthorityError,
+    build_regions,
+    product_identities,
+)
 from .discovery_assignment import (
     BASELINE_PRODUCT,
     DiscoveryAssignmentAuthority,
@@ -19,7 +24,8 @@ from .discovery_review import rom_finding_subject, source_finding_subject
 from .rom_discovery import discover_rom_batched, load_map, load_sym
 
 
-SCHEMA = "full-color-production-source-transition-v3"
+SCHEMA = "full-color-production-source-transition-v4"
+PREDECESSOR_SCHEMA = "full-color-production-source-transition-v3"
 PROPOSAL_SCHEMA = "full-color-source-transition-proposal-v1"
 TRANSITION_PATH = Path(
     "specs/full-colors/definitions/phase1-audit-source-transition.json"
@@ -29,6 +35,19 @@ ASSIGNMENTS_PATH = Path("specs/full-colors/inventory/assignments.json")
 
 class SourceTransitionError(RuntimeError):
     """The immutable reviewed authority cannot map uniquely to current evidence."""
+
+
+def _strict_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON value: {value}")
 
 
 def _manifest_sha256(manifest: dict[str, str]) -> str:
@@ -219,10 +238,21 @@ def _raw_baseline_rom(root: Path, source_report: Any) -> Any:
 def generate(root: Path, *, authority_path: Path | None = None) -> dict[str, object]:
     authority_file = authority_path or root / TRANSITION_PATH
     try:
-        authority = json.loads(authority_file.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        authority = json.loads(
+            authority_file.read_text(encoding="utf-8"),
+            object_pairs_hook=_strict_json_object,
+            parse_constant=_reject_json_constant,
+        )
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
         raise SourceTransitionError("source-transition authority is unreadable") from exc
-    expected = {
+    return generate_from_authority(root, authority)
+
+
+def generate_from_authority(
+    root: Path, authority: dict[str, object]
+) -> dict[str, object]:
+    """Canonically recompute a loaded reviewed or proposed transition."""
+    common = {
         "schema",
         "reviewed_source_sha256",
         "current_source_sha256",
@@ -231,7 +261,13 @@ def generate(root: Path, *, authority_path: Path | None = None) -> dict[str, obj
         "subject_rebindings",
         "rom_subject_rebindings",
     }
-    if set(authority) != expected or authority.get("schema") != SCHEMA:
+    schema = authority.get("schema")
+    expected = set(common)
+    if schema == SCHEMA:
+        expected |= {"audit_only_source_regions", "product_identities"}
+    elif schema != PREDECESSOR_SCHEMA:
+        raise SourceTransitionError("source-transition authority is malformed")
+    if set(authority) != expected:
         raise SourceTransitionError("source-transition authority is malformed")
     raw_paths = authority["reviewed_delta_paths"]
 
@@ -290,6 +326,63 @@ def generate(root: Path, *, authority_path: Path | None = None) -> dict[str, obj
         rebound=_rebound_rom_finding,
         kind="ROM",
     )
+    debug_symbols = load_sym(root / "pokeyellow_debug.sym")
+    missing_writer_pairs = {
+        (finding.path, finding.symbol)
+        for finding in source_report.findings
+        if finding.category == "writer"
+        and finding.symbol not in debug_symbols.by_name
+        and finding.path in reviewed_delta_paths
+        and reviewed_delta_paths[finding.path]["reviewed_sha256"] is not None
+    }
+    missing_writers = {symbol for _, symbol in missing_writer_pairs}
+    all_missing_writers = {
+        finding.symbol
+        for finding in source_report.findings
+        if finding.category == "writer" and finding.symbol not in debug_symbols.by_name
+    }
+    added_paths = {
+        path for path, binding in reviewed_delta_paths.items()
+        if binding["reviewed_sha256"] is None
+    }
+    unclassified = {
+        finding.symbol
+        for finding in source_report.findings
+        if finding.category == "writer"
+        and finding.symbol in all_missing_writers
+        and finding.path not in added_paths
+        and finding.symbol not in missing_writers
+    }
+    if unclassified:
+        raise SourceTransitionError(
+            "unlinked writer lacks an added-file or conditional-region predecessor: "
+            + ", ".join(sorted(unclassified))
+        )
+    if schema == SCHEMA:
+        pairs = {
+            (row["path"], row["symbol"])
+            for row in authority["audit_only_source_regions"]
+            if isinstance(row, dict)
+            and isinstance(row.get("path"), str)
+            and isinstance(row.get("symbol"), str)
+        }
+        if len(pairs) != len(authority["audit_only_source_regions"]):
+            raise SourceTransitionError("source-transition conditional regions are malformed")
+        if pairs != missing_writer_pairs:
+            raise SourceTransitionError(
+                "source-transition conditional regions do not enumerate exact unlinked writers"
+            )
+    else:
+        pairs = {
+            (finding.path, finding.symbol)
+            for finding in source_report.findings
+            if (finding.path, finding.symbol) in missing_writer_pairs
+        }
+    try:
+        conditional_regions = build_regions(root, pairs, reviewed_delta_paths)
+        products = product_identities(root)
+    except (ConditionalSourceAuthorityError, OSError, UnicodeError, ValueError) as exc:
+        raise SourceTransitionError(str(exc)) from exc
     return {
         "schema": SCHEMA,
         "reviewed_source_sha256": authority["reviewed_source_sha256"],
@@ -298,6 +391,8 @@ def generate(root: Path, *, authority_path: Path | None = None) -> dict[str, obj
         "reviewed_delta_paths": dict(sorted(reviewed_delta_paths.items())),
         "subject_rebindings": subject_rebindings,
         "rom_subject_rebindings": rom_subject_rebindings,
+        "audit_only_source_regions": conditional_regions,
+        "product_identities": products,
     }
 
 

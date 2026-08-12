@@ -61,10 +61,14 @@ RGBGFXFLAGS  ?= -Weverything
 	compare \
 	tools \
 	test-full-color-setup \
+	test-full-color-phase5-setup \
 	measure-full-color-phase1 \
 	measure-full-color-source-transition \
 	measure-full-color-audit-evidence-identities \
 	measure-full-color-phase2-audit \
+	measure-full-color-phase5-stress \
+	test-full-color-phase5-stress \
+	promote-full-color-phase5-reviewed \
 	measure-full-color-map-backgrounds \
 	render-full-color-map-background-atlases \
 	promote-full-color-map-backgrounds-reviewed \
@@ -138,6 +142,9 @@ FULL_COLOR_RUNTIME_RESULTS ?= test-results/full-color-renderer-runtime
 FULL_COLOR_HARNESS_RESULTS ?= test-results/full-color-harness
 FULL_COLOR_PROPOSALS ?= test-results/full-color-proposals
 FULL_COLOR_MAP_BACKGROUND_ATLASES ?= test-results/full-color-map-background-atlases
+FULL_COLOR_PHASE5_RESULTS ?= test-results/full-color-phase5
+FULL_COLOR_PHASE5_TOOLS ?= test-results/full-color-tools/sameboy-v1.0.3
+FULL_COLOR_PHASE5_PROPOSAL ?= $(FULL_COLOR_PROPOSALS)/phase5-stress.proposal.json
 ROM_TEST_PREBUILT_PRODUCTS ?= 0
 
 ROM_TEST_DEBUG_PRODUCTS := \
@@ -189,6 +196,20 @@ measure-full-color-audit-evidence-identities: measure-full-color-source-transiti
 
 measure-full-color-phase2-audit: measure-full-color-audit-evidence-identities
 	$(PYTHON) -m tools.rom_tests.full_color.phase2_measurements --root . --proposal-output "$(FULL_COLOR_PROPOSALS)/phase2-subjects.proposal.json"
+
+test-full-color-phase5-setup:
+	$(PYTHON) -m tools.rom_tests.full_color.sameboy_phase5_setup --root . --install-root "$(FULL_COLOR_PHASE5_TOOLS)"
+
+measure-full-color-phase5-stress: _rom-test-all-products test-full-color-phase5-setup
+	$(PYTHON) -m tools.rom_tests.full_color.phase5_stress --root . --tool-root "$(FULL_COLOR_PHASE5_TOOLS)" --results "$(FULL_COLOR_PHASE5_RESULTS)" --proposal-output "$(FULL_COLOR_PHASE5_PROPOSAL)"
+
+test-full-color-phase5-stress: measure-full-color-phase5-stress
+	$(PYTHON) -m tools.rom_tests.full_color.phase5_stress --root . --tool-root "$(FULL_COLOR_PHASE5_TOOLS)" --verify "$(FULL_COLOR_PHASE5_PROPOSAL)" --evidence-root "$(FULL_COLOR_PHASE5_RESULTS)" --compare-reviewed specs/full-colors/evidence/phase5-stress.json
+
+# Deliberately proposal-only unless an authority invokes this guarded apply
+# target. Ordinary CI, builds, and certification never publish evidence.
+promote-full-color-phase5-reviewed: _rom-test-all-products test-full-color-phase5-setup
+	$(PYTHON) -m tools.rom_tests.full_color.phase5_stress --root . --tool-root "$(FULL_COLOR_PHASE5_TOOLS)" --apply-proposal "$(FULL_COLOR_PHASE5_PROPOSAL)" --target specs/full-colors/evidence/phase5-stress.json --evidence-root "$(FULL_COLOR_PHASE5_RESULTS)" --authority-reviewed
 
 measure-full-color-map-backgrounds: _rom-test-all-products
 	$(PYTHON) -m tools.rom_tests.full_color.map_background_snapshot --root . --proposal-output "$(FULL_COLOR_PROPOSALS)/map-background-content.proposal.json"

@@ -107,6 +107,30 @@ def _canonical(value: object) -> str:
     return json.dumps(value, indent=2, sort_keys=True) + "\n"
 
 
+def _strict_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON value: {value}")
+
+
+def _strict_json(text: str, *, label: str) -> Any:
+    try:
+        return json.loads(
+            text,
+            object_pairs_hook=_strict_json_object,
+            parse_constant=_reject_json_constant,
+        )
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise AuditEvidenceIdentityError(f"{label} is not strict JSON") from exc
+
+
 def _contained_path(root: Path, path: Path, *, label: str) -> Path:
     root = root.resolve()
     candidate = path if path.is_absolute() else root / path
@@ -261,6 +285,19 @@ def _pin_target(root: Path, relative: Path) -> _PinnedTarget:
     except Exception:
         os.close(directory_fd)
         raise
+
+
+def _pin_input(root: Path, path: Path, *, label: str) -> _PinnedTarget:
+    root = Path(os.path.abspath(root))
+    candidate = Path(os.path.abspath(path if path.is_absolute() else root / path))
+    try:
+        relative = candidate.relative_to(root)
+    except ValueError as exc:
+        raise AuditEvidenceIdentityError(f"{label} escapes repository root") from exc
+    try:
+        return _pin_target(root, relative)
+    except AuditEvidenceIdentityError as exc:
+        raise AuditEvidenceIdentityError(f"{label} cannot be pinned: {exc}") from exc
 
 
 def _allocate_temporary(target: _PinnedTarget) -> tuple[int, str]:
@@ -555,38 +592,46 @@ def apply_reviewed_proposal(
     """Apply one canonically recomputed, explicitly reviewed hash-only proposal."""
     root = root.resolve()
     transition_proposal_argument = transition_proposal
-    transition_proposal = _contained_path(
-        root, transition_proposal_argument, label="source-transition proposal"
-    )
-    proposal_path = _contained_path(root, proposal_path, label="audit proposal")
-    supplied_text = proposal_path.read_text(encoding="utf-8")
-    supplied = json.loads(supplied_text)
-    if supplied_text != _canonical(supplied):
-        raise AuditEvidenceIdentityError(
-            "reviewed audit-evidence proposal is not canonical JSON"
-        )
-    expected = propose(root, transition_proposal_argument)
-    if supplied != expected:
-        raise AuditEvidenceIdentityError(
-            "reviewed audit-evidence proposal does not match canonical recomputation"
-        )
-    transition_envelope_text = transition_proposal.read_text(encoding="utf-8")
-    transition_envelope = json.loads(transition_envelope_text)
-    if transition_envelope_text != _canonical(transition_envelope):
-        raise AuditEvidenceIdentityError(
-            "reviewed source-transition proposal is not canonical JSON"
-        )
-    if transition_envelope.get("authority_path") != str(TRANSITION_PATH):
-        raise AuditEvidenceIdentityError(
-            "source-transition proposal does not name the canonical authority"
-        )
-    transition = transition_envelope.get("proposal")
-    if not isinstance(transition, dict):
-        raise AuditEvidenceIdentityError("source-transition proposal is malformed")
-
     pinned: list[_PinnedTarget] = []
     updates: list[tuple[_PinnedTarget, bytes]] = []
     try:
+        transition_input = _pin_input(
+            root, transition_proposal, label="source-transition proposal"
+        )
+        pinned.append(transition_input)
+        proposal_input = _pin_input(root, proposal_path, label="audit proposal")
+        pinned.append(proposal_input)
+        supplied_text = proposal_input.original.decode("utf-8")
+        supplied = _strict_json(supplied_text, label="reviewed audit-evidence proposal")
+        if supplied_text != _canonical(supplied):
+            raise AuditEvidenceIdentityError(
+                "reviewed audit-evidence proposal is not canonical JSON"
+            )
+        transition_envelope_text = transition_input.original.decode("utf-8")
+        expected = propose(
+            root,
+            transition_proposal_argument,
+            transition_envelope_text=transition_envelope_text,
+        )
+        if supplied != expected:
+            raise AuditEvidenceIdentityError(
+                "reviewed audit-evidence proposal does not match canonical recomputation"
+            )
+        transition_envelope = _strict_json(
+            transition_envelope_text, label="reviewed source-transition proposal"
+        )
+        if transition_envelope_text != _canonical(transition_envelope):
+            raise AuditEvidenceIdentityError(
+                "reviewed source-transition proposal is not canonical JSON"
+            )
+        if transition_envelope.get("authority_path") != str(TRANSITION_PATH):
+            raise AuditEvidenceIdentityError(
+                "source-transition proposal does not name the canonical authority"
+            )
+        transition = transition_envelope.get("proposal")
+        if not isinstance(transition, dict):
+            raise AuditEvidenceIdentityError("source-transition proposal is malformed")
+
         transition_target = _pin_target(root, TRANSITION_PATH)
         pinned.append(transition_target)
         updates.append((transition_target, _canonical(transition).encode()))
@@ -639,7 +684,12 @@ def apply_reviewed_proposal(
             os.close(target.directory_fd)
 
 
-def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
+def propose(
+    root: Path,
+    transition_proposal: Path,
+    *,
+    transition_envelope_text: str | None = None,
+) -> dict[str, object]:
     """Return hash-only, explicitly unreviewed inventory edits.
 
     Reviewer names and review flags are deliberately absent.  This producer
@@ -651,7 +701,12 @@ def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
         if transition_proposal.is_absolute()
         else root / transition_proposal
     )
-    envelope = json.loads(transition_path.read_text(encoding="utf-8"))
+    envelope = _strict_json(
+        transition_path.read_text(encoding="utf-8")
+        if transition_envelope_text is None
+        else transition_envelope_text,
+        label="source-transition proposal",
+    )
     if set(envelope) != {"schema", "reviewed", "authority_path", "proposal"} or (
         envelope.get("schema") != source_transition.PROPOSAL_SCHEMA
         or envelope.get("reviewed") is not False
@@ -670,6 +725,8 @@ def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
             "reviewed_delta_paths",
             "subject_rebindings",
             "rom_subject_rebindings",
+            "audit_only_source_regions",
+            "product_identities",
         }
         or transition["schema"] != source_transition.SCHEMA
     ):
@@ -689,7 +746,9 @@ def propose(root: Path, transition_proposal: Path) -> dict[str, object]:
             "source-transition identity does not match current baseline discovery"
         )
     try:
-        canonical_transition = source_transition.generate(root)
+        canonical_transition = source_transition.generate_from_authority(
+            root, transition
+        )
     except source_transition.SourceTransitionError as exc:
         raise AuditEvidenceIdentityError(
             "source-transition authority failed canonical recomputation"

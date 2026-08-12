@@ -3115,16 +3115,16 @@
       "artifacts": {
         "map": {
           "path": "pokeyellow_phase2_audit.map",
-          "sha256": "af0f8d0b9e37092d044a7d721d0aa889588660e8e09d75dc1c3921d946428e47"
+          "sha256": "5e1f9434614c3b456217ced7cb8394abd4dceb1f970a42672701e249585206de"
         },
         "rom": {
           "path": "pokeyellow_phase2_audit.gbc",
-          "sha256": "61744d0a53b9b7948a204f1344f283d54e184abccb2c969e940e9c541344b867",
+          "sha256": "3c9c19e0ad38fe4313895a012b87d74baddc0e5caad2d7e94ffb19076c0f3d46",
           "size": 1048576
         },
         "sym": {
           "path": "pokeyellow_phase2_audit.sym",
-          "sha256": "ce496c63ddb0620386dfc21979bff427e93f27daff2881a946e4625a1e999738"
+          "sha256": "717d2b5ddafd72c874cfc4b185d7372c15e67b0d9f19c2094e249d7695c7f149"
         }
       },
       "linked_consumers": {
@@ -3135,10 +3135,10 @@
           ],
           "routines": [
             {
-              "address": 16118,
+              "address": 16114,
               "bank": 0,
-              "rom_offset": 16118,
-              "sha256": "371e23cbd17074d58e5749ea69662949dfbb3d0705a7865a193cafda7ab7803a",
+              "rom_offset": 16114,
+              "sha256": "c8c4096ac6b998d13a01a332dbddf0335dd139483cdfcc8c8ee999b0eabb87a6",
               "size": 9,
               "symbol": "UpdateCinnabarGymGateTileBlocks"
             },
@@ -3146,7 +3146,7 @@
               "address": 25795,
               "bank": 7,
               "rom_offset": 124099,
-              "sha256": "2fff6652eaebdf2ecc4a8e59cdcd1c408e262991e399cc5d7e45e4494c9458a5",
+              "sha256": "659f2cea2f428ec6caabf71b313aa5feb02855def5e4b79a0abc43e4f5eacc35",
               "size": 68,
               "symbol": "UpdateCinnabarGymGateTileBlocks_"
             },
@@ -3169,7 +3169,7 @@
               "address": 28134,
               "bank": 3,
               "rom_offset": 60902,
-              "sha256": "6c59e2b663524ebaccae730c0b58b42caf9ddfc71208fe92b40385df1cf3251c",
+              "sha256": "0194448e478d9521b447650c7d2c2709d4bb7dfe61fc9f18de9475b051559684",
               "size": 158,
               "symbol": "UsedCut"
             },
@@ -3190,10 +3190,10 @@
           ],
           "routines": [
             {
-              "address": 31411,
+              "address": 32468,
               "bank": 59,
-              "rom_offset": 981683,
-              "sha256": "b23e5db0786c492a131337e4937ab3138e40c5d6c725c5c6daa0736236ab7aa6",
+              "rom_offset": 982740,
+              "sha256": "add821810386b4b70daea2160f41f34486d24f1a791dd555dc775bebb8a1b204",
               "size": 60,
               "symbol": "PassiveFullColorResolveAttributeForIdentity"
             }
@@ -3208,7 +3208,7 @@
               "address": 27931,
               "bank": 3,
               "rom_offset": 60699,
-              "sha256": "c92aac78b2d92b39276a257c4f027118123f23ef7d00992d59edeba8fc701197",
+              "sha256": "0b00a4241c12c6d2fda67fdfc52f0a06e49d572f8a1a322ec834afffd57d3b1e",
               "size": 62,
               "symbol": "ReplaceTileBlock"
             },
@@ -3231,26 +3231,26 @@
           ],
           "routines": [
             {
-              "address": 23912,
+              "address": 24961,
               "bank": 59,
-              "rom_offset": 974184,
-              "sha256": "6c674364cd5c1292405a4f90ad830d6397daa2972126fde967f6039839afc937",
+              "rom_offset": 975233,
+              "sha256": "a5740c7fd0679ffc7adacef03b254b9de803886eddcf233cacad173fe1e04d2b",
               "size": 38,
               "symbol": "PassiveFullColorCurrentRoofRegion"
             },
             {
-              "address": 31229,
+              "address": 32286,
               "bank": 59,
-              "rom_offset": 981501,
-              "sha256": "0be225cc86362b060ab7a83b68b12be4ad750493806beb61f9d8168100c94fbf",
+              "rom_offset": 982558,
+              "sha256": "1f2634de9e192e6e53f91f5612058e1ca01a95121e968c6689b5639b5fec8623",
               "size": 36,
               "symbol": "PassiveFullColorRoofPaletteForMap"
             },
             {
-              "address": 23950,
+              "address": 24999,
               "bank": 59,
-              "rom_offset": 974222,
-              "sha256": "58bcb6dd565d98a6de27792e6c1838b7b480ea2b93af15148410e00c9bc121e6",
+              "rom_offset": 975271,
+              "sha256": "d1b22107efe54098d78a31e4ec6152c7527c85e9d9afbec7dcf5c8e7b8a587c5",
               "size": 43,
               "symbol": "PassiveFullColorRoofRegionChanged"
             }
@@ -3267,7 +3267,7 @@
               "address": 20599,
               "bank": 17,
               "rom_offset": 282743,
-              "sha256": "77827e2558258eecbcfef79a33f50f7293dcce0fc49b30e6e9f15d1bad7a4c04",
+              "sha256": "c6be7a0723f9fc8771dc2ca6c8aa573534c7c6b212808c20db29cad15e02c29a",
               "size": 76,
               "symbol": "LoadSpinnerArrowTiles"
             }
@@ -3275,321 +3275,321 @@
         }
       },
       "map_overrides": {
-        "address": 31365,
+        "address": 32422,
         "bank": 59,
         "bytes": "7e05034b4c4d4e4f7a040407081718",
-        "rom_offset": 981637,
+        "rom_offset": 982694,
         "sha256": "b1ab3a162cb6b17bbc57a2a452f84eb81421e2c8f0990dd9bd2ef16412a158b8",
         "size": 15,
         "symbol": "FullColorMapAttributeOverrides"
       },
       "payloads": {
         "FullColorBeachHouseBGPalettes": {
-          "address": 29433,
+          "address": 30482,
           "bank": 59,
           "bytes": "ff671c3fb221a610bf63592a2f15850cfd7f0e77a55da228fe672f27e615c20cbf637f2616158610ff771667cc45a320ff5f3f1fd50da608ff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 979705,
+          "rom_offset": 980754,
           "sha256": "3e7f9eae1b29dbaaaee5cb4ce049c0673cb3c9ff576504f02d141060a805f941",
           "size": 64,
           "symbol": "FullColorBeachHouseBGPalettes"
         },
         "FullColorBeachHouseTileAttributes": {
-          "address": 25017,
+          "address": 26066,
           "bank": 59,
           "bytes": "01000101040004040303000000000000010101010400040403030000000000000101000001010101010101010101000001010101010101010101010101010101050502020303030300000000000000000000000000000000000000000000000007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 975289,
+          "rom_offset": 976338,
           "sha256": "0521973117cff482695c2ed425ee32fb91cf4489d8a4a3973dff47060ee8d23e",
           "size": 256,
           "symbol": "FullColorBeachHouseTileAttributes"
         },
         "FullColorCavernBGPalettes": {
-          "address": 29241,
+          "address": 30290,
           "bank": 59,
           "bytes": "dd73d452ab3183107d63f42d0b1d6310fc7f2e7fc56da134fd7f72772952c320bf5f5b223011850cde6f934a492983103b7fb059c8384214ff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 979513,
+          "rom_offset": 980562,
           "sha256": "f7dbc493aacdae230d5ace471193e09e689965f0d1a82a40db79813d9b631612",
           "size": 64,
           "symbol": "FullColorCavernBGPalettes"
         },
         "FullColorCavernTileAttributes": {
-          "address": 24249,
+          "address": 25298,
           "bank": 59,
           "bytes": "00060000050105000000040406050404050500000200000004040404060504040106060105000000000004040605040400050000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 974521,
+          "rom_offset": 975570,
           "sha256": "c05d2d1b10cb9e59b824cba300b87d62271e3545e2115700d70e2ac024e6e525",
           "size": 256,
           "symbol": "FullColorCavernTileAttributes"
         },
         "FullColorCemeteryBGPalettes": {
-          "address": 29113,
+          "address": 30162,
           "bank": 59,
           "bytes": "9e6b734ead35e71c9e6b7f625e19e71c9e6b8f06a901e71c9e6b0f7e297de71c9e6bff1f1f06e71c9e6b351eb00de71c9e6bd97e927de71cff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 979385,
+          "rom_offset": 980434,
           "sha256": "a6c1ad9855306d6be54cfa0c7de9d71e50d69ae7d20ff1c83461b5d8cf21d514",
           "size": 64,
           "symbol": "FullColorCemeteryBGPalettes"
         },
         "FullColorCemeteryTileAttributes": {
-          "address": 27065,
+          "address": 28114,
           "bank": 59,
           "bytes": "00060500000000050506060000050505060005000000000505060600000505050505060505050505050500000000000505050105050505050000050505050505000001000505050005050000000003050000010000000005000505050001010007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 977337,
+          "rom_offset": 978386,
           "sha256": "12da018b424e888fcbecf43bf31468aff6ee5c53c4bbfe12502c01c6a42c5259",
           "size": 256,
           "symbol": "FullColorCemeteryTileAttributes"
         },
         "FullColorClubTileAttributes": {
-          "address": 28345,
+          "address": 29394,
           "bank": 59,
           "bytes": "00020202000502050501010101010100050202020001010505000101010106060000000000000000010100000101010101010101010105000000000000000006000006060606060505050500000105050502020500050505050505050000050507070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 978617,
+          "rom_offset": 979666,
           "sha256": "0de5f6598b8535c8c165c550947926eec283e659f8901aed0154ff998b7699ee",
           "size": 256,
           "symbol": "FullColorClubTileAttributes"
         },
         "FullColorFacilityTileAttributes": {
-          "address": 28601,
+          "address": 29650,
           "bank": 59,
           "bytes": "00010505050202050005050505050505000005050302020500050505050505050101010500000505050500000000000501010100050505050000050505000005050501050505050505050000000005050505010505010005000500000505000007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 978873,
+          "rom_offset": 979922,
           "sha256": "bee0c705a14c519170bb0752db2ff415187e785a120d7424094dc145c2301751",
           "size": 256,
           "symbol": "FullColorFacilityTileAttributes"
         },
         "FullColorForestBGPalettes": {
-          "address": 29177,
+          "address": 30226,
           "bank": 59,
           "bytes": "ff6f9437491ae20cff6f0d2bc511e20cfc7f2f7fe56dc138df63792a4f15a50cbf631b221215860cfe73d44aab2da410ff633f23f70da608ff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 979449,
+          "rom_offset": 980498,
           "sha256": "f1fa3daec8ba0bf9d385e2e921549598e796a09e9bf5a831a46e2eb40d953e83",
           "size": 64,
           "symbol": "FullColorForestBGPalettes"
         },
         "FullColorForestTileAttributes": {
-          "address": 23993,
+          "address": 25042,
           "bank": 59,
           "bytes": "00000000010101010301010303030001010101010200000003010101030300010006040005030303040401010601000100030401060300050303030304040404000200000401010304040404030303030500030304040505000004040405050507070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 974265,
+          "rom_offset": 975314,
           "sha256": "41eb8b85d5c053eef50ccb754d170ce7c4fd261c91c5b952b6fe4c6a87a51be1",
           "size": 256,
           "symbol": "FullColorForestTileAttributes"
         },
         "FullColorGateTileAttributes": {
-          "address": 26297,
+          "address": 27346,
           "bank": 59,
           "bytes": "03010000010202050505000000000000000000000102020505060000000000000505050500050506060505050606060606060505000505010100060506060000000000000000060605000500000001010000000000000000000000000000010007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 976569,
+          "rom_offset": 977618,
           "sha256": "286f8941b2b22567af5db53f4eb9d2270deb975823f9b7b7d893c96ca04a2ed5",
           "size": 256,
           "symbol": "FullColorGateTileAttributes"
         },
         "FullColorGymTileAttributes": {
-          "address": 25785,
+          "address": 26834,
           "bank": 59,
           "bytes": "03000501000001050500000000050500030005050300010505000000000505000000000006060606000505020202020200000000030600000505050501010301020203030000000000000000010105050202030300000000050505000000000007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 976057,
+          "rom_offset": 977106,
           "sha256": "5d5ded1bda8c16111805cda617c4073222f3c66184c1151cc3e1a31884de3aa2",
           "size": 256,
           "symbol": "FullColorGymTileAttributes"
         },
         "FullColorHouseTileAttributes": {
-          "address": 26041,
+          "address": 27090,
           "bank": 59,
           "bytes": "03000000010003030202020202020505000000000100030305050505000005050000030303050505050502020503030505050505030505050505050505030303000000000000050503030303050505050505050503030505030003030505030107070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 976313,
+          "rom_offset": 977362,
           "sha256": "68306dfa3bf6dec9bdecd22752499eeed8532bcac9169513c0ccbcd753ef85d7",
           "size": 256,
           "symbol": "FullColorHouseTileAttributes"
         },
         "FullColorIndoorAltTextBGPalettes": {
-          "address": 29049,
+          "address": 30098,
           "bank": 59,
           "bytes": "9e6b734ead35e71c9e6b7f625e19e71c9e6b8f06a901e71c9e6b0f7e297de71c9e6bff1f1f06e71c9e6b351eb00de71c9e6b717e0e7ee71cff7fb556ad350000",
           "kind": "palette",
-          "rom_offset": 979321,
+          "rom_offset": 980370,
           "sha256": "4a73c1afc6ffa01d2d8cd5d4f9246ae944e4ef0e920bf50d341194dfd683e83a",
           "size": 64,
           "symbol": "FullColorIndoorAltTextBGPalettes"
         },
         "FullColorIndoorBGPalettes": {
-          "address": 28857,
+          "address": 29906,
           "bank": 59,
           "bytes": "9e6b734ead35e71c9e6b7f625e19e71c9e6b8f06a901e71c9e6b0f7e297de71c9e6bff1f1f06e71c9e6b351eb00de71c9e6b717e0e7ee71cff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 979129,
+          "rom_offset": 980178,
           "sha256": "1a691a87222bc41fc8f5ce0dc883c9625105820e62e4f75b756fbb3187a4420b",
           "size": 64,
           "symbol": "FullColorIndoorBGPalettes"
         },
         "FullColorIndoorPCBGPalettes": {
-          "address": 28921,
+          "address": 29970,
           "bank": 59,
           "bytes": "9e6b734ead35e71c9e6b7f625e19e71c9e6b8f06a901e71c9e6b0f7e297de71c9e6bff1f1f06e71c9e6b351eb00de71c9e6b717e0e7ee71cff7f7f2a5e190000",
           "kind": "palette",
-          "rom_offset": 979193,
+          "rom_offset": 980242,
           "sha256": "50c4f6366236f9d1ab5e15d31d8a9a66d688aa9c253fdf60b0c41089cfdeec7d",
           "size": 64,
           "symbol": "FullColorIndoorPCBGPalettes"
         },
         "FullColorInteriorTileAttributes": {
-          "address": 27321,
+          "address": 28370,
           "bank": 59,
           "bytes": "00010100000505050505050505050500050505010105050000000005050505000005050101000200000000050500000000010101000002000101000505050505050101010100010105050505050505050005050101010100050000050505050007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 977593,
+          "rom_offset": 978642,
           "sha256": "43a2f8ad68d29b136fe16722b48aa3e023d14e2a9afd716e6b1b2e5779cb1b13",
           "size": 256,
           "symbol": "FullColorInteriorTileAttributes"
         },
         "FullColorLabTileAttributes": {
-          "address": 28089,
+          "address": 29138,
           "bank": 59,
           "bytes": "00030505050505050505000001010505050505050505050500000000060605050505050506060001050505050202050505050202010100010000050502020505050505020200050605050005010106000505050505000506060600050002020207070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 978361,
+          "rom_offset": 979410,
           "sha256": "cfda1fca8e9dd70be5ef96624121c351370d31740474a782fcdb471690ed3ed4",
           "size": 256,
           "symbol": "FullColorLabTileAttributes"
         },
         "FullColorLobbyTileAttributes": {
-          "address": 27577,
+          "address": 28626,
           "bank": 59,
           "bytes": "00010101010501000000000000000303000501010105010000000000000003030401050500000000050000000000000005050505000000000500000000000000000000000000000006060105050505050000000000000000060600010505000507070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 977849,
+          "rom_offset": 978898,
           "sha256": "519d0ee125db32253fa487ef5f207188281c2b38f23fb9857fcf7c24e3454807",
           "size": 256,
           "symbol": "FullColorLobbyTileAttributes"
         },
         "FullColorMansionTileAttributes": {
-          "address": 27833,
+          "address": 28882,
           "bank": 59,
           "bytes": "00050505010103030202000000000300000105050104030305050000000003000600050505050505040500000005050503000505050505050505050505000005050505050202050503030303030303030300000000050505030303030303000307070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 978105,
+          "rom_offset": 979154,
           "sha256": "03c31d2c46f57e5415d118bb8ef89d2358e77165354917172b4256bc7490377e",
           "size": 256,
           "symbol": "FullColorMansionTileAttributes"
         },
         "FullColorOverworldBGPalettes": {
-          "address": 20898,
+          "address": 20720,
           "bank": 59,
           "bytes": "fb6fb556ad35e71cfb6f7f625e19e71cf62b2c07c501e71cf77e727e8d7de71cfb6fff1f1f06e71cfb6f581ef40de71cfb6fff7f1863e71cff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 971170,
+          "rom_offset": 970992,
           "sha256": "b7708a3bb6ee50e6e1e351398e58f9bc95fb6e0cc9aad63164deaab334397cb9",
           "size": 64,
           "symbol": "FullColorOverworldBGPalettes"
         },
         "FullColorOverworldTileAttributes": {
-          "address": 21026,
+          "address": 20848,
           "bank": 59,
           "bytes": "00050501050606060606040404000500000506050306060606060005050205000000000005060605060600000202020005000505050505050600000005020200020200000000000005050005060600000202020605050000050506050606000007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 971298,
+          "rom_offset": 971120,
           "sha256": "652bb77814f1ad9f997722da80fe179446880da452a42e7e42b1e37e6a35ce37",
           "size": 256,
           "symbol": "FullColorOverworldTileAttributes"
         },
         "FullColorPlateauBGPalettes": {
-          "address": 29369,
+          "address": 30418,
           "bank": 59,
           "bytes": "ff7778674f4ae520ff67732f281ae210fc7f2e7fc56da134de73b552ac39a41cbf635d2a12198614fd73ed36a51dc210ff63fd22b115a510ff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 979641,
+          "rom_offset": 980690,
           "sha256": "3342e7c381d46541556bc16b9924197c7709777fb0e390af5cd32c0f3fe65c0b",
           "size": 64,
           "symbol": "FullColorPlateauBGPalettes"
         },
         "FullColorPlateauTileAttributes": {
-          "address": 24761,
+          "address": 25810,
           "bank": 59,
           "bytes": "00030300000303050503030303040404050305030204040505060604040404040404050005050505050503030006040404040303010101010005050505040404040404040001000000000000000000000000000000000000000000000000000007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 975033,
+          "rom_offset": 976082,
           "sha256": "39c4b7beffd8f910a7ec092cfd75622ab46ba182ef7338692cdbf81743bfbda4",
           "size": 256,
           "symbol": "FullColorPlateauTileAttributes"
         },
         "FullColorPokecenterBGPalettes": {
-          "address": 28985,
+          "address": 30034,
           "bank": 59,
           "bytes": "9e6b734ead35e71c9e6b7f625e19e71c9e6b8f06a901e71c9e6b0f7e297de71c7f2a7f625e19e71c9e6b351eb00de71c9e6b717e0e7ee71cff7f7f2a5e190000",
           "kind": "palette",
-          "rom_offset": 979257,
+          "rom_offset": 980306,
           "sha256": "776802175fa8437de6c5370e46d37f984e37003a4cdff6c2253ffe1b7fa66a42",
           "size": 64,
           "symbol": "FullColorPokecenterBGPalettes"
         },
         "FullColorPokecenterTileAttributes": {
-          "address": 25529,
+          "address": 26578,
           "bank": 59,
           "bytes": "00000101030300000000000001000000000001010303000103030000010100000202050501040101030001010606060602020505010400010000000000000606000000000000000000000000060604040000000000000000000300000000000007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 975801,
+          "rom_offset": 976850,
           "sha256": "972b4d3a6dc0426f486435a43775045359b78d0bbef94edaff8e6a8917c9a89f",
           "size": 256,
           "symbol": "FullColorPokecenterTileAttributes"
         },
         "FullColorRedsHouseTileAttributes": {
-          "address": 25273,
+          "address": 26322,
           "bank": 59,
           "bytes": "03000000010003030202050505050000000000000100030305050505050500000000050503030505050505050500000005050505030305050505050505000000000000000202050500000101030300000000000001000000000001010303000107070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 975545,
+          "rom_offset": 976594,
           "sha256": "4d930ee139e0f350940154d2a23fa797bb2a0aaba13cc1552602bd7f9275e888",
           "size": 256,
           "symbol": "FullColorRedsHouseTileAttributes"
         },
         "FullColorShipPortBGPalettes": {
-          "address": 29305,
+          "address": 30354,
           "bank": 59,
           "bytes": "fc7f2e7fc46da134df67d556ac39a41cff73796f4f52c424fc7fad7665598228bf5f59262f11850cdf6398328e21a414bf635f22f6108610ff7fff7fff7f0000",
           "kind": "palette",
-          "rom_offset": 979577,
+          "rom_offset": 980626,
           "sha256": "e5d73e4a81fd2d8422a34d4192dae5d1326a55db6a855c65b1a9f50937e4bbfd",
           "size": 64,
           "symbol": "FullColorShipPortBGPalettes"
         },
         "FullColorShipPortTileAttributes": {
-          "address": 24505,
+          "address": 25554,
           "bank": 59,
           "bytes": "02020202020203030202000202020202020202020002020202020202020202020404040404040404040402020404040402010102020202020101010101010101020206060201010102020202030303030505050505050505050505050505010107070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 974777,
+          "rom_offset": 975826,
           "sha256": "28804901a15fc193ac711de512b18cbfb6d415a551bd4ff654701ef5dc51c877",
           "size": 256,
           "symbol": "FullColorShipPortTileAttributes"
         },
         "FullColorShipTileAttributes": {
-          "address": 26809,
+          "address": 27858,
           "bank": 59,
           "bytes": "00000606050000010103030503000101000003030300000101030000030101010606000501000005050000050300000003030000010105050500000505000000040401010505000001010500000000000404000001010000010100040303030007070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 977081,
+          "rom_offset": 978130,
           "sha256": "7297ea30579f62aa5401a11ec6e7bfbe8370a6c365a399bb5e8ff090e337be4d",
           "size": 256,
           "symbol": "FullColorShipTileAttributes"
         },
         "FullColorUndergroundTileAttributes": {
-          "address": 26553,
+          "address": 27602,
           "bank": 59,
           "bytes": "00010005050505050505050101000000000000050501000001000000060605000001010303050300010100000303030000010103000003010101060600050100000505000005030000000303000001010505050000050500000004040101050507070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707070707",
           "kind": "attribute",
-          "rom_offset": 976825,
+          "rom_offset": 977874,
           "sha256": "0390aba21d7875a555b3cdf76f824e630940ed002bc0ec56076695d0ef72e74d",
           "size": 256,
           "symbol": "FullColorUndergroundTileAttributes"
@@ -3597,10 +3597,10 @@
       },
       "pointer_tables": {
         "attributes": {
-          "address": 31315,
+          "address": 32372,
           "bank": 59,
-          "bytes": "2252b962b963b95db962b964b963b964b965b966b966b967b966b968b95fb969b96ab95eb96bb96cb96db96eb96fb960b961",
-          "rom_offset": 981587,
+          "bytes": "7051d266d267d261d266d268d267d268d269d26ad26ad26bd26ad26cd263d26dd26ed262d26fd270d271d272d273d264d265",
+          "rom_offset": 982644,
           "rows": [
             {
               "aliases": [
@@ -3609,7 +3609,7 @@
                 "FullColorOverworldTileAttributes"
               ],
               "authority": "FullColorOverworldTileAttributes",
-              "pointer": 21026,
+              "pointer": 20848,
               "tileset": "OVERWORLD",
               "tileset_id": 0
             },
@@ -3619,7 +3619,7 @@
                 "FullColorRedsHouseTileAttributes"
               ],
               "authority": "FullColorRedsHouseTileAttributes",
-              "pointer": 25273,
+              "pointer": 26322,
               "tileset": "REDS_HOUSE_1",
               "tileset_id": 1
             },
@@ -3629,7 +3629,7 @@
                 "FullColorRedsHouseTileAttributesEnd"
               ],
               "authority": "FullColorPokecenterTileAttributes",
-              "pointer": 25529,
+              "pointer": 26578,
               "tileset": "MART",
               "tileset_id": 2
             },
@@ -3638,7 +3638,7 @@
                 "FullColorForestTileAttributes"
               ],
               "authority": "FullColorForestTileAttributes",
-              "pointer": 23993,
+              "pointer": 25042,
               "tileset": "FOREST",
               "tileset_id": 3
             },
@@ -3648,7 +3648,7 @@
                 "FullColorRedsHouseTileAttributes"
               ],
               "authority": "FullColorRedsHouseTileAttributes",
-              "pointer": 25273,
+              "pointer": 26322,
               "tileset": "REDS_HOUSE_2",
               "tileset_id": 4
             },
@@ -3658,7 +3658,7 @@
                 "FullColorPokecenterTileAttributesEnd"
               ],
               "authority": "FullColorGymTileAttributes",
-              "pointer": 25785,
+              "pointer": 26834,
               "tileset": "DOJO",
               "tileset_id": 5
             },
@@ -3668,7 +3668,7 @@
                 "FullColorRedsHouseTileAttributesEnd"
               ],
               "authority": "FullColorPokecenterTileAttributes",
-              "pointer": 25529,
+              "pointer": 26578,
               "tileset": "POKECENTER",
               "tileset_id": 6
             },
@@ -3678,7 +3678,7 @@
                 "FullColorPokecenterTileAttributesEnd"
               ],
               "authority": "FullColorGymTileAttributes",
-              "pointer": 25785,
+              "pointer": 26834,
               "tileset": "GYM",
               "tileset_id": 7
             },
@@ -3688,7 +3688,7 @@
                 "FullColorHouseTileAttributes"
               ],
               "authority": "FullColorHouseTileAttributes",
-              "pointer": 26041,
+              "pointer": 27090,
               "tileset": "HOUSE",
               "tileset_id": 8
             },
@@ -3698,7 +3698,7 @@
                 "FullColorHouseTileAttributesEnd"
               ],
               "authority": "FullColorGateTileAttributes",
-              "pointer": 26297,
+              "pointer": 27346,
               "tileset": "FOREST_GATE",
               "tileset_id": 9
             },
@@ -3708,7 +3708,7 @@
                 "FullColorHouseTileAttributesEnd"
               ],
               "authority": "FullColorGateTileAttributes",
-              "pointer": 26297,
+              "pointer": 27346,
               "tileset": "MUSEUM",
               "tileset_id": 10
             },
@@ -3718,7 +3718,7 @@
                 "FullColorUndergroundTileAttributes"
               ],
               "authority": "FullColorUndergroundTileAttributes",
-              "pointer": 26553,
+              "pointer": 27602,
               "tileset": "UNDERGROUND",
               "tileset_id": 11
             },
@@ -3728,7 +3728,7 @@
                 "FullColorHouseTileAttributesEnd"
               ],
               "authority": "FullColorGateTileAttributes",
-              "pointer": 26297,
+              "pointer": 27346,
               "tileset": "GATE",
               "tileset_id": 12
             },
@@ -3738,7 +3738,7 @@
                 "FullColorUndergroundTileAttributesEnd"
               ],
               "authority": "FullColorShipTileAttributes",
-              "pointer": 26809,
+              "pointer": 27858,
               "tileset": "SHIP",
               "tileset_id": 13
             },
@@ -3748,7 +3748,7 @@
                 "FullColorShipPortTileAttributes"
               ],
               "authority": "FullColorShipPortTileAttributes",
-              "pointer": 24505,
+              "pointer": 25554,
               "tileset": "SHIP_PORT",
               "tileset_id": 14
             },
@@ -3758,7 +3758,7 @@
                 "FullColorShipTileAttributesEnd"
               ],
               "authority": "FullColorCemeteryTileAttributes",
-              "pointer": 27065,
+              "pointer": 28114,
               "tileset": "CEMETERY",
               "tileset_id": 15
             },
@@ -3768,7 +3768,7 @@
                 "FullColorInteriorTileAttributes"
               ],
               "authority": "FullColorInteriorTileAttributes",
-              "pointer": 27321,
+              "pointer": 28370,
               "tileset": "INTERIOR",
               "tileset_id": 16
             },
@@ -3778,7 +3778,7 @@
                 "FullColorForestTileAttributesEnd"
               ],
               "authority": "FullColorCavernTileAttributes",
-              "pointer": 24249,
+              "pointer": 25298,
               "tileset": "CAVERN",
               "tileset_id": 17
             },
@@ -3788,7 +3788,7 @@
                 "FullColorLobbyTileAttributes"
               ],
               "authority": "FullColorLobbyTileAttributes",
-              "pointer": 27577,
+              "pointer": 28626,
               "tileset": "LOBBY",
               "tileset_id": 18
             },
@@ -3798,7 +3798,7 @@
                 "FullColorMansionTileAttributes"
               ],
               "authority": "FullColorMansionTileAttributes",
-              "pointer": 27833,
+              "pointer": 28882,
               "tileset": "MANSION",
               "tileset_id": 19
             },
@@ -3808,7 +3808,7 @@
                 "FullColorMansionTileAttributesEnd"
               ],
               "authority": "FullColorLabTileAttributes",
-              "pointer": 28089,
+              "pointer": 29138,
               "tileset": "LAB",
               "tileset_id": 20
             },
@@ -3818,7 +3818,7 @@
                 "FullColorLabTileAttributesEnd"
               ],
               "authority": "FullColorClubTileAttributes",
-              "pointer": 28345,
+              "pointer": 29394,
               "tileset": "CLUB",
               "tileset_id": 21
             },
@@ -3828,7 +3828,7 @@
                 "FullColorFacilityTileAttributes"
               ],
               "authority": "FullColorFacilityTileAttributes",
-              "pointer": 28601,
+              "pointer": 29650,
               "tileset": "FACILITY",
               "tileset_id": 22
             },
@@ -3838,7 +3838,7 @@
                 "FullColorShipPortTileAttributesEnd"
               ],
               "authority": "FullColorPlateauTileAttributes",
-              "pointer": 24761,
+              "pointer": 25810,
               "tileset": "PLATEAU",
               "tileset_id": 23
             },
@@ -3848,20 +3848,20 @@
                 "FullColorPlateauTileAttributesEnd"
               ],
               "authority": "FullColorBeachHouseTileAttributes",
-              "pointer": 25017,
+              "pointer": 26066,
               "tileset": "BEACH_HOUSE",
               "tileset_id": 24
             }
           ],
-          "sha256": "ef1456369389e6501629c9580d84c9a021ce1db07c4ef762bf38b1ca8cbdd3c4",
+          "sha256": "e0caf0c46af1258e1686016d74a1f34868eba392c228e18698a9893ece96ab39",
           "size": 50,
           "symbol": "FullColorTileAttributePointers"
         },
         "palettes": {
-          "address": 31265,
+          "address": 32322,
           "bank": 59,
-          "bytes": "a251b970f970f971b970b9703971b970b970b9707971b9707971b9707972b971f9703972f970f970f970b970b970b972f972",
-          "rom_offset": 981537,
+          "bytes": "f050d27412751276d274d2745275d274d274d2749275d2749275d2749276d27512755276127512751275d274d274d2761277",
+          "rom_offset": 982594,
           "rows": [
             {
               "aliases": [
@@ -3869,7 +3869,7 @@
                 "FullColorOverworldBGPalettes"
               ],
               "authority": "FullColorOverworldBGPalettes",
-              "pointer": 20898,
+              "pointer": 20720,
               "tileset": "OVERWORLD",
               "tileset_id": 0
             },
@@ -3879,7 +3879,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "REDS_HOUSE_1",
               "tileset_id": 1
             },
@@ -3889,7 +3889,7 @@
                 "FullColorIndoorPCBGPalettes"
               ],
               "authority": "FullColorIndoorPCBGPalettes",
-              "pointer": 28921,
+              "pointer": 29970,
               "tileset": "MART",
               "tileset_id": 2
             },
@@ -3899,7 +3899,7 @@
                 "FullColorForestBGPalettes"
               ],
               "authority": "FullColorForestBGPalettes",
-              "pointer": 29177,
+              "pointer": 30226,
               "tileset": "FOREST",
               "tileset_id": 3
             },
@@ -3909,7 +3909,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "REDS_HOUSE_2",
               "tileset_id": 4
             },
@@ -3919,7 +3919,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "DOJO",
               "tileset_id": 5
             },
@@ -3929,7 +3929,7 @@
                 "FullColorPokecenterBGPalettes"
               ],
               "authority": "FullColorPokecenterBGPalettes",
-              "pointer": 28985,
+              "pointer": 30034,
               "tileset": "POKECENTER",
               "tileset_id": 6
             },
@@ -3939,7 +3939,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "GYM",
               "tileset_id": 7
             },
@@ -3949,7 +3949,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "HOUSE",
               "tileset_id": 8
             },
@@ -3959,7 +3959,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "FOREST_GATE",
               "tileset_id": 9
             },
@@ -3969,7 +3969,7 @@
                 "FullColorPokecenterBGPalettesEnd"
               ],
               "authority": "FullColorIndoorAltTextBGPalettes",
-              "pointer": 29049,
+              "pointer": 30098,
               "tileset": "MUSEUM",
               "tileset_id": 10
             },
@@ -3979,7 +3979,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "UNDERGROUND",
               "tileset_id": 11
             },
@@ -3989,7 +3989,7 @@
                 "FullColorPokecenterBGPalettesEnd"
               ],
               "authority": "FullColorIndoorAltTextBGPalettes",
-              "pointer": 29049,
+              "pointer": 30098,
               "tileset": "GATE",
               "tileset_id": 12
             },
@@ -3999,7 +3999,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "SHIP",
               "tileset_id": 13
             },
@@ -4009,7 +4009,7 @@
                 "FullColorShipPortBGPalettes"
               ],
               "authority": "FullColorShipPortBGPalettes",
-              "pointer": 29305,
+              "pointer": 30354,
               "tileset": "SHIP_PORT",
               "tileset_id": 14
             },
@@ -4019,7 +4019,7 @@
                 "FullColorIndoorAltTextBGPalettesEnd"
               ],
               "authority": "FullColorCemeteryBGPalettes",
-              "pointer": 29113,
+              "pointer": 30162,
               "tileset": "CEMETERY",
               "tileset_id": 15
             },
@@ -4029,7 +4029,7 @@
                 "FullColorIndoorPCBGPalettes"
               ],
               "authority": "FullColorIndoorPCBGPalettes",
-              "pointer": 28921,
+              "pointer": 29970,
               "tileset": "INTERIOR",
               "tileset_id": 16
             },
@@ -4039,7 +4039,7 @@
                 "FullColorForestBGPalettesEnd"
               ],
               "authority": "FullColorCavernBGPalettes",
-              "pointer": 29241,
+              "pointer": 30290,
               "tileset": "CAVERN",
               "tileset_id": 17
             },
@@ -4049,7 +4049,7 @@
                 "FullColorIndoorPCBGPalettes"
               ],
               "authority": "FullColorIndoorPCBGPalettes",
-              "pointer": 28921,
+              "pointer": 29970,
               "tileset": "LOBBY",
               "tileset_id": 18
             },
@@ -4059,7 +4059,7 @@
                 "FullColorIndoorPCBGPalettes"
               ],
               "authority": "FullColorIndoorPCBGPalettes",
-              "pointer": 28921,
+              "pointer": 29970,
               "tileset": "MANSION",
               "tileset_id": 19
             },
@@ -4069,7 +4069,7 @@
                 "FullColorIndoorPCBGPalettes"
               ],
               "authority": "FullColorIndoorPCBGPalettes",
-              "pointer": 28921,
+              "pointer": 29970,
               "tileset": "LAB",
               "tileset_id": 20
             },
@@ -4079,7 +4079,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "CLUB",
               "tileset_id": 21
             },
@@ -4089,7 +4089,7 @@
                 "FullColorIndoorBGPalettes"
               ],
               "authority": "FullColorIndoorBGPalettes",
-              "pointer": 28857,
+              "pointer": 29906,
               "tileset": "FACILITY",
               "tileset_id": 22
             },
@@ -4099,7 +4099,7 @@
                 "FullColorShipPortBGPalettesEnd"
               ],
               "authority": "FullColorPlateauBGPalettes",
-              "pointer": 29369,
+              "pointer": 30418,
               "tileset": "PLATEAU",
               "tileset_id": 23
             },
@@ -4109,40 +4109,40 @@
                 "FullColorPlateauBGPalettesEnd"
               ],
               "authority": "FullColorBeachHouseBGPalettes",
-              "pointer": 29433,
+              "pointer": 30482,
               "tileset": "BEACH_HOUSE",
               "tileset_id": 24
             }
           ],
-          "sha256": "db99cdc135ce9f345ec11c79654e94b2d93caa1d093d3b072bb52a042f4d5859",
+          "sha256": "3316a9695dc71d21254d03fbc4e529333d85ce389d5158cad1a49ce732e3417c",
           "size": 50,
           "symbol": "FullColorBGPalettePointers"
         }
       },
       "product": "pokeyellow_phase2_audit",
       "roof_assignments": {
-        "address": 31471,
+        "address": 32528,
         "bank": 59,
         "bytes": "000102030405060708090a00000102020a050a0a0404050507070706060608080809090303",
-        "rom_offset": 981743,
+        "rom_offset": 982800,
         "sha256": "9a930acff1a4e1490880abff645db68c45b886cf9a305e41eb0f06943d9493b8",
         "size": 37,
         "symbol": "FullColorOverworldRoofAssignments"
       },
       "roof_palettes": {
-        "address": 31512,
+        "address": 32569,
         "bank": 59,
         "bytes": "ff7f1863a01f001f386b344e0e7f8e6a977d33611d0116014f4f832e7f4879301d001600107c0a647f03dc02",
-        "rom_offset": 981784,
+        "rom_offset": 982841,
         "sha256": "6f7369ee8e88ff11563782579268224d677a248eb3f4e0cfec5c106e6e6f5b64",
         "size": 44,
         "symbol": "FullColorOverworldRoofPalettes"
       },
       "roof_region_rules": {
-        "address": 31508,
+        "address": 32565,
         "bank": 59,
         "bytes": "11020a05",
-        "rom_offset": 981780,
+        "rom_offset": 982837,
         "sha256": "13f4f558d8b4ce9e9572c64a88ab9c21b9f6d61ef901a61bb48389206a513f06",
         "size": 4,
         "symbol": "FullColorOverworldRoofRegionRules"
@@ -4151,7 +4151,7 @@
   ],
   "schema": "full-color-map-background-snapshot-v1",
   "source": {
-    "assembled_parity_sha256": "edb6eb226f5c35669678a25dfa752bd5225cf9a57c6060fed5913ffb720540ad",
+    "assembled_parity_sha256": "36d1824c9200e9006919df8ab2d2bf5edd92c65854402067c225b9511cc54f72",
     "authorities": [
       {
         "path": "data/tilesets/full_color_overworld.asm",

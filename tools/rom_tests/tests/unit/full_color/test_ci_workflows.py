@@ -56,6 +56,7 @@ FULL_COLOR_JOB_NAMES = {
     "renderer-contracts": "Renderer / Contract Fixtures",
     "renderer-runtime": "Renderer / Runtime Ownership",
     "audit-evidence": "Evidence / Audit",
+    "phase5-stress": "Phase 5 / Stress & Timing",
 }
 VERIFICATION_JOB_IDS = {
     "build",
@@ -217,6 +218,7 @@ def test_ci_exposes_flat_checks_and_one_stable_merge_gate() -> None:
         "RENDERER_CONTRACTS": "${{ needs.renderer-contracts.result }}",
         "RENDERER_RUNTIME": "${{ needs.renderer-runtime.result }}",
         "AUDIT_EVIDENCE": "${{ needs.audit-evidence.result }}",
+        "PHASE5_STRESS": "${{ needs.phase5-stress.result }}",
         "E2E": "${{ needs.e2e.result }}",
     }
     syntax = subprocess.run(
@@ -259,6 +261,7 @@ def test_merge_gate_accepts_only_all_successful_jobs() -> None:
         "RENDERER_CONTRACTS",
         "RENDERER_RUNTIME",
         "AUDIT_EVIDENCE",
+        "PHASE5_STRESS",
         "E2E",
     ),
 )
@@ -337,6 +340,33 @@ def test_full_color_jobs_split_one_run_contracts_from_evidence() -> None:
         _step(harness, "Run repository and bank contracts")["run"]
     )
     assert _step(harness, "Upload harness contract evidence")["if"] == "always()"
+
+    phase5 = jobs["phase5-stress"]
+    assert phase5["timeout-minutes"] == "45"
+    assert _step(phase5, "Set up build dependencies")["uses"] == (
+        "./.github/actions/setup-build"
+    )
+    assert _step(phase5, "Download same-revision test products")["with"] == {
+        "name": "pokeyellow-test-products",
+        "path": ".",
+    }
+    assert _step(phase5, "Set up pinned SameBoy timing authority")["run"] == (
+        "make test-full-color-phase5-setup"
+    )
+    assert _step(phase5, "Capture and verify Phase 5 proposal")["run"] == (
+        "make test-full-color-phase5-stress ROM_TEST_PREBUILT_PRODUCTS=1"
+    )
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+    assert "--compare-reviewed specs/full-colors/evidence/phase5-stress.json" in makefile
+    assert '--evidence-root "$(FULL_COLOR_PHASE5_RESULTS)"' in makefile
+    assert '--apply-proposal "$(FULL_COLOR_PHASE5_PROPOSAL)"' in makefile
+    assert "--target specs/full-colors/evidence/phase5-stress.json" in makefile
+    assert "--authority-reviewed" in makefile
+    assert "--reviewer" not in makefile
+    assert "test-full-color-phase5-stress: measure-full-color-phase5-stress" in makefile
+    phase5_upload = _step(phase5, "Upload Phase 5 proposal and captures")
+    assert phase5_upload["if"] == "always()"
+    assert phase5_upload["with"]["if-no-files-found"] == "error"
 
     capture = jobs["evidence-capture"]
     assert capture["strategy"] == {

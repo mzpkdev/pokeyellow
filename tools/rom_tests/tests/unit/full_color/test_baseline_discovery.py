@@ -22,6 +22,10 @@ from tools.rom_tests.full_color.baseline_discovery import (
     summary_json,
     writer_roots,
 )
+from tools.rom_tests.full_color.conditional_source_authority import (
+    PRODUCTS,
+    product_identities,
+)
 from tools.rom_tests.full_color.rom_discovery import RomDiscoveryError, parse_sym
 from tools.rom_tests.full_color.source_discovery import (
     SourceDiscoveryReport,
@@ -40,6 +44,11 @@ def _write_reviewed_transition(
     *,
     current_source_sha256: str | None = None,
 ) -> None:
+    for rom_name, sym_name in PRODUCTS.values():
+        if not (repository / rom_name).exists():
+            (repository / rom_name).write_bytes(b"rom")
+        if not (repository / sym_name).exists():
+            (repository / sym_name).write_text("; symbols\n", encoding="utf-8")
     current = {
         relative: _sha256((repository / relative).read_bytes())
         for relative, _ in report.include_graph
@@ -61,7 +70,7 @@ def _write_reviewed_transition(
     path.write_text(
         json.dumps(
             {
-                "schema": "full-color-production-source-transition-v3",
+                "schema": "full-color-production-source-transition-v4",
                 "reviewed_source_sha256": "1" * 64,
                 "current_source_sha256": (
                     report.source_sha256
@@ -72,6 +81,8 @@ def _write_reviewed_transition(
                 "reviewed_delta_paths": bindings,
                 "subject_rebindings": {},
                 "rom_subject_rebindings": {},
+                "audit_only_source_regions": [],
+                "product_identities": product_identities(repository),
             }
         ),
         encoding="utf-8",

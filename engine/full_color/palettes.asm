@@ -15,6 +15,14 @@ PrepareFullColorVisibleUnitSelected::
 	jp PrepareFullColorPairedTransferSelected
 
 PrepareFullColorBGPaletteSelected:
+	; The audit fast writer reconstructs the resident descriptor after its
+	; cross-bank call. Bind that pointer while preparation owns the singleton
+	; palette scratch so a separately cached commit cannot inherit an older
+	; descriptor's transform flag.
+	ld a, l
+	ld [wFullColorActiveDescriptor], a
+	ld a, h
+	ld [wFullColorActiveDescriptor + 1], a
 	push hl
 	ld de, FULL_COLOR_DESCRIPTOR_SOURCE
 	add hl, de
@@ -84,25 +92,12 @@ CommitFullColorVisibleUnitSelected::
 	jp z, CommitFullColorOAMBatchSelected
 	jp CommitFullColorPairedTransferSelected
 
+FullColorPhase5PaletteStart::
 CommitFullColorBGPaletteSelected:
-	push hl
-	ld de, FULL_COLOR_DESCRIPTOR_FLAGS
-	add hl, de
-	bit 1, [hl]
-	ld hl, wFullColorBGPaletteBase
-	jr z, .source
-	ld hl, wFullColorBGPaletteTransformed
-.source
-	ld a, $80
-	ldh [rBGPI], a
-	ld c, LOW(rBGPD)
-	ld b, 64
-.copy
-	ld a, [hli]
-	ldh [c], a
-	dec b
-	jr nz, .copy
-	pop hl
+	; The added-only writer unrolls all 64 bytes while reconstructing
+	; the descriptor pointer from scheduler authority after the farcall.
+	farcall CommitFullColorPhase5BGPaletteFastSelected
+FullColorPhase5PaletteEnd::
 	ret
 
 CommitFullColorOBJPaletteSelected:

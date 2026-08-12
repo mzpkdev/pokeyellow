@@ -369,6 +369,7 @@ INCLUDE "engine/full_color/debug_runtime.asm"
 
 IF DEF(PHASE2_AUDIT)
 INCLUDE "engine/full_color/lifecycle.asm"
+INCLUDE "engine/full_color/phase5_audit.asm"
 ASSERT BANK(FullColorLifecycleROMStart) == FULL_COLOR_PHASE2_ROM_BANK
 ASSERT FullColorLifecycleROMStart >= FULL_COLOR_PHASE3_ROM_START
 ASSERT @ <= $8000

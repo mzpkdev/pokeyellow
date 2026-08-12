@@ -63,6 +63,7 @@ E2E_MODULES = {
         "test_full_color_map_background_batches.py",
         "test_full_color_oak_battle_handoff.py",
         "test_full_color_oaks_lab_save_confirmation.py",
+        "test_phase5_party_reconstruction.py",
         "test_full_color_start_menu_journey.py",
     },
     "journey": {
@@ -461,7 +462,7 @@ def test_each_e2e_module_belongs_to_exactly_one_suite() -> None:
     }
     assert actual == E2E_MODULES
     all_modules = [name for modules in actual.values() for name in modules]
-    assert len(all_modules) == 10
+    assert len(all_modules) == 11
     assert len(all_modules) == len(set(all_modules))
 
 

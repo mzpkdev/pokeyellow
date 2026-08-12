@@ -298,6 +298,22 @@ def test_owned_vblank_commits_window_bg1_before_presentation_and_close_hides_it(
     phase2_rom.write_fixed(shadow, oam_batch)
     for offset in range(160):
         emu.pyboy.memory[0xFE00 + offset] = 0x5A
+    # Serialized audit publication may retain hardware OAM only with an exact
+    # COMPLETE declaration for the current shadow-authority epoch.
+    epoch = 7
+    retained_oam = bytearray(phase2_rom.descriptor(
+        "FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA",
+        source=shadow,
+        flags=phase2_rom.constants["FULL_COLOR_FLAG_OAM_FINISHED"],
+    ))
+    retained_oam[0] |= phase2_rom.constants["COMPLETE"] << 4
+    retained_oam[19] = epoch
+    descriptors = bytearray(phase2_rom.read_wram2(
+        "wFullColorRequestDescriptors", 8 * 20
+    ))
+    descriptors[20:40] = retained_oam
+    phase2_rom.write_wram2("wFullColorRequestDescriptors", descriptors)
+    phase2_rom.write_wram2("wFullColorPhase5OAMAuthorityEpoch", epoch)
     emu.pyboy.memory[emu.symbols["hSCX"]] = 7
     emu.pyboy.memory[emu.symbols["hSCY"]] = 9
     emu.pyboy.memory[emu.symbols["hWY"]] = 0
@@ -305,7 +321,7 @@ def test_owned_vblank_commits_window_bg1_before_presentation_and_close_hides_it(
     emu.pyboy.memory[0xFF42] = 0x66
     emu.pyboy.memory[0xFF4A] = 0x90
     barrier_samples: list[tuple[int, bytes, bytes]] = []
-    barrier_name = "FullColorVBlankOwnerConsumed.publishWindowY"
+    barrier_name = "FullColorPhase5OwnerRevalidationEnd.publishWindowY"
     barrier = emu.symbols[barrier_name]
     barrier_bank = emu.symbol_banks[barrier_name]
 
@@ -316,6 +332,10 @@ def test_owned_vblank_commits_window_bg1_before_presentation_and_close_hides_it(
             emu.read_vram_bank(0, 0x9800, 20),
         ))
 
+    # Commit the immutable overlay through the retained scheduler before the
+    # owner route publishes WY/scroll state. The barrier hook proves the public
+    # plane is complete at its first presentation seam.
+    phase2_rom.call("RunFullColorOwnershipVBlank")
     emu.pyboy.hook_register(barrier_bank, barrier, observe_barrier, None)
     try:
         _, flags = _farcall_from_wram(
@@ -339,7 +359,10 @@ def test_owned_vblank_commits_window_bg1_before_presentation_and_close_hides_it(
         )
     hardware_oam = bytes(emu.pyboy.memory[0xFE00 + offset] for offset in range(160))
     assert hardware_oam == b"\x5a" * 160
-    assert phase2_rom.read_wram2("wFullColorRetryCounter")[0] >= 1
+    # The overlay was already completed through the retained scheduler. Owner
+    # presentation must not manufacture a retry merely because the declared
+    # OAM epoch is retained rather than copied again.
+    assert phase2_rom.read_wram2("wFullColorRetryCounter") == b"\x00"
 
     emu.pyboy.memory[emu.symbols["hWY"]] = 0x90
     _, flags = _farcall_from_wram(
@@ -348,18 +371,31 @@ def test_owned_vblank_commits_window_bg1_before_presentation_and_close_hides_it(
     assert flags & 0x10 == 0
     assert emu.pyboy.memory[0xFF4A] == 0x90
     hardware_oam = bytes(emu.pyboy.memory[0xFE00 + offset] for offset in range(160))
-    assert hardware_oam == oam_batch
+    assert hardware_oam == b"\x5a" * 160
     assert phase2_rom.read_wram2("wFullColorRequestCount") == b"\x00"
 
 
-def test_admission_coalescing_and_oam_noncoalescing(phase2_rom: Phase2Rom) -> None:
+def test_admission_coalescing_and_exact_oam_declaration_identity(
+    phase2_rom: Phase2Rom,
+) -> None:
     bg = phase2_rom.descriptor("FULL_COLOR_REQUEST_BG_PALETTE_PAYLOAD")
     assert phase2_rom.admit(bg)[0] == phase2_rom.constants["ACCEPTED"]
     assert phase2_rom.admit(bg)[0] == phase2_rom.constants["COALESCED"]
-    oam = phase2_rom.descriptor("FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA", desired=2)
-    assert phase2_rom.admit(oam)[0] == phase2_rom.constants["ACCEPTED"]
-    assert phase2_rom.admit(oam)[0] == phase2_rom.constants["ACCEPTED"]
-    assert phase2_rom.read_wram2("wFullColorRequestCount") == b"\x03"
+    shadow = phase2_rom.emulator.symbols["wShadowOAM"]
+    # The natural audit ABI declares only the producer-finished fixed shadow;
+    # an arbitrary descriptor source is rejected without residency.
+    assert phase2_rom.call("EnqueueFullColorOAMBatch", hl=0xC900)[0] == (
+        phase2_rom.constants["DEFERRED"]
+    )
+    assert phase2_rom.call("EnqueueFullColorOAMBatch", hl=shadow)[0] == (
+        phase2_rom.constants["ACCEPTED"]
+    )
+    # A second declaration in the same epoch is a retry, never coalesced or
+    # admitted as a duplicate OAM authority.
+    assert phase2_rom.call("EnqueueFullColorOAMBatch", hl=shadow)[0] == (
+        phase2_rom.constants["DEFERRED"]
+    )
+    assert phase2_rom.read_wram2("wFullColorRequestCount") == b"\x02"
 
 
 @pytest.mark.parametrize("mutated_offset", (13, 17))
@@ -448,14 +484,13 @@ def test_deferred_movement_strip_is_retained_and_retried_without_partial_commit(
         phase2_rom.emulator.symbols["wUpdateSpritesEnabled"]
     ] = 0xFF
 
-    _farcall_from_wram(
-        phase2_rom, "FullColorVBlankOwnerConsumed", entry_bank=1,
-    )
+    phase2_rom.call("RunFullColorOwnershipVBlank")
     assert phase2_rom.read_wram2("wFullColorProducerPending") == b"\x01"
-    _farcall_from_wram(
-        phase2_rom, "FullColorVBlankOwnerConsumed", entry_bank=1,
-    )
+    # Retry is a natural mainline responsibility in the serialized audit
+    # route. It rebuilds only from the frozen private producer authority.
+    _farcall_from_wram(phase2_rom, "RetryFullColorProducer", entry_bank=1)
     assert phase2_rom.read_wram2("wFullColorProducerPending") == b"\x00"
+    phase2_rom.call("RunFullColorOwnershipVBlank")
     for row in range(18):
         assert phase2_rom.emulator.read_vram_bank(0, 0x9840 + row * 32, 2) == second[row * 2:row * 2 + 2]
 
@@ -690,6 +725,72 @@ def test_paired_transfer_commits_whole_tiles_and_attributes(phase2_rom: Phase2Ro
     assert phase2_rom.emulator.read_vram_bank(1, 0x9800, 4) == bytes(value & 0xEF for value in attributes)
 
 
+def test_two_row_paired_transfer_writes_every_tile_and_attribute_once(
+    phase2_rom: Phase2Rom,
+) -> None:
+    width, height = 20, 2
+    extent = width * height
+    tiles = bytes((index * 5 + 3) & 0x7F for index in range(extent))
+    attributes = bytes((index * 3 + 1) & 0xFF for index in range(extent))
+    phase2_rom.write_fixed(0xC900, tiles + attributes)
+    result, flags = phase2_rom.admit(phase2_rom.descriptor(
+        "FULL_COLOR_REQUEST_MAP_ROW_PAIRED",
+        source=0xC900,
+        desired=width | height << 8,
+        extent=extent,
+        reservation=2 * extent,
+        flags=phase2_rom.constants["FULL_COLOR_FLAG_MOVEMENT_STRIP"],
+    ))
+    assert result == phase2_rom.constants["ACCEPTED"]
+    assert flags & 0x10 == 0
+
+    writes: list[tuple[int, int]] = []
+    emu = phase2_rom.emulator
+    start_name = "FullColorPhase5PairedRow20WritesStart"
+    end_name = "FullColorPhase5PairedRow20WritesEnd"
+    bank = emu.symbol_banks[start_name]
+    start = emu.symbols[start_name]
+    end = emu.symbols[end_name]
+    assert emu.symbol_banks[end_name] == bank
+    rom = (REPOSITORY_ROOT / "pokeyellow_phase2_audit.gbc").read_bytes()
+    offset = bank * 0x4000 + start - 0x4000
+    write_sites = [
+        start + index
+        for index, opcode in enumerate(rom[offset:offset + end - start])
+        if opcode == 0x22  # ld [hli], a
+    ]
+    assert len(write_sites) == 2 * width * height
+
+    def record_write(_: object) -> None:
+        writes.append((emu.pyboy.memory[0xFF4F] & 1, emu.pyboy.register_file.HL))
+
+    for address in write_sites:
+        emu.pyboy.hook_register(bank, address, record_write, None)
+    try:
+        phase2_rom.call("RunFullColorOwnershipVBlank")
+    finally:
+        for address in write_sites:
+            emu.pyboy.hook_deregister(bank, address)
+
+    destinations = [
+        0x9800 + row * 32 + column
+        for row in range(height)
+        for column in range(width)
+    ]
+    assert writes == (
+        [(0, address) for address in destinations]
+        + [(1, address) for address in destinations]
+    )
+    assert len(writes) == 2 * width * height
+    for row in range(height):
+        start = row * width
+        destination = 0x9800 + row * 32
+        assert emu.read_vram_bank(0, destination, width) == tiles[start:start + width]
+        assert emu.read_vram_bank(1, destination, width) == bytes(
+            value & 0xEF for value in attributes[start:start + width]
+        )
+
+
 def test_overlay_is_independent_of_vram_or_ambient_map_oracle(phase2_rom: Phase2Rom) -> None:
     tiles = bytes([0x08, 0x19, 0x2A, 0x3B])
     attribute_table = _linked_overworld_tile_attributes(phase2_rom)
@@ -710,21 +811,39 @@ def test_overlay_is_independent_of_vram_or_ambient_map_oracle(phase2_rom: Phase2
     assert phase2_rom.emulator.read_vram_bank(1, 0x9800, 4) == attributes
 
 
-def test_oam_preparation_maps_final_identity_with_palette_zero_fallback(phase2_rom: Phase2Rom) -> None:
+def test_audit_oam_declaration_uses_finished_shadow_without_legacy_remap(
+    phase2_rom: Phase2Rom,
+) -> None:
     batch = bytearray(160)
     for index in range(40):
         batch[index * 4 + 3] = 0xF8 | (index & 7)
-    identities = bytes([3, 0xFF, 9, 0x80] + [0] * 36)
-    phase2_rom.write_fixed(0xC900, bytes(batch) + identities)
-    phase2_rom.admit(phase2_rom.descriptor(
-        "FULL_COLOR_REQUEST_OAM_BATCH_AND_DMA", source=0xC900,
-    ))
-    phase2_rom.call("PrepareNextFullColorRequest")
-    mapped = phase2_rom.read_wram2("wFullColorShadowOAMBatch", 16)
-    assert mapped[3] == 0xFB
-    assert mapped[7] == 0xF8
-    assert mapped[11] == 0xF8
-    assert mapped[15] == 0xF8
+    shadow = phase2_rom.emulator.symbols["wShadowOAM"]
+    phase2_rom.write_fixed(shadow, bytes(batch))
+    phase2_rom.write_fixed(0xC900, b"\xee" * 160)
+    phase2_rom.write_wram2("wFullColorShadowOAMBatch", b"\xa5" * 160)
+    before_hardware = bytes(
+        phase2_rom.emulator.pyboy.memory[0xFE00 + index] for index in range(160)
+    )
+
+    assert phase2_rom.call("EnqueueFullColorOAMBatch", hl=0xC900)[0] == (
+        phase2_rom.constants["DEFERRED"]
+    )
+    assert phase2_rom.read_wram2("wFullColorRequestCount") == b"\x00"
+    assert bytes(
+        phase2_rom.emulator.pyboy.memory[0xFE00 + index] for index in range(160)
+    ) == before_hardware
+
+    assert phase2_rom.call("EnqueueFullColorOAMBatch", hl=shadow)[0] == (
+        phase2_rom.constants["ACCEPTED"]
+    )
+    descriptor = phase2_rom.read_wram2("wFullColorRequestDescriptors", 20)
+    assert int.from_bytes(descriptor[8:10], "little") == shadow
+    assert descriptor[18] == phase2_rom.constants["FULL_COLOR_FLAG_OAM_FINISHED"]
+    phase2_rom.call("RunFullColorOwnershipVBlank")
+    assert bytes(
+        phase2_rom.emulator.pyboy.memory[0xFE00 + index] for index in range(160)
+    ) == bytes(batch)
+    assert phase2_rom.read_wram2("wFullColorShadowOAMBatch", 160) == b"\xa5" * 160
 
 
 def test_prepared_scratch_cannot_be_overwritten_by_a_second_request(phase2_rom: Phase2Rom) -> None:

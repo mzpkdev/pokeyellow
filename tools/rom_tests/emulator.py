@@ -245,8 +245,17 @@ class Emulator:
         )
 
     def is_in_bedroom_overworld(self) -> bool:
-        game_timer_counting = self.read("wStatusFlags6") & 1
-        return self.read("wCurMap") == 0x26 and bool(game_timer_counting)
+        # Map/status bytes take these values transiently during cold-boot setup.
+        # Require the completed Red's bedroom header and spawn state so callers
+        # cannot mistake a half-loaded map (or a crashed boot) for arrival.
+        return (
+            self.read("wCurMap") == 0x26
+            and (self.read("wYCoord"), self.read("wXCoord")) == (6, 3)
+            and self.read("wCurMapTileset") == 4
+            and (self.read("wCurMapHeight"), self.read("wCurMapWidth")) == (4, 4)
+            and bool(self.read("wStatusFlags6") & 1)
+            and bool(self.pyboy.memory[0xFF40] & 0x80)
+        )
 
     def is_in_battle(self) -> bool:
         return self.read("wIsInBattle") != 0
