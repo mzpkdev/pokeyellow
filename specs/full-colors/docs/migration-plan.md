@@ -381,6 +381,13 @@ records their concrete `CHK-…` IDs and timing-row keys. The named
 poisoned-return case is stress progress toward `AC-STRESS-02` and
 `AC-RETURN-01`, not exhaustive closure.
 
+The audit-only case, timing-row, and reached-inventory declaration is
+`specs/full-colors/definitions/phase5-stress-cases.json`. Its
+canonical reviewed evidence path and schema are fixed, but hashes and numeric
+measurements enter authority only through guarded review and promotion. CI
+must reproduce the stable semantic result and compare it exactly with that
+reviewed record; capture artifact identities remain separate evidence.
+
 **Exit gate:** All three named architecture stress cases pass repeatedly with
 deterministic artifacts, positive numeric margins, and threshold-plus-one
 whole-unit deferral for every timed path.

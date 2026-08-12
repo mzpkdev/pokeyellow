@@ -1,3 +1,8 @@
+IF DEF(PHASE2_AUDIT)
+; Zero-byte timing origin for the natural interrupt path. The accepted CGB
+; double-speed deadline remains this origin plus 9120 CPU T-cycles.
+FullColorPhase5VBlankOrigin::
+ENDC
 VBlank::
 
 	push af
@@ -19,6 +24,17 @@ VBlank::
 
 	ldh a, [hLoadedROMBank]
 	ld [wVBlankSavedROMBank], a
+	IF DEF(PHASE2_AUDIT)
+		; Decide the retained VBlank owner before any Yellow-visible register,
+		; VRAM, or OAM writer. Carry clear means the full-color owner completed
+		; its bounded work; resume only the shared non-visible interrupt tail.
+		farcall FullColorVBlankOwnerConsumed
+		jr c, FullColorPhase5YellowOwner
+FullColorPhase5CombinedVBlankEnd::
+		farcall FinishFullColorPhase5DeferredAccounting
+		jr FullColorPhase5YellowOwner.vblankSensitiveOperationsDone
+FullColorPhase5YellowOwner:
+	ENDC
 	ldh a, [hSCX]
 	ldh [rSCX], a
 	ldh a, [hSCY]
@@ -127,6 +143,9 @@ VBlank::
 	pop de
 	pop bc
 	pop af
+	IF DEF(PHASE2_AUDIT)
+FullColorPhase5VBlankHandlerEnd::
+	ENDC
 	reti
 
 

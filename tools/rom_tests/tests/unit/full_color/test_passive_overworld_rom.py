@@ -32,6 +32,9 @@ VIRIDIAN_CITY = 1
 SAFFRON_CITY = 0x0A
 ROUTE_1 = 0x0C
 ROUTE_6 = 0x11
+CELADON_MART_1F = 0x7A
+CELADON_MART_ROOF = 0x7E
+MART = 2
 FOREST = 3
 CAVERN = 17
 SHIP_PORT = 14
@@ -50,6 +53,7 @@ SET_PAL_OVERWORLD = 9
 SCREEN_WIDTH = 20
 SCREEN_HEIGHT = 18
 PRODUCTS = ("pokeyellow", "pokeyellow_debug", "pokeyellow_vc")
+FOUNDATION_PRODUCTS = (*PRODUCTS, "pokeyellow_phase2_audit")
 
 
 @pytest.fixture(name="phase2_rom", params=PRODUCTS)
@@ -69,6 +73,23 @@ def phase2_rom_fixture(request: pytest.FixtureRequest):
         emulator.pyboy.memory[0xFF80 + offset] = value
     try:
         yield instance
+    finally:
+        emulator.close()
+
+
+@pytest.fixture(name="foundation_rom", params=FOUNDATION_PRODUCTS)
+def foundation_rom_fixture(request: pytest.FixtureRequest):
+    product = request.param
+    rom = REPOSITORY_ROOT / f"{product}.gbc"
+    sym = REPOSITORY_ROOT / f"{product}.sym"
+    emulator = Emulator(
+        rom=rom,
+        symbols=sym,
+        results=result_directory(request.node.nodeid) / product,
+        cgb=True,
+    )
+    try:
+        yield Phase2Rom(emulator, numeric_symbols(sym))
     finally:
         emulator.close()
 
@@ -112,10 +133,20 @@ def _linked_overworld_bg_palettes(
         "FullColorOverworldRoofPalettes",
         "FullColorOverworldRoofPalettesEnd",
     )
+    region_rules = _linked_bytes(
+        rom,
+        "FullColorOverworldRoofRegionRules",
+        "FullColorOverworldRoofRegionRulesEnd",
+    )
     assert len(palettes) == 64
     assert 0 <= map_id < len(assignments)
-    roof_map_id = SAFFRON_CITY if map_id == ROUTE_6 and y_coord < 2 else map_id
-    roof_start = assignments[roof_map_id] * 4
+    roof_identity = assignments[map_id]
+    for offset in range(0, len(region_rules), 4):
+        rule_map, y_split, upper_roof, lower_roof = region_rules[offset : offset + 4]
+        if rule_map == map_id:
+            roof_identity = upper_roof if y_coord < y_split else lower_roof
+            break
+    roof_start = roof_identity * 4
     roof_middle_colors = roof_palettes[roof_start : roof_start + 4]
     assert len(roof_middle_colors) == 4
     palettes[6 * 8 + 2 : 6 * 8 + 6] = roof_middle_colors
@@ -462,39 +493,128 @@ def test_viridian_publish_commits_linked_map_specific_roof_colors(
     assert phase2_rom.emulator.read_palette_ram() == viridian
 
 
-@pytest.mark.parametrize(
-    ("y_coord", "roof_map_id"),
-    ((1, SAFFRON_CITY), (2, ROUTE_6)),
-)
-def test_route6_publish_selects_linked_roof_by_player_coordinate(
-    phase2_rom: Phase2Rom,
-    y_coord: int,
-    roof_map_id: int,
+def test_route6_rule_drives_every_near_boundary_palette_and_region_token(
+    foundation_rom: Phase2Rom,
 ) -> None:
-    emu = phase2_rom.emulator.pyboy
+    emu = foundation_rom.emulator.pyboy
     assignments = _linked_bytes(
-        phase2_rom,
+        foundation_rom,
         "FullColorOverworldRoofAssignments",
         "FullColorOverworldRoofAssignmentsEnd",
     )
     roof_palettes = _linked_bytes(
-        phase2_rom,
+        foundation_rom,
         "FullColorOverworldRoofPalettes",
         "FullColorOverworldRoofPalettesEnd",
     )
-    expected = _linked_overworld_bg_palettes(phase2_rom, ROUTE_6, y_coord=y_coord)
-    roof_start = assignments[roof_map_id] * 4
+    rules = _linked_bytes(
+        foundation_rom,
+        "FullColorOverworldRoofRegionRules",
+        "FullColorOverworldRoofRegionRulesEnd",
+    )
+    assert rules == bytes((ROUTE_6, 2, assignments[SAFFRON_CITY], assignments[ROUTE_6]))
 
-    assert expected[6 * 8 + 2 : 6 * 8 + 6] == roof_palettes[roof_start : roof_start + 4]
+    for y_coord, roof_map_id, region in (
+        (0, SAFFRON_CITY, 0),
+        (1, SAFFRON_CITY, 0),
+        (2, ROUTE_6, 1),
+        (3, ROUTE_6, 1),
+    ):
+        expected = _linked_overworld_bg_palettes(
+            foundation_rom, ROUTE_6, y_coord=y_coord
+        )
+        roof_start = assignments[roof_map_id] * 4
+        assert expected[6 * 8 + 2 : 6 * 8 + 6] == roof_palettes[
+            roof_start : roof_start + 4
+        ]
 
-    phase2_rom.call("InitRendererOwnership")
-    emu.memory[phase2_rom.emulator.symbols["wCurMap"]] = ROUTE_6
-    emu.memory[phase2_rom.emulator.symbols["wYCoord"]] = y_coord
-    _write_player_data(phase2_rom, "wUnusedObtainedBadges", 0)
-    emu.memory[0xFF40] &= 0x7F
-    phase2_rom.call("PassiveFullColorApplyMap")
+        foundation_rom.call("InitRendererOwnership")
+        emu.memory[foundation_rom.emulator.symbols["wCurMap"]] = ROUTE_6
+        emu.memory[foundation_rom.emulator.symbols["wCurMapTileset"]] = 0
+        emu.memory[foundation_rom.emulator.symbols["wYCoord"]] = y_coord
+        _write_player_data(foundation_rom, "wUnusedObtainedBadges", 0)
+        emu.memory[0xFF40] &= 0x7F
+        foundation_rom.call("PassiveFullColorApplyMap")
 
-    assert phase2_rom.emulator.read_palette_ram() == expected
+        assert foundation_rom.emulator.read_palette_ram() == expected
+        assert foundation_rom.read_wram2("wPassiveFullColorRoofRegion") == bytes(
+            (region,)
+        )
+
+
+def test_celadon_override_lookup_covers_every_matching_and_nonmatching_tile(
+    foundation_rom: Phase2Rom,
+) -> None:
+    emu = foundation_rom.emulator.pyboy
+    symbols = foundation_rom.emulator.symbols
+    attributes = _linked_bytes(
+        foundation_rom,
+        "FullColorPokecenterTileAttributes",
+        "FullColorPokecenterTileAttributesEnd",
+    )
+    assert len(attributes) == 0x100
+    cases = (
+        (CELADON_MART_ROOF, frozenset(range(0x4B, 0x50)), 3),
+        (CELADON_MART_1F, frozenset((0x07, 0x08, 0x17, 0x18)), 4),
+    )
+    emu.memory[RSVBK] = 1
+    emu.memory[symbols["wCurMapTileset"]] = MART
+    for map_id, overridden_tiles, override in cases:
+        emu.memory[symbols["wCurMap"]] = map_id
+        for tile_id in range(0x100):
+            expected = override if tile_id in overridden_tiles else attributes[tile_id]
+            actual, _ = foundation_rom.call(
+                "PassiveFullColorAttributeForTileWRAM1",
+                a=tile_id,
+                b=0xA5,
+                c=0x5A,
+                de=0xBEEF,
+                hl=0x1234,
+            )
+            assert actual == expected, f"map={map_id:#04x}, tile={tile_id:#04x}"
+            registers = emu.register_file
+            assert (
+                registers.B,
+                registers.C,
+                registers.D << 8 | registers.E,
+                registers.HL,
+            ) == (
+                0xA5,
+                0x5A,
+                0xBEEF,
+                0x1234,
+            )
+            assert emu.memory[RSVBK] == 1
+
+
+def test_runtime_data_change_does_not_widen_or_narrow_admission(
+    foundation_rom: Phase2Rom,
+) -> None:
+    emu = foundation_rom.emulator.pyboy
+    symbols = foundation_rom.emulator.symbols
+    cases = (
+        (ROUTE_6, 0, True),
+        (CELADON_MART_1F, MART, True),
+        (CELADON_MART_ROOF, MART, True),
+        (VIRIDIAN_FOREST, FOREST, False),
+        (MT_MOON_1F, CAVERN, False),
+        (VERMILION_DOCK, SHIP_PORT, False),
+        (INDIGO_PLATEAU, PLATEAU, False),
+        (SUMMER_BEACH_HOUSE, BEACH_HOUSE, False),
+    )
+    emu.memory[RSVBK] = 1
+    emu.memory[symbols["wUnusedObtainedBadges"]] = 0
+    for map_id, tileset, admitted in cases:
+        emu.memory[symbols["wCurMap"]] = map_id
+        emu.memory[symbols["wCurMapTileset"]] = tileset
+        _, flags = foundation_rom.call("PassiveFullColorIsSliceMap")
+        assert bool(flags & 0x80) is admitted
+
+    emu.memory[symbols["wCurMap"]] = ROUTE_6
+    emu.memory[symbols["wCurMapTileset"]] = 0
+    emu.memory[symbols["wUnusedObtainedBadges"]] = 1
+    _, flags = foundation_rom.call("PassiveFullColorIsSliceMap")
+    assert not flags & 0x80
 
 
 @pytest.mark.parametrize(

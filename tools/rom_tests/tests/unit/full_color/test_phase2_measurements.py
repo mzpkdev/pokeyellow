@@ -35,8 +35,8 @@ from tools.rom_tests.full_color.phase2_measurements import (
 from tools.rom_tests.full_color.inventory import WriterInventory
 
 ROOT = Path(__file__).resolve().parents[5]
-BASE_COMMIT = "04c98f0a632d7e0a59ebb83dcd5ef1b6b3452cf5"
-BASE_TREE = "a02a502375a964268ad9ec00ecf7401d3bc0b9ff"
+BASE_COMMIT = "1fe39464be71d7ddaf378c689b40f33faf5c9290"
+BASE_TREE = "d915abf57fcdec79e45e723dd278c7a697d2e0f9"
 GIT_OBJECTS = Path(
     subprocess.run(
         ["git", "rev-parse", "--git-path", "objects"],
@@ -82,6 +82,8 @@ def _phase2_apply_fixture(
     transition_path = ROOT / phase2_measurements.REVIEWED_TRANSITION_PATH
     transition = json.loads(transition_path.read_text(encoding="utf-8"))
     for relative in transition["allowed_tracked_path_sha256"]:
+        if relative == "tools/rom_tests/tests/unit/full_color/test_phase2_measurements.py":
+            continue
         destination = tmp_path / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, destination)
@@ -101,10 +103,10 @@ def _phase2_apply_fixture(
 
 
 def _activate_phase4_transition(root: Path) -> None:
-    for relative in (
-        "specs/full-colors/inventory/assignments.json",
-        phase2_measurements.PLANNED_SUBJECTS_PATH,
-    ):
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    for relative in transition["predecessor_authority_sha256"]:
         (root / relative).write_bytes(
             subprocess.run(
                 ["git", "show", f"{BASE_COMMIT}:{relative}"],
@@ -113,6 +115,42 @@ def _activate_phase4_transition(root: Path) -> None:
                 capture_output=True,
             ).stdout
         )
+
+
+def _consume_reviewed_transition(root: Path) -> None:
+    subprocess.run(["git", "add", "--all"], cwd=root, check=True, capture_output=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Phase 2 Test",
+            "-c",
+            "user.email=phase2@example.invalid",
+            "commit",
+            "-q",
+            "-m",
+            "materialize reviewed successor",
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    )
+
+
+def _trust_fixture_phase1_evidence(root: Path, monkeypatch):
+    evidence = (
+        root / phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    ).read_text(encoding="utf-8")
+    decision = SimpleNamespace(to_json=lambda: evidence)
+    monkeypatch.setattr(
+        phase2_measurements, "generate_phase1_placement", lambda measured_root: decision
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "verify_phase1_placement_evidence",
+        lambda measured_root, evidence_path: decision,
+    )
+    return decision
 
 
 def _rewrite_subject_digest(subject: dict[str, object]) -> None:
@@ -209,6 +247,112 @@ def test_reviewed_subject_apply_accepts_normal_canonical_target(
 
     assert json.loads(target.read_text())
     assert not tuple(target.parent.glob(f".{target.name}.*"))
+
+
+def test_reviewed_subject_apply_rebinds_exact_inventory_source_coordinates(
+    tmp_path, monkeypatch
+) -> None:
+    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+
+    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+
+    documents = {
+        filename: json.loads(
+            (root / "specs/full-colors/inventory" / filename).read_text()
+        )
+        for filename in ("writers.json", "mutations.json")
+    }
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    source_transitions = [
+        item
+        for item in transition["inventory_site_transitions"]
+        if item["site_kind"] == "source_sites"
+    ]
+    assert len(source_transitions) == 9
+    for item in source_transitions:
+        filename = Path(item["inventory"]).name
+        row = next(
+            row for row in documents[filename]["rows"] if row["id"] == item["row_id"]
+        )
+        assert row["source_sites"][item["index"]] == item["to"]
+
+
+@pytest.mark.parametrize("field", ("path", "symbol", "line"))
+def test_reviewed_subject_apply_rejects_inventory_source_identity_mutation(
+    tmp_path, monkeypatch, field: str
+) -> None:
+    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    binding = next(
+        item
+        for item in transition["inventory_site_transitions"]
+        if item["site_kind"] == "source_sites"
+    )
+    inventory_path = root / binding["inventory"]
+    document = json.loads(inventory_path.read_text())
+    row = next(row for row in document["rows"] if row["id"] == binding["row_id"])
+    site = row["source_sites"][binding["index"]]
+    hostile_values = {
+        "path": "engine/full_color/hostile.asm",
+        "symbol": f"{site['symbol']}.hostile",
+        "line": site["line"] + 1,
+    }
+    site[field] = hostile_values[field]
+    inventory_path.write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="reviewed transition predecessor authority set is partial or changed",
+    ):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+
+
+def test_reviewed_inventory_site_transition_rejects_exact_predecessor_tamper(
+    tmp_path,
+) -> None:
+    transition = json.loads(
+        (ROOT / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    binding = transition["inventory_site_transitions"][0]
+    inventory_documents = {}
+    for relative in transition["predecessor_authority_sha256"]:
+        if not relative.startswith("specs/full-colors/inventory/") or relative.endswith(
+            "assignments.json"
+        ):
+            continue
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        document = json.loads(
+            subprocess.run(
+                ["git", "show", f"{BASE_COMMIT}:{relative}"],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout
+        )
+        inventory_documents[path] = document
+    document = next(
+        document
+        for path, document in inventory_documents.items()
+        if path.relative_to(tmp_path).as_posix() == binding["inventory"]
+    )
+    row = next(row for row in document["rows"] if row["id"] == binding["row_id"])
+    row[binding["site_kind"]][binding["index"]]["address"] += 1
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="reviewed inventory site predecessor identity changed",
+    ):
+        phase2_measurements._apply_reviewed_inventory_site_transitions(
+            inventory_documents, [binding]
+        )
 
 
 @pytest.mark.parametrize("replacement", ("symlink", "hardlink", "directory"))
@@ -395,24 +539,23 @@ def test_reviewed_subject_apply_retains_backup_when_postpublish_restore_fails(
     root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
     assignment = root / "specs/full-colors/inventory/assignments.json"
     original = assignment.read_bytes()
-    real_directory_identity = phase2_measurements._directory_identity
+    real_validate_publication = phase2_measurements._validate_publication
     real_replace = os.replace
     validations = 0
 
-    def fail_postpublish(directory, directory_fd):
+    def fail_postpublish(publication):
         nonlocal validations
-        if directory == assignment.parent:
-            validations += 1
-            if validations == 3:
-                raise Phase2MeasurementError("injected postpublish validation failure")
-        return real_directory_identity(directory, directory_fd)
+        validations += 1
+        if validations == 1:
+            raise Phase2MeasurementError("injected postpublish validation failure")
+        return real_validate_publication(publication)
 
     def fail_restore(src, dst, *args, **kwargs):
         if isinstance(src, str) and src.endswith(".restore"):
             raise OSError("injected restore failure")
         return real_replace(src, dst, *args, **kwargs)
 
-    monkeypatch.setattr(phase2_measurements, "_directory_identity", fail_postpublish)
+    monkeypatch.setattr(phase2_measurements, "_validate_publication", fail_postpublish)
     monkeypatch.setattr(phase2_measurements.os, "replace", fail_restore)
     with pytest.raises(
         Phase2MeasurementError,
@@ -500,9 +643,9 @@ def test_reviewed_subject_rollback_uses_pinned_bytes_across_last_moment_swap(
     real_read = phase2_measurements._read_pinned_backup
     calls = 0
 
-    def swap_after_validation(selected):
+    def swap_after_validation(selected, **kwargs):
         nonlocal calls
-        payload = real_read(selected)
+        payload = real_read(selected, **kwargs)
         calls += 1
         if calls == 1:
             backup.rename(parked)
@@ -540,8 +683,8 @@ def test_reviewed_subject_finalize_rejects_last_moment_backup_substitution(
     victim.write_bytes(b"unrelated\n")
     real_read = phase2_measurements._read_pinned_backup
 
-    def swap_after_validation(selected):
-        payload = real_read(selected)
+    def swap_after_validation(selected, **kwargs):
+        payload = real_read(selected, **kwargs)
         backup.rename(parked)
         backup.symlink_to(victim)
         return payload
@@ -586,6 +729,189 @@ def test_reviewed_subject_finalize_rejects_mutation_during_unlink(
     assert not backup.exists()
 
 
+def test_reviewed_subject_finalize_rejects_published_content_tamper(
+    tmp_path,
+) -> None:
+    target = tmp_path / "authority.json"
+    original = b'{"authority":"reviewed"}\n'
+    target.write_bytes(original)
+    publications = []
+    expected = phase2_measurements._authority_identity(
+        target, label="reviewed authority"
+    )
+    phase2_measurements._atomic_replace(
+        target, b'{"authority":"new"}\n', expected, publications
+    )
+    publication = publications[0]
+    backup = tmp_path / publication.backup_name
+    target.write_bytes(b'{"authority":"hostile"}\n')
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="transaction changed before finalize; original authorities restored",
+    ):
+        phase2_measurements._finalize_publication(publication)
+
+    assert target.read_bytes() == original
+    assert not backup.exists()
+
+
+def test_reviewed_subject_finalize_rolls_back_all_publications_on_tamper(
+    tmp_path,
+) -> None:
+    originals = {
+        tmp_path / "transition.json": b'{"authority":"old-transition"}\n',
+        tmp_path / "verifier.py": b'VERIFIER = "old"\n',
+    }
+    replacements = {
+        tmp_path / "transition.json": b'{"authority":"new-transition"}\n',
+        tmp_path / "verifier.py": b'VERIFIER = "new"\n',
+    }
+    publications = []
+    for path, original in originals.items():
+        path.write_bytes(original)
+        expected = phase2_measurements._authority_identity(
+            path, label="reviewed authority"
+        )
+        phase2_measurements._atomic_replace(
+            path, replacements[path], expected, publications
+        )
+    publications[0].path.write_bytes(b'{"authority":"hostile"}\n')
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="transaction changed before finalize; original authorities restored",
+    ):
+        phase2_measurements._finalize_publications(publications)
+
+    assert {path: path.read_bytes() for path in originals} == originals
+    assert not tuple(tmp_path.glob("*.rollback"))
+
+
+def test_reviewed_subject_finalize_rolls_back_after_first_backup_unlink(
+    tmp_path, monkeypatch
+) -> None:
+    originals = {
+        tmp_path / "transition.json": b'{"authority":"old-transition"}\n',
+        tmp_path / "verifier.py": b'VERIFIER = "old"\n',
+    }
+    replacements = {
+        tmp_path / "transition.json": b'{"authority":"new-transition"}\n',
+        tmp_path / "verifier.py": b'VERIFIER = "new"\n',
+    }
+    publications = []
+    for path, original in originals.items():
+        path.write_bytes(original)
+        expected = phase2_measurements._authority_identity(
+            path, label="reviewed authority"
+        )
+        phase2_measurements._atomic_replace(
+            path, replacements[path], expected, publications
+        )
+    real_unlink = phase2_measurements._unlink_pinned_backup
+    injected = False
+
+    def fail_after_first_unlink(publication):
+        nonlocal injected
+        real_unlink(publication)
+        if not injected:
+            injected = True
+            raise Phase2MeasurementError("injected finalize failure")
+
+    monkeypatch.setattr(
+        phase2_measurements, "_unlink_pinned_backup", fail_after_first_unlink
+    )
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="transaction changed before finalize; original authorities restored",
+    ):
+        phase2_measurements._finalize_publications(publications)
+
+    assert {path: path.read_bytes() for path in originals} == originals
+    assert not tuple(tmp_path.glob("*.rollback"))
+
+
+def test_reviewed_subject_finalize_rolls_back_on_directory_fsync_failure(
+    tmp_path, monkeypatch
+) -> None:
+    originals = {
+        tmp_path / "transition.json": b'{"authority":"old-transition"}\n',
+        tmp_path / "verifier.py": b'VERIFIER = "old"\n',
+    }
+    publications = []
+    for path, original in originals.items():
+        path.write_bytes(original)
+        expected = phase2_measurements._authority_identity(
+            path, label="reviewed authority"
+        )
+        phase2_measurements._atomic_replace(
+            path, b"reviewed successor\n", expected, publications
+        )
+    real_fsync = os.fsync
+    injected = False
+
+    def fail_first_directory_fsync(descriptor):
+        nonlocal injected
+        if not injected and descriptor == publications[0].directory_fd:
+            injected = True
+            raise OSError("injected directory fsync failure")
+        return real_fsync(descriptor)
+
+    monkeypatch.setattr(phase2_measurements.os, "fsync", fail_first_directory_fsync)
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="transaction changed before finalize; original authorities restored",
+    ):
+        phase2_measurements._finalize_publications(publications)
+
+    assert {path: path.read_bytes() for path in originals} == originals
+    assert not tuple(tmp_path.glob("*.rollback"))
+
+
+def test_reviewed_subject_finalize_closes_every_fd_after_close_failure(
+    tmp_path, monkeypatch
+) -> None:
+    originals = {
+        tmp_path / "transition.json": b'{"authority":"old-transition"}\n',
+        tmp_path / "verifier.py": b'VERIFIER = "old"\n',
+    }
+    successor = b"reviewed successor\n"
+    publications = []
+    for path, original in originals.items():
+        path.write_bytes(original)
+        expected = phase2_measurements._authority_identity(
+            path, label="reviewed authority"
+        )
+        phase2_measurements._atomic_replace(path, successor, expected, publications)
+    descriptors = tuple(
+        descriptor
+        for publication in publications
+        for descriptor in (publication.backup_fd, publication.directory_fd)
+    )
+    real_close = os.close
+    injected = False
+
+    def fail_first_backup_close(descriptor):
+        nonlocal injected
+        if not injected and descriptor == publications[0].backup_fd:
+            injected = True
+            raise OSError("injected descriptor close failure")
+        return real_close(descriptor)
+
+    monkeypatch.setattr(phase2_measurements.os, "close", fail_first_backup_close)
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="transaction committed but descriptor cleanup failed",
+    ):
+        phase2_measurements._finalize_publications(publications)
+
+    assert all(path.read_bytes() == successor for path in originals)
+    assert not tuple(tmp_path.glob("*.rollback"))
+    for descriptor in descriptors:
+        with pytest.raises(OSError):
+            os.fstat(descriptor)
+
+
 def test_reviewed_subject_transaction_rejects_final_ancestor_swap_with_decoy(
     tmp_path, monkeypatch
 ) -> None:
@@ -627,6 +953,7 @@ def test_reviewed_subject_apply_rejects_rom_semantic_drift(
     tmp_path, monkeypatch, mutation: str
 ) -> None:
     root, proposal_path, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
     proposal = json.loads(proposal_path.read_text())
     subject = proposal["products"][phase2_measurements.PHASE2_AUDIT_PRODUCT][
         "rom_subjects"
@@ -650,8 +977,142 @@ def test_reviewed_subject_apply_rejects_rom_semantic_drift(
         phase2_measurements, "propose_phase2_subjects", lambda root: proposal
     )
 
-    with pytest.raises(Phase2MeasurementError, match="reviewed ROM subject semantics"):
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="exact reviewed subject identity|unreviewed Phase 2 root",
+    ):
         phase2_measurements.apply_reviewed_subject_proposal(root, proposal_path, target)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("call-retarget", "same-offset-unrelated-subject"),
+)
+def test_reviewed_transition_rejects_exact_rom_successor_tamper(
+    tmp_path, monkeypatch, mutation: str
+) -> None:
+    root, proposal_path, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    proposal = json.loads(proposal_path.read_text())
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    assignments = json.loads(
+        (root / "specs/full-colors/inventory/assignments.json").read_text()
+    )
+    rows = {row["id"]: row for row in assignments["rows"]}
+    assignment_id, binding = next(
+        (assignment_id, binding)
+        for assignment_id, binding in transition["subject_transitions"].items()
+        if rows[assignment_id]["subject"]["kind"] == "ROM_FINDING"
+        and isinstance(
+            rows[assignment_id]["subject"]["metadata"]["destination_low"], int
+        )
+    )
+    product = rows[assignment_id]["product"]
+    subject = next(
+        subject
+        for subject in (
+            *proposal["products"][product]["rom_subjects"],
+            *proposal["products"][product]["rom_candidate_subjects"],
+        )
+        if subject["sha256"] == binding["to_sha256"]
+    )
+    metadata = subject["metadata"]
+    if mutation == "call-retarget":
+        metadata["destination_low"] += 1
+        metadata["destination_high"] += 1
+    else:
+        metadata["root"] = "HostileSameOffsetUnrelatedRoot"
+    _rewrite_subject_digest(subject)
+    proposal_path.write_text(
+        json.dumps(proposal, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: proposal
+    )
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="exact reviewed subject identity|unreviewed Phase 2 root",
+    ):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal_path, target)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("cross-subject-pairing", "unlisted-line-and-destination-delta"),
+)
+def test_reviewed_transition_rejects_exact_source_successor_tamper(
+    tmp_path, monkeypatch, mutation: str
+) -> None:
+    root, proposal_path, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    proposal = json.loads(proposal_path.read_text())
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    successor_digests = {
+        binding["to_sha256"]
+        for binding in transition["subject_transitions"].values()
+    }
+    subjects = [
+        subject
+        for subject in proposal["source_subjects"]
+        if subject["sha256"] in successor_digests
+    ]
+    if mutation == "cross-subject-pairing":
+        first, second = subjects[:2]
+        first["metadata"]["line"], second["metadata"]["line"] = (
+            second["metadata"]["line"],
+            first["metadata"]["line"],
+        )
+        _rewrite_subject_digest(first)
+        _rewrite_subject_digest(second)
+    else:
+        subject = next(
+            subject
+            for subject in subjects
+            if isinstance(subject["metadata"]["destination_line"], int)
+        )
+        subject["metadata"]["line"] += 97
+        subject["metadata"]["destination_line"] += 41
+        _rewrite_subject_digest(subject)
+    proposal_path.write_text(
+        json.dumps(proposal, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: proposal
+    )
+
+    with pytest.raises(Phase2MeasurementError, match="exact reviewed subject identity"):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal_path, target)
+
+
+def test_reviewed_transition_cannot_replay_from_partial_predecessor_restore(
+    tmp_path, monkeypatch
+) -> None:
+    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _activate_phase4_transition(root)
+    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+    for relative in (
+        "specs/full-colors/inventory/assignments.json",
+        phase2_measurements.PLANNED_SUBJECTS_PATH,
+    ):
+        (root / relative).write_bytes(
+            subprocess.run(
+                ["git", "show", f"{BASE_COMMIT}:{relative}"],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+            ).stdout
+        )
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="reviewed transition predecessor authority set is partial or changed",
+    ):
+        phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
 
 
 def test_current_phase2_authorities_reproduce_exactly_from_pinned_base_verifier(
@@ -666,18 +1127,18 @@ def test_current_phase2_authorities_reproduce_exactly_from_pinned_base_verifier(
         phase2_measurements.PLANNED_SUBJECTS_PATH,
     )
     expected = {relative: (ROOT / relative).read_bytes() for relative in relative_paths}
-    for relative in relative_paths:
-        baseline = subprocess.run(
-            ["git", "show", f"HEAD:{relative}"],
-            cwd=ROOT,
-            check=True,
-            capture_output=True,
-        ).stdout
-        (root / relative).write_bytes(baseline)
 
     for product in phase2_measurements.PRODUCT_ARTIFACTS.values():
         for suffix in (".gbc", ".map", ".sym"):
             shutil.copy2(ROOT / f"{product}{suffix}", root / f"{product}{suffix}")
+    # The reviewed semantic relocation is a source-coordinate transition, so
+    # historical reproduction needs the same reviewed sources as the products.
+    for reviewed_source in (
+        Path("data/tilesets/full_color_overworld.asm"),
+        Path("engine/full_color/passive_overworld.asm"),
+        Path("engine/full_color/passive_palette_refresh.asm"),
+    ):
+        shutil.copy2(ROOT / reviewed_source, root / reviewed_source)
     proposal.unlink()
     module = "tools.rom_tests.full_color.phase2_measurements"
     subprocess.run(
@@ -733,6 +1194,17 @@ def test_reviewed_transition_rebind_preserves_semantics_and_updates_carrier(
     root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
     transition_path = root / phase2_measurements.REVIEWED_TRANSITION_PATH
     before = json.loads(transition_path.read_text(encoding="utf-8"))
+    extension_path = phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    extension_digest = hashlib.sha256((root / extension_path).read_bytes()).hexdigest()
+    before["allowed_tracked_path_sha256"][extension_path].remove(extension_digest)
+    transition_path.write_bytes(phase2_measurements._canonical_pretty(before))
+    monkeypatch.setattr(
+        phase2_measurements,
+        "REVIEWED_TRANSITION_SHA256",
+        hashlib.sha256(transition_path.read_bytes()).hexdigest(),
+    )
+    _consume_reviewed_transition(root)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
     proposal = phase2_measurements.propose_reviewed_transition_rebind(root)
     proposal_path = root / "reviewed-transition.proposal.json"
     proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
@@ -741,7 +1213,19 @@ def test_reviewed_transition_rebind_preserves_semantics_and_updates_carrier(
 
     after = json.loads(transition_path.read_text(encoding="utf-8"))
     assert after["reason"] == before["reason"]
+    assert after["base_commit"] == before["base_commit"]
+    assert after["base_tree"] == before["base_tree"]
     assert after["subject_transitions"] == before["subject_transitions"]
+    assert after["inventory_site_transitions"] == before["inventory_site_transitions"]
+    assert (
+        after["predecessor_authority_sha256"]
+        == before["predecessor_authority_sha256"]
+    )
+    assert after["successor_authority_sha256"] == before["successor_authority_sha256"]
+    assert after["allowed_tracked_path_sha256"][extension_path] == [
+        *before["allowed_tracked_path_sha256"][extension_path],
+        extension_digest,
+    ]
     transition_digest = hashlib.sha256(transition_path.read_bytes()).hexdigest()
     verifier = (root / phase2_measurements.VERIFIER_PATH).read_bytes()
     assert f'    "{transition_digest}"'.encode() in verifier
@@ -755,15 +1239,242 @@ def test_reviewed_transition_rebind_preserves_semantics_and_updates_carrier(
     )
 
 
+def test_reviewed_transition_extension_rejects_unrelated_tracked_e2e(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    unrelated = (
+        root
+        / "tools/rom_tests/tests/e2e/renderer/test_full_color_map_background_batches.py"
+    )
+    unrelated.write_bytes(unrelated.read_bytes() + b"\n# unreviewed successor\n")
+    with pytest.raises(Phase2MeasurementError, match="forbids modified tracked path"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_extension_rejects_historical_allowed_e2e(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    relative = "tools/rom_tests/tests/e2e/renderer/test_full_color_map_background_batches.py"
+    (root / relative).write_bytes(
+        subprocess.run(
+            ["git", "show", f"{BASE_COMMIT}:{relative}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+    )
+    with pytest.raises(Phase2MeasurementError, match="forbids modified tracked path"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_extension_rejects_hostile_valid_json_phase1(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    evidence = root / phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    evidence.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(Phase2MeasurementError, match="stale or edited"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_extension_rejects_stale_prior_phase1(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    evidence = root / phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    evidence.write_bytes(
+        subprocess.run(
+            ["git", "show", f"{BASE_COMMIT}:{evidence.relative_to(root).as_posix()}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+    )
+    with pytest.raises(Phase2MeasurementError, match="stale or edited"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_extension_rejects_future_canonical_phase1(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    evidence = root / phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    future = json.loads(evidence.read_text(encoding="utf-8"))
+    future["ownership_state"]["stack_margin_bytes"] += 1
+    future_payload = json.dumps(future, indent=2, sort_keys=True) + "\n"
+    evidence.write_text(future_payload, encoding="utf-8")
+    decision = SimpleNamespace(to_json=lambda: future_payload)
+    monkeypatch.setattr(
+        phase2_measurements, "generate_phase1_placement", lambda measured_root: decision
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "verify_phase1_placement_evidence",
+        lambda measured_root, evidence_path: decision,
+    )
+    with pytest.raises(Phase2MeasurementError, match="unreviewed Phase 1 successor"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_base_rejects_future_canonical_phase1(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    evidence = root / phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    future = json.loads(evidence.read_text(encoding="utf-8"))
+    future["ownership_state"]["stack_margin_bytes"] += 1
+    future_payload = json.dumps(future, indent=2, sort_keys=True) + "\n"
+    evidence.write_text(future_payload, encoding="utf-8")
+    decision = SimpleNamespace(to_json=lambda: future_payload)
+    monkeypatch.setattr(
+        phase2_measurements, "generate_phase1_placement", lambda measured_root: decision
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "verify_phase1_placement_evidence",
+        lambda measured_root, evidence_path: decision,
+    )
+    with pytest.raises(Phase2MeasurementError, match="unreviewed Phase 1 successor"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_base_accepts_exact_phase1_predecessor(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    relative = phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    evidence = root / relative
+    predecessor = subprocess.run(
+        ["git", "show", f"{BASE_COMMIT}:{relative}"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout.decode("utf-8")
+    evidence.write_text(predecessor, encoding="utf-8")
+    decision = SimpleNamespace(to_json=lambda: predecessor)
+    monkeypatch.setattr(
+        phase2_measurements, "generate_phase1_placement", lambda measured_root: decision
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "verify_phase1_placement_evidence",
+        lambda measured_root, evidence_path: decision,
+    )
+
+    before = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )["allowed_tracked_path_sha256"][relative]
+    proposal = phase2_measurements.propose_reviewed_transition_rebind(root)
+    assert proposal["transition"]["allowed_tracked_path_sha256"][relative] == before
+
+
+def test_reviewed_transition_extension_rejects_mixed_dirty_paths(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    verifier = root / phase2_measurements.VERIFIER_PATH
+    unrelated = root / "docs/ADDING_CONTENT.md"
+    verifier.write_bytes(
+        phase2_measurements._TRANSITION_DIGEST_CARRIER.sub(
+            b'REVIEWED_TRANSITION_SHA256 = (\n    "' + b"0" * 64 + b'"\n)',
+            verifier.read_bytes(),
+        )
+    )
+    unrelated.write_bytes(unrelated.read_bytes() + b"\nunreviewed future content\n")
+    with pytest.raises(Phase2MeasurementError, match="forbids modified tracked path"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_extension_rejects_general_verifier_rotation(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    verifier = root / phase2_measurements.VERIFIER_PATH
+    verifier.write_bytes(verifier.read_bytes() + b"\n# unreviewed verifier source\n")
+    with pytest.raises(Phase2MeasurementError, match="forbids verifier source rotation"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_base_rejects_general_verifier_rotation(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    verifier = root / phase2_measurements.VERIFIER_PATH
+    verifier.write_bytes(verifier.read_bytes() + b"\n# unreviewed verifier source\n")
+    with pytest.raises(Phase2MeasurementError, match="forbids verifier source rotation"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_extension_rejects_phase1_symlink(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _consume_reviewed_transition(root)
+    evidence = root / phase2_measurements.REVIEWED_TRANSITION_EXTENSION_PATH
+    victim = root / "phase1-decoy.json"
+    victim.write_bytes(evidence.read_bytes())
+    evidence.unlink()
+    evidence.symlink_to(victim)
+    with pytest.raises(Phase2MeasurementError, match="regular non-symlink file"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
+def test_reviewed_transition_rebind_hash_binds_authority_before_semantics(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    transition_path = root / phase2_measurements.REVIEWED_TRANSITION_PATH
+    transition = json.loads(transition_path.read_text(encoding="utf-8"))
+    transition["consumed_extension"]["successor_sha256"] = "f" * 64
+    transition_path.write_bytes(phase2_measurements._canonical_pretty(transition))
+    with pytest.raises(Phase2MeasurementError, match="transition authority changed"):
+        phase2_measurements.propose_reviewed_transition_rebind(root)
+
+
 def test_reviewed_transition_rebind_rejects_stale_proposal(
     tmp_path, monkeypatch
 ) -> None:
     root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
     proposal = phase2_measurements.propose_reviewed_transition_rebind(root)
     proposal_path = root / "reviewed-transition.proposal.json"
     proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
     changed = root / "docs/ADDING_CONTENT.md"
     changed.write_bytes(changed.read_bytes() + b"\n")
+
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="stale or semantically changed reviewed-transition rebind proposal",
+    ):
+        phase2_measurements.apply_reviewed_transition_rebind(root, proposal_path)
+
+
+def test_reviewed_transition_rebind_rejects_stale_unlisted_tracked_edit(
+    tmp_path, monkeypatch
+) -> None:
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
+    _trust_fixture_phase1_evidence(root, monkeypatch)
+    proposal = phase2_measurements.propose_reviewed_transition_rebind(root)
+    proposal_path = root / "reviewed-transition.proposal.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+    readme = root / "README.md"
+    readme.write_bytes(readme.read_bytes() + b"\nunreviewed tracked edit\n")
 
     with pytest.raises(
         Phase2MeasurementError,
@@ -862,15 +1573,13 @@ def test_reviewed_phase4_transition_rejects_unrelated_tracked_edit(
 def test_reviewed_phase4_transition_accepts_hash_bound_intended_dirty_paths(
     tmp_path, monkeypatch
 ) -> None:
-    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
     _activate_phase4_transition(root)
 
-    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
-
-    assert (
-        target.read_bytes()
-        == (ROOT / phase2_measurements.PLANNED_SUBJECTS_PATH).read_bytes()
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
     )
+    phase2_measurements._validate_reviewed_phase4_worktree(root, transition)
 
 
 def test_reviewed_phase4_transition_rejects_mm_index_bypass(
@@ -921,7 +1630,7 @@ def test_reviewed_phase4_transition_rejects_every_staged_change_kind(
 def test_reviewed_phase4_transition_ignores_untracked_build_artifacts(
     tmp_path, monkeypatch
 ) -> None:
-    root, proposal, target = _phase2_apply_fixture(tmp_path, monkeypatch)
+    root, _, _ = _phase2_apply_fixture(tmp_path, monkeypatch)
     _activate_phase4_transition(root)
     (root / "pokeyellow.gbc").write_bytes(b"disposable build artifact")
     disposable = root / "test-results/phase2"
@@ -931,7 +1640,10 @@ def test_reviewed_phase4_transition_ignores_untracked_build_artifacts(
     preemdeck.mkdir(parents=True)
     (preemdeck / "state.json").write_text("{}\n", encoding="utf-8")
 
-    phase2_measurements.apply_reviewed_subject_proposal(root, proposal, target)
+    transition = json.loads(
+        (root / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    phase2_measurements._validate_reviewed_phase4_worktree(root, transition)
 
 
 @pytest.mark.parametrize(
@@ -1802,25 +2514,379 @@ def test_passive_rom_pointer_authority_has_exact_site_and_root_coverage() -> Non
     } == {"WR-P2-YELLOW-OVERLAY-TRANSFER"}
 
 
-def test_passive_rom_pointer_authority_has_one_uniform_payload_rebase() -> None:
+def test_passive_rom_pointer_authority_has_exact_reviewed_rebases() -> None:
     previous = phase2_measurements._PREVIOUS_PASSIVE_ROM_POINTER_WRITES
-    current = phase2_measurements._PASSIVE_ROM_POINTER_WRITES
-    assert len(previous) == len(current) == 78
+    phase4 = phase2_measurements._PHASE4_PASSIVE_ROM_POINTER_WRITES
+    assert len(previous) == len(phase4) == 78
 
-    expected_delta = phase2_measurements._PASSIVE_ROM_POINTER_REBASE_BYTES
-    assert expected_delta == 0x780
+    payload_delta = phase2_measurements._PASSIVE_ROM_POINTER_REBASE_BYTES
+    column_delta = phase2_measurements._MAP_SEMANTIC_COLUMN_POINTER_REBASE_BYTES
+    row_delta = phase2_measurements._MAP_SEMANTIC_ROW_POINTER_REBASE_BYTES
+    assert payload_delta == 0x780
+    assert column_delta == 0xA2
+    assert row_delta == 0xB4
+    assert phase2_measurements._MAP_SEMANTIC_COLUMN_POINTER_SITES == {
+        0x6BD5,
+        0x6BD8,
+        0x6BDE,
+        0x6BE1,
+    }
+    assert phase2_measurements._MAP_SEMANTIC_ROW_POINTER_SITES == {
+        0x6C8E,
+        0x6C91,
+        0x6C97,
+        0x6C9A,
+    }
     deltas = []
     expected_sites = []
     for (old_bank, old_address, opcode), roots in previous.items():
-        delta = expected_delta if opcode == "12" else 0
+        delta = phase2_measurements._passive_pointer_rebase(old_address, opcode)
         rebased = (old_bank, old_address + delta, opcode)
-        assert current[rebased] is roots
+        assert phase4[rebased] is roots
+        deltas.append(delta)
+        expected_sites.append(rebased)
+
+    assert list(phase4) == expected_sites
+    assert deltas.count(0) == 2
+    assert deltas.count(payload_delta) == 68
+    assert deltas.count(payload_delta + column_delta) == 4
+    assert deltas.count(payload_delta + row_delta) == 4
+
+
+def test_phase5_passive_rom_pointer_authority_is_relocation_only() -> None:
+    phase4 = phase2_measurements._PHASE4_PASSIVE_ROM_POINTER_WRITES
+    current = phase2_measurements._PASSIVE_ROM_POINTER_WRITES
+    assert len(phase4) == len(current) == 78
+
+    clear_delta = phase2_measurements._PHASE5_CLEAR_POINTER_REBASE_BYTES
+    redraw_delta = phase2_measurements._PHASE5_REDRAW_POINTER_REBASE_BYTES
+    assert clear_delta == -0xAA
+    assert redraw_delta == 0x419
+
+    deltas = []
+    expected_sites = []
+    for (bank, address, opcode), roots in phase4.items():
+        delta = phase2_measurements._phase5_passive_pointer_rebase(opcode)
+        rebased = (bank, address + delta, opcode)
+        assert current[rebased] == phase2_measurements._phase5_passive_pointer_roots(
+            roots
+        )
         deltas.append(delta)
         expected_sites.append(rebased)
 
     assert list(current) == expected_sites
-    assert deltas.count(0) == 2
-    assert deltas.count(expected_delta) == 76
+    assert deltas.count(clear_delta) == 2
+    assert deltas.count(redraw_delta) == 76
+    assert min(address for _, address, _ in current) == 21541
+    assert max(address for _, address, _ in current) == 30951
+
+
+@pytest.mark.parametrize(
+    ("opcode", "expected"),
+    [("72", -0xAA), ("22", -0xAA), ("12", 0x419)],
+)
+def test_phase5_passive_pointer_rebase_is_opcode_bound(
+    opcode: str, expected: int
+) -> None:
+    assert phase2_measurements._phase5_passive_pointer_rebase(opcode) == expected
+
+
+def test_phase5_passive_pointer_rebase_refuses_unknown_opcode() -> None:
+    with pytest.raises(
+        Phase2MeasurementError, match="unreviewed Phase 5 passive pointer opcode"
+    ):
+        phase2_measurements._phase5_passive_pointer_rebase("ea")
+
+
+def test_phase5_passive_pointer_ancestry_is_exact_symbol_preserving_rebase() -> None:
+    assert phase2_measurements._PHASE5_CLEAR_ANCESTRY_SITES == {
+        0x5378,
+        0x545A,
+        0x549A,
+        0x54AD,
+        0x54BA,
+        0x54BD,
+        0x54EC,
+        0x5513,
+    }
+    assert phase2_measurements._PHASE5_REDRAW_ANCESTRY_SITES == {0x7353, 0x740C}
+    assert phase2_measurements._phase5_passive_ancestry_rebase(
+        "PassiveFullColorVBlank"
+    ) == "PassiveFullColorVBlank"
+    assert phase2_measurements._phase5_passive_ancestry_rebase("3b:545a") == (
+        "3b:53b0"
+    )
+    assert phase2_measurements._phase5_passive_ancestry_rebase("3b:7353") == (
+        "3b:776c"
+    )
+
+
+def test_phase5_passive_pointer_ancestry_refuses_unknown_linked_site() -> None:
+    with pytest.raises(
+        Phase2MeasurementError,
+        match="unreviewed Phase 5 passive pointer ancestry site",
+    ):
+        phase2_measurements._phase5_passive_ancestry_rebase("3b:6000")
+
+
+def test_phase5_relocation_extension_is_complete_and_production_neutral() -> None:
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    assert proposal["schema"] == (
+        "full-color-phase2-phase5-audit-relocation-proposal-v1"
+    )
+    assert proposal["reviewed"] is False
+    extension = proposal["extension"]
+    assert extension["previous_transition_sha256"] == (
+        phase2_measurements.REVIEWED_TRANSITION_SHA256
+    )
+    assert len(extension["relocation_sites"]) == 78
+    assert len(extension["subject_transitions"]) == 253
+    assert len(extension["shared_candidate_transitions"]) == 15
+    assert set(extension["predecessor_authority_sha256"]) == set(
+        extension["successor_authority_sha256"]
+    ) == set(phase2_measurements._PHASE2_AUTHORITY_PATHS)
+
+    evidence = json.loads(
+        (
+            ROOT
+            / "specs/full-colors/evidence/phase2-hostile-slice-representation.json"
+        ).read_text()
+    )
+    assert extension["production_artifact_sha256"] == {
+        name: evidence["inputs"][name]["sha256"]
+        for product in phase2_measurements.PRODUCTION_PRODUCTS
+        for name in (
+            f"{phase2_measurements.PRODUCT_ARTIFACTS[product]}.gbc",
+            f"{phase2_measurements.PRODUCT_ARTIFACTS[product]}.map",
+            f"{phase2_measurements.PRODUCT_ARTIFACTS[product]}.sym",
+        )
+    }
+
+
+def test_phase5_relocation_extension_successors_match_pinned_hashes() -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_relocation_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    extension = proposal["extension"]
+    assert {
+        relative: hashlib.sha256(payload).hexdigest()
+        for relative, payload in payloads.items()
+    } == extension["successor_authority_sha256"]
+    assert details["subject_transitions"] == extension["subject_transitions"]
+    assert details["shared_candidate_transitions"] == extension[
+        "shared_candidate_transitions"
+    ]
+
+
+def test_phase5_relocation_extension_refuses_replay(tmp_path, monkeypatch) -> None:
+    relative = phase2_measurements.REVIEWED_TRANSITION_PATH
+    transition = json.loads((ROOT / relative).read_text())
+    transition[phase2_measurements.PHASE5_RELOCATION_EXTENSION_KEY] = {
+        "schema": phase2_measurements.PHASE5_RELOCATION_EXTENSION_SCHEMA
+    }
+    payload = phase2_measurements._canonical_pretty(transition)
+    destination = tmp_path / relative
+    destination.parent.mkdir(parents=True)
+    destination.write_bytes(payload)
+    monkeypatch.setattr(
+        phase2_measurements,
+        "REVIEWED_TRANSITION_SHA256",
+        hashlib.sha256(payload).hexdigest(),
+    )
+    with pytest.raises(
+        Phase2MeasurementError, match="relocation extension is already consumed"
+    ):
+        phase2_measurements.propose_phase5_relocation_extension(tmp_path)
+
+
+def test_phase5_shared_candidate_relocation_is_exact() -> None:
+    assert phase2_measurements._PHASE5_SHARED_CANDIDATE_REBASE_BYTES == -0x18
+
+
+def test_phase5_relocation_apply_publishes_all_authorities_atomically(
+    tmp_path, monkeypatch
+) -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_relocation_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    for relative in (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+    ):
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+    proposal_path = tmp_path / "phase5-relocation.proposal.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+
+    monkeypatch.setattr(
+        phase2_measurements,
+        "propose_phase5_relocation_extension",
+        lambda root: proposal,
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: measured
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "_phase5_relocation_successor_payloads",
+        lambda root, current: (payloads, details),
+    )
+    phase2_measurements.apply_phase5_relocation_extension(
+        tmp_path, proposal_path
+    )
+
+    extension = proposal["extension"]
+    assert {
+        relative: hashlib.sha256((tmp_path / relative).read_bytes()).hexdigest()
+        for relative in phase2_measurements._PHASE2_AUTHORITY_PATHS
+    } == extension["successor_authority_sha256"]
+    transition = json.loads(
+        (tmp_path / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    assert transition[phase2_measurements.PHASE5_RELOCATION_EXTENSION_KEY] == (
+        extension
+    )
+    assert phase2_measurements._TRANSITION_DIGEST_CARRIER.search(
+        (tmp_path / phase2_measurements.VERIFIER_PATH).read_bytes()
+    )
+
+
+@pytest.mark.parametrize(
+    "relative",
+    (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+    ),
+)
+@pytest.mark.parametrize("mutation", ("same-inode-restore", "inode-swap"))
+@pytest.mark.parametrize("stage", ("after-recompute", "before-replace"))
+def test_phase5_relocation_apply_rejects_concurrent_predecessor_mutation(
+    tmp_path, monkeypatch, relative, mutation, stage
+) -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_relocation_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_relocation_extension(ROOT)
+    relatives = (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+    )
+    before = {}
+    for copied_relative in relatives:
+        destination = tmp_path / copied_relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / copied_relative, destination)
+        before[copied_relative] = destination.read_bytes()
+    proposal_path = tmp_path / "phase5-relocation.proposal.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+
+    monkeypatch.setattr(
+        phase2_measurements,
+        "propose_phase5_relocation_extension",
+        lambda root: proposal,
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: measured
+    )
+    target = tmp_path / relative
+
+    def mutate_target() -> None:
+        original = target.read_bytes()
+        if mutation == "same-inode-restore":
+            with target.open("r+b") as stream:
+                stream.seek(0)
+                stream.write(bytes([original[0] ^ 1]))
+                stream.flush()
+                os.fsync(stream.fileno())
+                stream.seek(0)
+                stream.write(original)
+                stream.truncate()
+                stream.flush()
+                os.fsync(stream.fileno())
+        else:
+            replacement = target.with_name(f".{target.name}.concurrent")
+            replacement.write_bytes(original)
+            os.replace(replacement, target)
+
+    def mutate_after_recompute(root, current):
+        mutate_target()
+        return payloads, details
+
+    if stage == "after-recompute":
+        monkeypatch.setattr(
+            phase2_measurements,
+            "_phase5_relocation_successor_payloads",
+            mutate_after_recompute,
+        )
+        message = "pinned authority changed during recomputation"
+    else:
+        monkeypatch.setattr(
+            phase2_measurements,
+            "_phase5_relocation_successor_payloads",
+            lambda root, current: (payloads, details),
+        )
+        real_atomic_replace = phase2_measurements._atomic_replace
+        mutated = False
+
+        def mutate_before_replace(path, payload, expected, ledger, **kwargs):
+            nonlocal mutated
+            if path == target and not mutated:
+                mutate_target()
+                mutated = True
+            return real_atomic_replace(path, payload, expected, ledger, **kwargs)
+
+        monkeypatch.setattr(
+            phase2_measurements, "_atomic_replace", mutate_before_replace
+        )
+        message = "Phase 5 relocation apply failed; predecessor authorities restored"
+    with pytest.raises(
+        Phase2MeasurementError, match=message
+    ):
+        phase2_measurements.apply_phase5_relocation_extension(
+            tmp_path, proposal_path
+        )
+    assert {
+        copied_relative: (tmp_path / copied_relative).read_bytes()
+        for copied_relative in relatives
+    } == before
+
+
+@pytest.mark.parametrize(
+    ("site", "opcode", "expected"),
+    [
+        (0x6BD5, "12", 0x822),
+        (0x6C8E, "12", 0x834),
+        (0x6BE7, "12", 0x780),
+        (0x54CF, "72", 0),
+    ],
+)
+def test_passive_rom_pointer_rebase_is_site_and_opcode_bound(
+    site: int, opcode: str, expected: int
+) -> None:
+    assert phase2_measurements._passive_pointer_rebase(site, opcode) == expected
+
+
+def test_map_semantic_subject_relocations_are_exact_reviewed_transitions() -> None:
+    transition = json.loads(
+        (ROOT / phase2_measurements.REVIEWED_TRANSITION_PATH).read_text()
+    )
+    assert transition["schema"] == "full-color-phase2-reviewed-transition-v2"
+    assert len(transition["subject_transitions"]) == 1784
+    assert all(
+        set(binding) == {"from_sha256", "to_sha256"}
+        and binding["from_sha256"] != binding["to_sha256"]
+        for binding in transition["subject_transitions"].values()
+    )
+    assert len(transition["inventory_site_transitions"]) == 17
 
 
 def test_transport_special_relocation_is_exactly_three_complete_payload_pairs() -> None:
@@ -2253,3 +3319,303 @@ def test_normal_link_products_expose_no_phase2_audit_entries(
     path.write_bytes(path.read_bytes() + b"Phase2AuditForbidden")
     with pytest.raises(Phase2MeasurementError, match="forbidden Phase 2"):
         _verify_audit_product(tmp_path)
+
+
+def test_phase5_closure_proposal_has_truthful_complete_cardinality() -> None:
+    proposal = phase2_measurements.propose_phase5_closure_extension(ROOT)
+    extension = proposal["extension"]
+    assert len(extension["additions"]) == 56
+    assert len(extension["retirements"]) == 105
+    assert len(extension["audit_splits"]) == 21
+    assert sum(
+        item["type"] == "cross_row_reroot"
+        for item in extension["subject_transitions"].values()
+    ) == 0
+    for product in (
+        *phase2_measurements.PRODUCTION_PRODUCTS,
+        phase2_measurements.PHASE2_AUDIT_PRODUCT,
+    ):
+        assert extension["cardinality"]["by_product"][product] == {
+            "source_additions": 14,
+            "source_equation": "263 - 25 + 14 = 252",
+            "source_predecessor": 263,
+            "source_retirements": 25,
+            "source_successor": 252,
+        }
+
+
+def test_phase5_closure_proposal_does_not_fabricate_source_pairings() -> None:
+    extension = phase2_measurements.propose_phase5_closure_extension(ROOT)["extension"]
+    assert not any(
+        item.get("reason") == "phase5_source_control_flow_replacement"
+        for item in extension["subject_transitions"].values()
+    )
+    assert all(
+        item["added_subject"]["sha256"] == item["added_sha256"]
+        for item in extension["additions"].values()
+    )
+    assert all(
+        item["retired_subject"]["sha256"] == item["retired_sha256"]
+        for item in extension["retirements"].values()
+    )
+
+
+def test_phase5_closure_apply_rejects_production_artifact_mutation(
+    tmp_path, monkeypatch
+) -> None:
+    measured = phase2_measurements.propose_phase2_subjects(ROOT)
+    payloads, details = phase2_measurements._phase5_closure_successor_payloads(
+        ROOT, measured
+    )
+    proposal = phase2_measurements.propose_phase5_closure_extension(ROOT)
+    relatives = (
+        *phase2_measurements._PHASE2_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+        *proposal["extension"]["production_artifact_sha256"],
+    )
+    for relative in relatives:
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+    proposal_path = tmp_path / "closure.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase5_closure_extension", lambda root: proposal
+    )
+    monkeypatch.setattr(
+        phase2_measurements, "propose_phase2_subjects", lambda root: measured
+    )
+    artifact = tmp_path / next(
+        iter(proposal["extension"]["production_artifact_sha256"])
+    )
+
+    def mutate_after_recompute(root, current):
+        artifact.write_bytes(artifact.read_bytes() + b"tamper")
+        return payloads, details
+
+    monkeypatch.setattr(
+        phase2_measurements,
+        "_phase5_closure_successor_payloads",
+        mutate_after_recompute,
+    )
+    with pytest.raises(Phase2MeasurementError, match="changed during recomputation"):
+        phase2_measurements.apply_phase5_closure_extension(tmp_path, proposal_path)
+
+
+def test_phase5_product_split_restores_production_and_bounds_audit() -> None:
+    proposal = phase2_measurements.propose_phase5_product_split_extension(ROOT)
+    extension = proposal["extension"]
+    assert proposal["schema"] == phase2_measurements.PHASE5_PRODUCT_SPLIT_PROPOSAL_SCHEMA
+    assert extension["conditional_region_count"] == 17
+    assert {key: len(value) for key, value in extension["restored_production_predecessors"].items()} == {
+        product: 25 for product in phase2_measurements.PRODUCTION_PRODUCTS
+    }
+    assert {key: len(value) for key, value in extension["removed_assignments_by_product"].items()} == {
+        "pokeyellow": 14,
+        "pokeyellow_debug": 14,
+        "pokeyellow_vc": 14,
+        phase2_measurements.PHASE2_AUDIT_PRODUCT: 9,
+    }
+    assert len(extension["production_artifact_sha256"]) == 9
+
+
+@pytest.mark.parametrize(
+    "attack", ("product-swap", "other-audit-swap", "omission", "resurrection")
+)
+def test_phase5_product_split_rejects_hostile_partition_edits(attack) -> None:
+    payloads, _ = phase2_measurements._phase5_product_split_successor_payloads(ROOT)
+    authority = json.loads(
+        payloads["specs/full-colors/inventory/assignments.json"]
+    )
+    if attack == "product-swap":
+        row = next(
+            row
+            for row in authority["rows"]
+            if row["product"] == phase2_measurements.PHASE2_AUDIT_PRODUCT
+            and row["subject"]["kind"] == "SOURCE_FINDING"
+            and phase2_measurements._assignment_source_edge(row)
+            == phase2_measurements._PHASE5_AUDIT_ONLY_EDGE
+        )
+        row["product"] = "pokeyellow"
+    elif attack == "other-audit-swap":
+        row = next(
+            row
+            for row in authority["rows"]
+            if row["product"] == phase2_measurements.PHASE2_AUDIT_PRODUCT
+            and row["subject"]["kind"] == "SOURCE_FINDING"
+            and row["subject"]["metadata"]["symbol"] == "DisplayPartyMenu"
+            and row["subject"]["metadata"]["destination"] == "ClearSprites"
+        )
+        row["product"] = "pokeyellow"
+    elif attack == "omission":
+        authority["rows"] = [
+            row
+            for row in authority["rows"]
+            if not (
+                row["product"] == "pokeyellow"
+                and row["subject"]["kind"] == "SOURCE_FINDING"
+                and phase2_measurements._assignment_source_edge(row)
+                == ("LoadMapData", "RunPaletteCommand")
+            )
+        ]
+    else:
+        row = next(
+            row
+            for row in authority["rows"]
+            if row["product"] == phase2_measurements.PHASE2_AUDIT_PRODUCT
+            and row["subject"]["kind"] == "SOURCE_FINDING"
+            and phase2_measurements._assignment_source_edge(row)
+            == phase2_measurements._PHASE5_AUDIT_ONLY_EDGE
+        )
+        resurrected = json.loads(json.dumps(row))
+        resurrected["id"] += "-RESURRECTED"
+        resurrected["product"] = "pokeyellow_debug"
+        authority["rows"].append(resurrected)
+    with pytest.raises(phase2_measurements.Phase2MeasurementError):
+        phase2_measurements._validate_product_source_partition(ROOT, authority)
+
+
+def test_phase5_product_split_refuses_inventory_line_drift() -> None:
+    document = {
+        "path": "home/overworld.asm",
+        "symbol": "LoadMapData",
+        "line": 1942,
+    }
+    counts = phase2_measurements._relocate_inventory_lines(document)
+    assert not any(counts.values())
+
+    duplicate = {
+        "rows": [
+            {
+                "path": "home/overworld.asm",
+                "symbol": "LoadMapData",
+                "line": 1941,
+            },
+            {
+                "path": "home/overworld.asm",
+                "symbol": "LoadMapData",
+                "line": 1941,
+            },
+        ]
+    }
+    counts = phase2_measurements._relocate_inventory_lines(duplicate)
+    relocation = (
+        "home/overworld.asm",
+        "LoadMapData",
+        1941,
+        1977,
+    )
+    assert counts[relocation] == 2
+
+
+def test_phase5_product_split_requires_exact_closure_successor_history(
+    monkeypatch,
+) -> None:
+    real_read = phase2_measurements._read_pinned_regular_file
+
+    def corrupt_history(root, path, *, label):
+        payload = real_read(root, path, label=label)
+        if Path(path) == ROOT / phase2_measurements.REVIEWED_TRANSITION_PATH:
+            transition = json.loads(payload)
+            transition[phase2_measurements.PHASE5_CLOSURE_EXTENSION_KEY][
+                "successor_authority_sha256"
+            ][phase2_measurements._PHASE2_AUTHORITY_PATHS[0]] = "0" * 64
+            return phase2_measurements._canonical_pretty(transition)
+        return payload
+
+    monkeypatch.setattr(
+        phase2_measurements, "_read_pinned_regular_file", corrupt_history
+    )
+    with pytest.raises(
+        phase2_measurements.Phase2MeasurementError,
+        match="lost exact closure predecessor",
+    ):
+        phase2_measurements._phase5_product_split_successor_payloads(ROOT)
+
+
+def test_phase5_product_split_refuses_replay(tmp_path, monkeypatch) -> None:
+    relative = phase2_measurements.REVIEWED_TRANSITION_PATH
+    transition = json.loads((ROOT / relative).read_text())
+    transition[phase2_measurements.PHASE5_PRODUCT_SPLIT_EXTENSION_KEY] = {
+        "schema": phase2_measurements.PHASE5_PRODUCT_SPLIT_EXTENSION_SCHEMA
+    }
+    payload = phase2_measurements._canonical_pretty(transition)
+    destination = tmp_path / relative
+    destination.parent.mkdir(parents=True)
+    destination.write_bytes(payload)
+    monkeypatch.setattr(
+        phase2_measurements,
+        "REVIEWED_TRANSITION_SHA256",
+        hashlib.sha256(payload).hexdigest(),
+    )
+    with pytest.raises(
+        phase2_measurements.Phase2MeasurementError,
+        match="product split extension is already consumed",
+    ):
+        phase2_measurements.propose_phase5_product_split_extension(tmp_path)
+
+
+def test_phase5_product_split_rolls_back_on_late_production_artifact_swap(
+    tmp_path, monkeypatch
+) -> None:
+    proposal = phase2_measurements.propose_phase5_product_split_extension(ROOT)
+    successors, details = phase2_measurements._phase5_product_split_successor_payloads(
+        ROOT
+    )
+    relatives = (
+        *phase2_measurements._PHASE5_PRODUCT_SPLIT_AUTHORITY_PATHS,
+        phase2_measurements.REVIEWED_TRANSITION_PATH,
+        phase2_measurements.VERIFIER_PATH,
+        *proposal["extension"]["production_artifact_sha256"],
+    )
+    before = {}
+    for relative in relatives:
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+        before[relative] = destination.read_bytes()
+    proposal_path = tmp_path / "phase5-product-split.proposal.json"
+    proposal_path.write_bytes(phase2_measurements._canonical_pretty(proposal))
+    monkeypatch.setattr(
+        phase2_measurements,
+        "propose_phase5_product_split_extension",
+        lambda root: proposal,
+    )
+    monkeypatch.setattr(
+        phase2_measurements,
+        "_phase5_product_split_successor_payloads",
+        lambda root: (successors, details),
+    )
+    source_transition = json.loads(successors[phase2_measurements.SOURCE_TRANSITION_PATH])
+    monkeypatch.setattr(
+        phase2_measurements.phase1_source_transition,
+        "generate",
+        lambda root: source_transition,
+    )
+    target = tmp_path / next(
+        iter(proposal["extension"]["production_artifact_sha256"])
+    )
+    real_replace = phase2_measurements._atomic_replace
+    replacement_count = 0
+
+    def swap_after_last(path, payload, expected, ledger, **kwargs):
+        nonlocal replacement_count
+        result = real_replace(path, payload, expected, ledger, **kwargs)
+        replacement_count += 1
+        if replacement_count == len(successors) + 2:
+            replacement = target.with_name(f".{target.name}.late-swap")
+            replacement.write_bytes(target.read_bytes())
+            os.replace(replacement, target)
+        return result
+
+    monkeypatch.setattr(phase2_measurements, "_atomic_replace", swap_after_last)
+    with pytest.raises(
+        phase2_measurements.Phase2MeasurementError,
+        match="production artifact changed during apply",
+    ):
+        phase2_measurements.apply_phase5_product_split_extension(
+            tmp_path, proposal_path
+        )
+    for relative in phase2_measurements._PHASE5_PRODUCT_SPLIT_AUTHORITY_PATHS:
+        assert (tmp_path / relative).read_bytes() == before[relative]

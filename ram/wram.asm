@@ -976,7 +976,14 @@ wBadgeOrFaceTiles:: ds NUM_BADGES + 1
 wTempObtainedBadgesBooleans:: ds NUM_BADGES
 
 NEXTU
-wUnusedCreditsByte:: db
+wUnusedCreditsByte::
+IF DEF(PHASE2_AUDIT)
+; Stack-independent one-call carrier for the paired producer's class. This
+; fixed-WRAM byte has no legacy reader or writer, so it cannot race the short
+; interval before the renderer selector masks IE and switches to WRAM2.
+wFullColorPhase5PairedClassScratch::
+ENDC
+	db
 ; the number of credits mons that have been displayed so far
 wNumCreditsMonsDisplayed:: db
 
@@ -2679,7 +2686,57 @@ wFullColorDebugReconstructionState:: ds 8
 wFullColorDebugTraceCountPhase2:: db
 wFullColorDebugTraceWritePhase2:: db
 wFullColorDebugTracePhase2:: ds FULL_COLOR_DEBUG_TRACE_CAPACITY_PHASE2 * FULL_COLOR_DEBUG_TRACE_RECORD_BYTES
-wFullColorDebugCarrierReserved:: ds FULL_COLOR_DEBUG_CARRIER_BYTES - (@ - wFullColorDebugCarrierStart)
+wFullColorDebugCarrierReserved::
+wFullColorPhase5StressStateStart::
+wFullColorPhase5StressMode:: db
+wFullColorPhase5StressRequestClass:: db
+wFullColorPhase5StressTargetBoundary:: db
+wFullColorPhase5StressAvailableCycles:: dw
+wFullColorPhase5StressRequiredCycles:: dw
+wFullColorPhase5StressReachedMask:: db
+wFullColorPhase5StressDeferredMask:: db
+wFullColorPhase5StressCancelledMask:: db
+wFullColorPhase5StressTerminalResult:: db
+wFullColorPhase5StressStateEnd::
+
+wFullColorPhase5ScenarioStateStart::
+wFullColorPhase5ScenarioControl:: db
+wFullColorPhase5Scenario:: db
+wFullColorPhase5ScenarioMutation:: db
+wFullColorPhase5ScenarioResult:: db
+wFullColorPhase5ScenarioState:: db
+wFullColorPhase5PoisonMask:: db
+wFullColorPhase5YellowLedgerMask:: db
+wFullColorPhase5ColorLedgerMask:: db
+wFullColorPhase5BarrierState:: db
+wFullColorPhase5StableFrames:: db
+wFullColorPhase5ScenarioFlags:: db
+wFullColorPhase5ScenarioStateEnd::
+
+; Private trace scratch. These bytes are implementation detail rather than
+; host control, but remain inside the same bounded audit-only carrier tail.
+wFullColorPhase5TraceBoundary:: db
+wFullColorPhase5TraceValidation:: db
+wFullColorPhase5TraceResult:: db
+
+; Natural scheduler pressure authority and bounded producer accounting.  Cycle
+; values are never aliases of descriptor reservations or write counts.
+wFullColorPhase5FrameAvailableCycles:: dw
+wFullColorPhase5FrameRequiredCycles:: dw
+wFullColorPhase5PressureEnqueuedMask:: db
+wFullColorPhase5PressureDrainedMask:: db
+
+; Mainline freezes the exact PREPARED descriptor identity once. VBlank uses
+; this private cache only to avoid a generic scan; it still compares every
+; commit-relevant descriptor byte and the live owner/generation/resources.
+wFullColorPhase5FastCacheValid:: db
+wFullColorPhase5FastCacheDescriptor:: dw
+wFullColorPhase5FastCacheSnapshot:: ds FULL_COLOR_REQUEST_DESCRIPTOR_BYTES
+wFullColorPhase5FastCacheRequiredCycles:: dw
+wFullColorPhase5OAMAuthorityEpoch:: db
+wFullColorPhase5FastCacheEnd::
+
+	ds FULL_COLOR_DEBUG_CARRIER_BYTES - (@ - wFullColorDebugCarrierStart)
 wFullColorDebugCarrierEnd::
 wFullColorPhase2LifecycleStateEnd::
 
@@ -2687,6 +2744,13 @@ ASSERT wFullColorAuthoritySnapshotEnd - wFullColorAuthoritySnapshot == FULL_COLO
 ASSERT wFullColorProducerAttributes - wFullColorProducerTiles == SCREEN_AREA
 ASSERT wFullColorProducerSource - wFullColorProducerAttributes == SCREEN_AREA
 ASSERT wFullColorDebugCarrierEnd - wFullColorDebugCarrierStart == FULL_COLOR_DEBUG_CARRIER_BYTES
+ASSERT wFullColorDebugCarrierReserved - wFullColorDebugTracePhase2 == FULL_COLOR_DEBUG_TRACE_CAPACITY_PHASE2 * FULL_COLOR_DEBUG_TRACE_RECORD_BYTES
+ASSERT wFullColorPhase5StressStateStart == wFullColorDebugCarrierReserved
+ASSERT wFullColorPhase5StressStateEnd - wFullColorPhase5StressStateStart == 11
+ASSERT wFullColorPhase5ScenarioStateEnd - wFullColorPhase5ScenarioStateStart == 11
+ASSERT wFullColorPhase5ScenarioStateEnd <= wFullColorDebugCarrierEnd
+ASSERT wFullColorPhase5TraceResult + 1 <= wFullColorDebugCarrierEnd
+ASSERT wFullColorPhase5FastCacheEnd <= wFullColorDebugCarrierEnd
 ASSERT wFullColorPhase2LifecycleStateStart == FULL_COLOR_PHASE3_WRAM_START
 ASSERT wFullColorPhase2LifecycleStateEnd == FULL_COLOR_PHASE3_WRAM_END
 ASSERT BANK(wFullColorPhase2LifecycleStateStart) == FULL_COLOR_PHASE2_WRAM_BANK

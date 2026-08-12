@@ -165,6 +165,11 @@ RecordFullColorOAMFallbackSelected:
 
 CommitFullColorOAMBatchSelected:
 	push hl
+	IF DEF(PHASE2_AUDIT)
+		; The complete declared wShadowOAM batch was built immediately before
+		; this owned VBlank.  The resident descriptor prevents any second build;
+		; final revalidation precedes this sole hardware-visible operation.
+	ELSE
 	ld hl, wFullColorShadowOAMBatch
 	ld de, wShadowOAM
 	ld b, 160
@@ -174,7 +179,10 @@ CommitFullColorOAMBatchSelected:
 	inc de
 	dec b
 	jr nz, .copy
+	ENDC
+FullColorPhase5OAMDMAStart::
 	call hDMARoutine
+FullColorPhase5OAMDMAEnd::
 	pop hl
 	ret
 

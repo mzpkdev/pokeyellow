@@ -55,6 +55,37 @@ reconstruction ledgers and barriers, and fallback kind—must be derived. The
 case parser rejects missing primary check IDs and check IDs unrelated to the
 selected operation before a report can be produced.
 
+## Phase 5 audit-slice traceability
+
+`specs/full-colors/definitions/phase5-stress-cases.json` is the concrete
+declaration for the Phase 5 audit slice. It keeps runtime admission at
+196 Color-presented maps and 28 Yellow-presented maps, and it grants no
+production activation.
+
+- `RC-P5-COMBINED-PRESSURE-PALLET` maps to `CHK-STRESS-01` and timing rows
+  `VBlank`, `palette`, `vertical`, `animation`, `OAM-build`, and `OAM-DMA`.
+- `RC-P5-PARTY-RETURN-PALLET` maps to `CHK-STRESS-02` and timing rows
+  `handoff-to-Yellow`, `handoff-to-Color`, and `reconstruct-Color`.
+- `RC-P5-CONNECTION-PALLET-NORTH` maps to `CHK-STRESS-03` and timing row
+  `connection`.
+
+Each case records its natural runtime request class separately from the
+boundary-matrix class. The natural classes are column, rectangle, and
+connection paired respectively; all boundary cells use the same independent
+1x1 row-paired unit with an exact 2680-cycle authority.
+
+The declaration names the audit-only `WR-…`, `SC-…`, and `MU-…` rows reached
+by each case. Reused Phase 2 inventory is cited separately by the concrete
+root executed, without claiming the rest of the older row. The declaration
+also binds the canonical reviewed evidence path and schema. The Party return
+rows cover every hidden Color producer through the 912-T-cycle guard and first
+presentation, while the north-connection row distinguishes semantic
+supersession of an outgoing movement authority from generic queue disposal.
+Hosted verification captures two fresh runs with at least 32 natural executions
+per path per run, compares stable semantic output exactly with the reviewed
+record, and checks capture artifact identities separately. Promotion is
+guarded and forbidden in CI.
+
 ## Requirement-to-evidence traceability
 
 Each row has one primary requirement. Cross-reference cells contain only
@@ -411,6 +442,33 @@ maximum visible NPC population; static NPCs and item balls; cut tree and
 boulder movement; dust/smoke; healing machine; emotion bubbles; and objects
 under grass/priority tiles. Evidence includes shadow OAM, hardware OAM, OBJ
 palettes, and multi-frame images.
+
+## Reviewed audit-only source transitions
+
+The checked-in source transition uses
+`full-color-production-source-transition-v4`. A source writer that is absent
+from the normal, debug, and VC symbol tables may remain outside baseline ROM
+discovery only through one of two reviewed forms: its entire file was added by
+the hash-bound transition, or its exact symbol is listed in
+`audit_only_source_regions`.
+
+Each conditional-region row binds the predecessor and current file hashes, the
+symbol and conditional anchor, an exact line span and body hash, and the audit
+ROM address. The span must be in the direct true arm of
+`IF DEF(PHASE2_AUDIT)`. Nested conditions, `ELSE` arms, renamed flags, and
+spans that escape the conditional fail closed. The transition also binds the
+ROM and symbol-table hashes for normal, debug, VC, and audit products. The
+listed symbol must be absent from every production symbol table and resolve to
+an in-range audit ROM offset.
+
+`measure-full-color-source-transition` writes an unreviewed proposal. The
+audit-evidence identity proposal recomputes that transition before proposing
+inventory hash changes. Neither producer edits checked-in authority. After a
+human reviews both canonical proposals, the guarded audit-evidence apply path
+publishes the source transition and inventory identity changes in one
+transaction. Baseline discovery and inventory reconciliation reject the old
+schema or any stale source, file, span, body, symbol, product, or linkage
+identity.
 
 ## Completion report
 

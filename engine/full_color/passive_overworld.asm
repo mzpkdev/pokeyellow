@@ -795,20 +795,16 @@ PassiveFullColorRecordPalettePublished:
 
 ; Select the donor's two authored roof colors for the current town or route.
 ; The caller has already admitted an OVERWORLD map, so its ID is below the
-; indoor boundary. Route 6's top rows belong visually to Saffron City.
+; indoor boundary. A coordinate-dependent rule supplies its exact roof byte;
+; every other map uses the reviewed positional assignment.
 PassiveFullColorRoofPaletteForMap:
+	call PassiveFullColorCurrentRoofRegion
+	cp $ff
+	ld a, c
+	jr nz, .resolve
 	ld a, [wCurMap]
 	cp FIRST_INDOOR_MAP
 	jr nc, .pallet
-	cp ROUTE_6
-	jr nz, .assigned
-	ld a, [wYCoord]
-	cp 2
-	jr nc, .assigned_route6
-	ld a, FULL_COLOR_ROOF_SAFFRON
-	jr .resolve
-.assigned_route6
-	ld a, ROUTE_6
 .assigned
 	ld c, a
 	ld b, 0
@@ -859,32 +855,41 @@ PassiveFullColorAttributeForTile:
 	ld a, b
 	ldh [rIE], a
 PassiveFullColorResolveAttributeForIdentity:
+	push hl ; Preserve the tileset identity in H while HL scans override data.
+	ld hl, FullColorMapAttributeOverrides
+	ld b, NUM_FULL_COLOR_MAP_ATTRIBUTE_OVERRIDE_GROUPS
+.override_group
+	ld a, [hli]
+	cp e
+	jr z, .matching_map
+	ld a, [hli]
+	inc hl ; Skip the exact override byte before the tile identity sequence.
+	add l
+	ld l, a
+	jr nc, .next_override_group
+	inc h
+.next_override_group
+	dec b
+	jr nz, .override_group
+	jr .lookup
+.matching_map
+	ld a, [hli]
+	ld b, a
+	ld a, [hli]
+	ld e, a
+.override_tile
+	ld a, [hli]
+	cp c
+	jr z, .override
+	dec b
+	jr nz, .override_tile
+	jr .lookup
+.override
 	ld a, e
-	cp CELADON_MART_ROOF
-	jr nz, .not_celadon_mart_roof
-	ld a, c
-	cp $4b
-	jr c, .lookup
-	cp $50
-	jr nc, .lookup
-	ld a, FULL_COLOR_INTERIOR_BLUE
-	jr .done
-.not_celadon_mart_roof
-	cp CELADON_MART_1F
-	jr nz, .lookup
-	ld a, c
-	cp $07
-	jr z, .celadon_mart_1f
-	cp $08
-	jr z, .celadon_mart_1f
-	cp $17
-	jr z, .celadon_mart_1f
-	cp $18
-	jr nz, .lookup
-.celadon_mart_1f
-	ld a, FULL_COLOR_INTERIOR_YELLOW
+	pop hl
 	jr .done
 .lookup
+	pop hl
 	ld a, h
 	add a
 	ld e, a

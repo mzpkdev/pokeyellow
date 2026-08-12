@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
 from enum import StrEnum
 import hashlib
@@ -19,20 +20,20 @@ LEDGER_PATH = Path("specs/full-colors/inventory/map-background-content.json")
 # cannot grant itself promotion authority.
 REVIEW_RECORD_SHA256_ALLOWLIST: dict[str, str] = {
     "specs/full-colors/evidence/map-background-reviews/overworld.json": (
-        "c01ad4f35ac50992d125b6681f7d352b2dd67e9c90b231cfcbd1aa449ffa7772"
+        "5f56acc0ef6aed08609f8b5ce844c8c9a406ca37ddc59e2c8f225022db6f9361"
     ),
     "specs/full-colors/evidence/map-background-reviews/residential-services.json": (
-        "17203709f3713f41bb54faee83cd2e60bf186f9a41f7fdd90d9beb7871b90f28"
+        "e00b3b6f05fc0e4e7398e5a96888b97df6eeeb1da730fae077bbdc5a6745a27f"
     ),
     "specs/full-colors/evidence/map-background-reviews/"
     "challenge-special-interiors.json": (
-        "ad32754b0f0e28d4ffa4067679a78b8c2e246cdac1cca11f12bfa2dc3eeb585a"
+        "6b80c6dea1d640132b05ee3cd2af4f5028767accb303ab1570178db430f635ae"
     ),
     "specs/full-colors/evidence/map-background-reviews/forest-cavern.json": (
-        "9ccee4da14d9f13c07ed80be17f96e41361b683da3f550e4c439715d3cb75f4a"
+        "593864b60c3bd55c4b96baf06a13fde549b8e546422750034aee556c99cd7f15"
     ),
     "specs/full-colors/evidence/map-background-reviews/transport-special.json": (
-        "964f797f0517edf8dfde445808e7dd027449ec62c2fec1e2a1669f79bb1be645"
+        "4759a850c63039bed2a12e28b55ede96d034d32b0768a597759d99f41f31a27d"
     ),
 }
 _REVIEW_BATCH_IDENTITIES = {
@@ -69,29 +70,29 @@ _REVIEW_BATCH_IDENTITIES = {
 }
 _REVIEWED_CANDIDATE_IDENTITIES = {
     "overworld": (
-        "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
-        "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
-        "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c",
+        "2447aef2be0eb1f891b4eb83758ad8e4b4f17c531d0fc4de9d431ff3014fb302",
+        "3dcc146ab480219846f18eea232170ecf4716cfdf321599f16888d724c8ccedd",
+        "7aa5dbd60715e553b26c1a9ce3f81ff28d420b6c109cd28b6ff41414de2a1009",
     ),
     "residential-services": (
-        "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
-        "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
-        "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c",
+        "2447aef2be0eb1f891b4eb83758ad8e4b4f17c531d0fc4de9d431ff3014fb302",
+        "3dcc146ab480219846f18eea232170ecf4716cfdf321599f16888d724c8ccedd",
+        "7aa5dbd60715e553b26c1a9ce3f81ff28d420b6c109cd28b6ff41414de2a1009",
     ),
     "challenge-special-interiors": (
-        "d36064f2d67d33d809b81aedf98553e05284d846f4fcf2abc0b9d48c76be4a6f",
-        "3adc56375d8b54a0ce3d310994242baf0017a9f8b0d827aeab286ff03bd7c173",
-        "cd8bf387bfb384b768d3218d6c7b2c522d3175dbab57b379bc298ea77485af4c",
+        "2447aef2be0eb1f891b4eb83758ad8e4b4f17c531d0fc4de9d431ff3014fb302",
+        "3dcc146ab480219846f18eea232170ecf4716cfdf321599f16888d724c8ccedd",
+        "7aa5dbd60715e553b26c1a9ce3f81ff28d420b6c109cd28b6ff41414de2a1009",
     ),
     "forest-cavern": (
-        "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
-        "57dcaf95fd2fdbeb1e206a0bdd64589a3bb7e4843dc2d1d137f1bcb21d645450",
-        "7f8b5fd33c900c409137a293f2007003f61b6db120ac82613f06220288349c3f",
+        "2447aef2be0eb1f891b4eb83758ad8e4b4f17c531d0fc4de9d431ff3014fb302",
+        "3dcc146ab480219846f18eea232170ecf4716cfdf321599f16888d724c8ccedd",
+        "7aa5dbd60715e553b26c1a9ce3f81ff28d420b6c109cd28b6ff41414de2a1009",
     ),
     "transport-special": (
-        "c706c349ee2796cd7af4fa70301ed1eacd8d7cfdbed02932fcf8da63830661ee",
-        "57dcaf95fd2fdbeb1e206a0bdd64589a3bb7e4843dc2d1d137f1bcb21d645450",
-        "7f8b5fd33c900c409137a293f2007003f61b6db120ac82613f06220288349c3f",
+        "2447aef2be0eb1f891b4eb83758ad8e4b4f17c531d0fc4de9d431ff3014fb302",
+        "3dcc146ab480219846f18eea232170ecf4716cfdf321599f16888d724c8ccedd",
+        "7aa5dbd60715e553b26c1a9ce3f81ff28d420b6c109cd28b6ff41414de2a1009",
     ),
 }
 _PHASE4_ATLAS_IDENTITIES = {
@@ -314,7 +315,55 @@ _BATCH_TILESETS = {
     "forest-cavern": frozenset({"FOREST", "CAVERN"}),
     "transport-special": frozenset({"SHIP_PORT", "PLATEAU", "BEACH_HOUSE"}),
 }
-_PHASE1_REPLACEMENTS = {"OVERWORLD": ("CUT_TREE",)}
+_REPLACEMENT_IDENTITIES = (
+    "CINNABAR_GYM_GATE_BLOCKS",
+    "CUT_TREE",
+    "REPLACE_TILE_BLOCK",
+    "SPINNER_ARROW_TILES",
+)
+_GENERIC_REPLACE_TILE_BLOCK_MAPS = frozenset(
+    {
+        "AGATHAS_ROOM",
+        "BRUNOS_ROOM",
+        "GAME_CORNER",
+        "LANCES_ROOM",
+        "LORELEIS_ROOM",
+        "POKEMON_MANSION_1F",
+        "POKEMON_MANSION_2F",
+        "ROCKET_HIDEOUT_B1F",
+        "SILPH_CO_2F",
+        "SILPH_CO_3F",
+        "SILPH_CO_4F",
+        "SILPH_CO_5F",
+        "SILPH_CO_6F",
+        "SILPH_CO_7F",
+        "SILPH_CO_8F",
+        "SILPH_CO_9F",
+        "SILPH_CO_10F",
+        "SILPH_CO_11F",
+        "VERMILION_GYM",
+        "VICTORY_ROAD_1F",
+        "VICTORY_ROAD_2F",
+        "VICTORY_ROAD_3F",
+    }
+)
+_SPINNER_ARROW_MAPS = frozenset(
+    {"ROCKET_HIDEOUT_B2F", "ROCKET_HIDEOUT_B3F", "VIRIDIAN_GYM"}
+)
+_CARD_KEY_MAPS = tuple(f"SILPH_CO_{floor}F" for floor in range(2, 12))
+_ROOF_IDENTITIES = (
+    "PALLET",
+    "VIRIDIAN",
+    "PEWTER",
+    "CERULEAN",
+    "LAVENDER",
+    "VERMILION",
+    "CELADON",
+    "FUCHSIA",
+    "CINNABAR",
+    "INDIGO",
+    "SAFFRON",
+)
 _MAP_OVERRIDE_IDENTITIES = {
     "CELADON_MART_ROOF": ("CELADON_MART_ROOF_TILES_4B_TO_4F_BLUE",),
     "CELADON_MART_1F": ("CELADON_MART_1F_TILES_07_08_17_18_YELLOW",),
@@ -335,76 +384,6 @@ _MAP_OVERRIDE_RULES = (
         "palette": "FULL_COLOR_INTERIOR_YELLOW",
     },
 )
-_MAP_OVERRIDE_ROUTINE_CONTRACT = (
-    "PassiveFullColorAttributeForTile:",
-    "push hl",
-    "push de",
-    "push bc",
-    "ld c, a",
-    "ldh a, [rIE]",
-    "ld b, a",
-    "xor a",
-    "ldh [rIE], a",
-    "ldh a, [rSVBK]",
-    "ld d, a",
-    "ld a, 1",
-    "ldh [rSVBK], a",
-    "ld a, [wCurMap]",
-    "ld e, a",
-    "ld a, [wCurMapTileset]",
-    "ld h, a",
-    "ld a, d",
-    "ldh [rSVBK], a",
-    "ld a, b",
-    "ldh [rIE], a",
-    "PassiveFullColorResolveAttributeForIdentity:",
-    "ld a, e",
-    "cp CELADON_MART_ROOF",
-    "jr nz, .not_celadon_mart_roof",
-    "ld a, c",
-    "cp $4b",
-    "jr c, .lookup",
-    "cp $50",
-    "jr nc, .lookup",
-    "ld a, FULL_COLOR_INTERIOR_BLUE",
-    "jr .done",
-    ".not_celadon_mart_roof",
-    "cp CELADON_MART_1F",
-    "jr nz, .lookup",
-    "ld a, c",
-    "cp $07",
-    "jr z, .celadon_mart_1f",
-    "cp $08",
-    "jr z, .celadon_mart_1f",
-    "cp $17",
-    "jr z, .celadon_mart_1f",
-    "cp $18",
-    "jr nz, .lookup",
-    ".celadon_mart_1f",
-    "ld a, FULL_COLOR_INTERIOR_YELLOW",
-    "jr .done",
-    ".lookup",
-    "ld a, h",
-    "add a",
-    "ld e, a",
-    "ld d, 0",
-    "ld hl, FullColorTileAttributePointers",
-    "add hl, de",
-    "ld a, [hli]",
-    "ld h, [hl]",
-    "ld l, a",
-    "ld b, 0",
-    "add hl, bc",
-    "ld a, [hl]",
-    ".done",
-    "pop bc",
-    "pop de",
-    "pop hl",
-    "ret",
-)
-_PHASE1_REPLACEMENT_AUTHORITIES = {
-    "CUT_TREE": (Path("data/tilesets/cut_tree_blocks.asm"), "CutTreeBlockSwaps")
-}
 _MISSING_FALLBACK_AUTHORITY = (
     "data/tilesets/full_color_interiors.asm#FullColorBGPalettePointers"
 )
@@ -863,16 +842,18 @@ def _effective_literal_includes(source: str, *, path: Path) -> tuple[str, ...]:
     return tuple(includes)
 
 
-def _effective_asm_lines(root: Path) -> tuple[tuple[Path, int, str], ...]:
-    """Expand the literal ``main.asm`` include universe in assembler order.
+def _effective_asm_lines(
+    root: Path, *, entry_names: tuple[str, ...] = ("main.asm",)
+) -> tuple[tuple[Path, int, str], ...]:
+    """Expand literal translation-root include universes in assembler order.
 
     Reconciliation fixtures intentionally contain only the map-background slice of
     the repository. Missing unrelated includes are therefore ignored, while every
     present dependency is expanded and checked. A real checkout contains the full
     graph and the build independently rejects a missing include.
     """
-    entry = root / "main.asm"
-    if not entry.is_file():
+    entries = tuple(root / name for name in entry_names)
+    if not all(entry.is_file() for entry in entries):
         return tuple(
             (path, line_number, raw_line)
             for path in sorted(root.rglob("*.asm"))
@@ -911,7 +892,8 @@ def _effective_asm_lines(root: Path) -> tuple[tuple[Path, int, str], ...]:
             expand(root.joinpath(*relative.parts))
         active.remove(resolved)
 
-    expand(entry)
+    for entry in entries:
+        expand(entry)
     return tuple(lines)
 
 
@@ -1642,50 +1624,80 @@ def _tileset_animation_authorities(
     return authorities
 
 
-def _validate_phase1_semantic_identities(root: Path) -> None:
-    for identity, (relative, label) in _PHASE1_REPLACEMENT_AUTHORITIES.items():
-        path = root / relative
-        if (
-            re.search(
-                rf"^\s*{re.escape(label)}:\s*$",
-                path.read_text(encoding="utf-8"),
-                re.MULTILINE,
-            )
-            is None
-        ):
-            raise MapBackgroundContentError(
-                f"{identity}: source-owned replacement authority {relative}#{label} is absent"
-            )
+def production_roof_region_rules(root: Path | str) -> tuple[dict[str, object], ...]:
+    """Return the fixed reviewed coordinate-dependent roof records."""
+    root = Path(root)
+    path = root / "data/tilesets/full_color_overworld.asm"
+    source = path.read_text(encoding="utf-8")
+    definitions = tuple(
+        re.findall(
+            r"^\s*DEF\s+(FULL_COLOR_ROOF_REGION_RULE_SIZE|"
+            r"NUM_FULL_COLOR_ROOF_REGION_RULES)\s+EQU\s+([0-9]+)\s*$",
+            source,
+            re.MULTILINE,
+        )
+    )
+    body = tuple(
+        line.strip()
+        for line in _asm_table_body(
+            source, path=path, label="FullColorOverworldRoofRegionRules"
+        )
+        if line.split(";", 1)[0].strip()
+    )
+    expected = ("db ROUTE_6, 2, FULL_COLOR_ROOF_SAFFRON, FULL_COLOR_ROOF_VERMILION",)
+    if definitions != (
+        ("FULL_COLOR_ROOF_REGION_RULE_SIZE", "4"),
+        ("NUM_FULL_COLOR_ROOF_REGION_RULES", "1"),
+    ) or body != expected:
+        raise MapBackgroundContentError(
+            f"{path}: roof-region identities, data shape, or exact values drifted"
+        )
+    return (
+        {
+            "map": "ROUTE_6",
+            "y_split": 2,
+            "upper_roof": "SAFFRON",
+            "lower_roof": "VERMILION",
+        },
+    )
 
 
 def production_map_override_rules(root: Path | str) -> tuple[dict[str, object], ...]:
-    """Return the exact production map override rules after validating source."""
+    """Return the exact reviewed data-table overrides after validating source."""
     root = Path(root)
-    path = root / "engine/full_color/passive_overworld.asm"
-    normalized = _normalized_asm(path.read_text(encoding="utf-8"))
-    starts = [
-        index
-        for index, line in enumerate(normalized)
-        if line == _MAP_OVERRIDE_ROUTINE_CONTRACT[0]
-    ]
-    if len(starts) != 1:
-        raise MapBackgroundContentError(
-            f"{path}: expected one complete production tile-dispatch authority"
+    path = root / "data/tilesets/full_color_interiors.asm"
+    source = path.read_text(encoding="utf-8")
+    count_definitions = re.findall(
+        r"^\s*DEF\s+NUM_FULL_COLOR_MAP_ATTRIBUTE_OVERRIDE_GROUPS\s+EQU\s+"
+        r"([0-9]+)\s*$",
+        source,
+        re.MULTILINE,
+    )
+    body = tuple(
+        line.split(";", 1)[0].strip()
+        for line in _asm_table_body(
+            source, path=path, label="FullColorMapAttributeOverrides"
         )
-    start = starts[0]
-    try:
-        end = normalized.index("POPS", start + 1)
-    except ValueError as exc:
+        if line.split(";", 1)[0].strip()
+    )
+    expected_body = (
+        "db CELADON_MART_ROOF, 5, FULL_COLOR_INTERIOR_BLUE",
+        "db $4b, $4c, $4d, $4e, $4f",
+        "db CELADON_MART_1F, 4, FULL_COLOR_INTERIOR_YELLOW",
+        "db $07, $08, $17, $18",
+    )
+    if count_definitions != ["2"] or body != expected_body:
         raise MapBackgroundContentError(
-            f"{path}: production tile-dispatch boundary is absent"
-        ) from exc
-    actual = normalized[start:end]
-    if actual != _MAP_OVERRIDE_ROUTINE_CONTRACT:
-        raise MapBackgroundContentError(
-            f"{path}: production map override identities, control flow, or exact values drifted"
+            f"{path}: override identities, data shape, or exact values drifted"
         )
-
     palette_values = _override_palette_values(root)
+    if palette_values != {
+        "FULL_COLOR_INTERIOR_BLUE": 3,
+        "FULL_COLOR_INTERIOR_YELLOW": 4,
+    }:
+        raise MapBackgroundContentError(
+            f"{path}: override identities, data shape, or exact values drifted"
+        )
     rules: list[dict[str, object]] = []
     for template in _MAP_OVERRIDE_RULES:
         rule = dict(template)
@@ -1693,6 +1705,207 @@ def production_map_override_rules(root: Path | str) -> tuple[dict[str, object], 
         rule["palette_value"] = palette_values[palette]
         rules.append(rule)
     return tuple(rules)
+
+
+def _production_replacement_authorities(
+    root: Path, discovered_maps: tuple[_DiscoveredMap, ...]
+) -> tuple[dict[str, tuple[str, ...]], dict[str, tuple[str, ...]]]:
+    """Discover exact tileset capabilities and concrete map-callable writers."""
+    map_tilesets = {row.name: row.tileset for row in discovered_maps}
+    # Caller discovery must follow the assembler's effective dependency graph.
+    # Besides being the reviewed authority, this also keeps isolated shadow
+    # repositories honest: Path.rglob() does not descend into their symlinked
+    # source directories and would otherwise report every callable writer absent.
+    source_lines = _effective_asm_lines(
+        root, entry_names=("main.asm", "home.asm", "maps.asm")
+    )
+
+    generic_callers: list[Path] = []
+    spinner_callers: list[Path] = []
+    for path, _line_number, raw_line in source_lines:
+        code = raw_line.split(";", 1)[0].strip()
+        if re.fullmatch(r"(?:predef|predef_jump)\s+ReplaceTileBlock", code):
+            generic_callers.append(path.relative_to(root))
+        if re.search(r"\b(?:call|jp|jr|farjp)\s+(?:nz,\s*)?LoadSpinnerArrowTiles\b", code):
+            spinner_callers.append(path.relative_to(root))
+
+    expected_generic_paths = {
+        Path("engine/events/card_key.asm"),
+        *(Path("scripts") / f"{name}.asm" for name in (
+            "AgathasRoom", "BrunosRoom", "GameCorner", "LancesRoom",
+            "LoreleisRoom", "PokemonMansion1F", "PokemonMansion2F",
+            "RocketHideoutB1F", "SilphCo2F", "SilphCo3F", "SilphCo4F",
+            "SilphCo5F", "SilphCo6F", "SilphCo7F", "SilphCo8F",
+            "SilphCo9F", "SilphCo10F", "SilphCo11F", "VermilionGym",
+            "VictoryRoad1F", "VictoryRoad2F", "VictoryRoad3F",
+        )),
+    }
+    expected_spinner_paths = {
+        Path("home/overworld.asm"),
+        Path("scripts/RocketHideoutB2F.asm"),
+        Path("scripts/RocketHideoutB3F.asm"),
+        Path("scripts/ViridianGym.asm"),
+    }
+    expected_generic_counts = {path: 1 for path in expected_generic_paths}
+    expected_generic_counts.update(
+        {
+            Path("scripts/GameCorner.asm"): 2,
+            Path("scripts/SilphCo2F.asm"): 2,
+            Path("scripts/SilphCo3F.asm"): 2,
+            Path("scripts/SilphCo4F.asm"): 2,
+            Path("scripts/SilphCo5F.asm"): 3,
+            Path("scripts/SilphCo7F.asm"): 3,
+            Path("scripts/SilphCo9F.asm"): 4,
+        }
+    )
+    if Counter(generic_callers) != expected_generic_counts:
+        raise MapBackgroundContentError(
+            "REPLACE_TILE_BLOCK: concrete caller identities or dependencies drifted"
+        )
+    if Counter(spinner_callers) != {path: 1 for path in expected_spinner_paths}:
+        raise MapBackgroundContentError(
+            "SPINNER_ARROW_TILES: concrete caller identities or dependencies drifted"
+        )
+
+    maps_assembly_path = root / "maps.asm"
+    if not maps_assembly_path.is_file():
+        raise MapBackgroundContentError(
+            f"{maps_assembly_path}: replacement caller dependency is stale or absent"
+        )
+    included_scripts = {
+        Path(match.group(1))
+        for match in re.finditer(
+            r'^\s*INCLUDE\s+"(scripts/[A-Za-z0-9_]+\.asm)"\s*$',
+            maps_assembly_path.read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+    }
+    expected_map_scripts = (
+        expected_generic_paths - {Path("engine/events/card_key.asm")}
+    ) | (expected_spinner_paths - {Path("home/overworld.asm")})
+    if not expected_map_scripts <= included_scripts:
+        raise MapBackgroundContentError(
+            f"{maps_assembly_path}: replacement caller dependency is stale or absent"
+        )
+
+    card_key_path = root / "data/events/card_key_maps.asm"
+    card_key_lines = tuple(
+        match.group(1)
+        for match in re.finditer(
+            r"^\s*db\s+(SILPH_CO_[0-9]+F)\s*$",
+            card_key_path.read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+    )
+    if card_key_lines != _CARD_KEY_MAPS:
+        raise MapBackgroundContentError(
+            f"{card_key_path}: Card Key ReplaceTileBlock map identities drifted"
+        )
+    card_key_writer = (root / "engine/events/card_key.asm").read_text(
+        encoding="utf-8"
+    )
+    if (
+        len(re.findall(r"^\s*cp\s+SILPH_CO_11F\s*$", card_key_writer, re.MULTILINE)) != 2
+        or len(re.findall(r"^\s*ld\s+a,\s*\$3\s*$", card_key_writer, re.MULTILINE)) != 1
+        or len(re.findall(r"^\s*ld\s+a,\s*\$e\s*$", card_key_writer, re.MULTILINE)) != 1
+    ):
+        raise MapBackgroundContentError(
+            f"{card_key_path}: Card Key ReplaceTileBlock exact block semantics drifted"
+        )
+
+    cut_path = root / "engine/overworld/cut.asm"
+    cut_source = _normalized_asm(cut_path.read_text(encoding="utf-8"))
+    cut_contract = (
+        "ld a, [wCurMapTileset]", "and a", "jr z, .overworld", "cp GYM",
+        "jr nz, .nothingToCut", "ld a, [wTileInFrontOfPlayer]", "cp $50",
+        "jr nz, .nothingToCut", "jr .canCut", ".overworld", "dec a",
+        "ld a, [wTileInFrontOfPlayer]", "cp $3d", "jr z, .canCut", "cp $52",
+        "jr z, .canCut",
+    )
+    try:
+        cut_start = cut_source.index(cut_contract[0])
+    except ValueError as exc:
+        raise MapBackgroundContentError(
+            f"{cut_path}: CUT_TREE tileset callability authority is absent"
+        ) from exc
+    if cut_source[cut_start : cut_start + len(cut_contract)] != cut_contract:
+        raise MapBackgroundContentError(
+            f"{cut_path}: CUT_TREE tileset callability authority drifted"
+        )
+    cut_blocks_path = root / "data/tilesets/cut_tree_blocks.asm"
+    cut_blocks_source = cut_blocks_path.read_text(encoding="utf-8")
+    pairs = re.findall(
+        r"^\s*db\s+\$([0-9A-Fa-f]{2}),\s*\$([0-9A-Fa-f]{2})\s*$",
+        cut_blocks_source,
+        re.MULTILINE,
+    )
+    if (
+        len(re.findall(r"^CutTreeBlockSwaps:\s*$", cut_blocks_source, re.MULTILINE)) != 1
+        or len(re.findall(r"^\s*db\s+-1\s*;\s*end\s*$", cut_blocks_source, re.MULTILINE)) != 1
+        or pairs != [
+        ("32", "6D"), ("33", "6C"), ("34", "6F"), ("35", "4C"),
+        ("60", "6E"), ("0B", "0A"), ("3C", "35"), ("3F", "35"),
+        ("3D", "36"),
+        ]
+    ):
+        raise MapBackgroundContentError(
+            f"{cut_blocks_path}: CUT_TREE replacement authority or blockset semantics drifted"
+        )
+
+    cinnabar_path = root / "engine/events/hidden_events/cinnabar_gym_quiz.asm"
+    cinnabar_source = cinnabar_path.read_text(encoding="utf-8")
+    # Keep coordinates and symbolic orientation exact without deriving them from
+    # the FACILITY tileset used by this one map.
+    gate_rows_raw = re.findall(
+        r"^\s*gym_gate_coord\s+([0-9]+),\s*([0-9]+),\s*"
+        r"(HORIZONTAL_GATE_BLOCK|VERTICAL_GATE_BLOCK)\s*$",
+        cinnabar_source,
+        re.MULTILINE,
+    )
+    if (
+        len(re.findall(r"^\s*call\s+CinnabarGym_ReplaceTileBlock\s*$", cinnabar_source, re.MULTILINE)) != 1
+        or len(re.findall(r"^CinnabarGym_ReplaceTileBlock:\s*$", cinnabar_source, re.MULTILINE)) != 1
+        or re.findall(
+            r"^\s*DEF\s+(HORIZONTAL_GATE_BLOCK|VERTICAL_GATE_BLOCK)\s+EQU\s+"
+            r"(\$[0-9A-Fa-f]{2})\s*$",
+            cinnabar_source,
+            re.MULTILINE,
+        )
+        != [("HORIZONTAL_GATE_BLOCK", "$54"), ("VERTICAL_GATE_BLOCK", "$5f")]
+        or gate_rows_raw
+        != [
+            ("9", "3", "HORIZONTAL_GATE_BLOCK"),
+            ("6", "3", "HORIZONTAL_GATE_BLOCK"),
+            ("6", "6", "HORIZONTAL_GATE_BLOCK"),
+            ("3", "8", "VERTICAL_GATE_BLOCK"),
+            ("2", "6", "HORIZONTAL_GATE_BLOCK"),
+            ("2", "3", "HORIZONTAL_GATE_BLOCK"),
+        ]
+    ):
+        raise MapBackgroundContentError(
+            f"{cinnabar_path}: CINNABAR_GYM_GATE_BLOCKS writer semantics drifted"
+        )
+
+    map_authorities: dict[str, set[str]] = {name: set() for name in map_tilesets}
+    for name, tileset in map_tilesets.items():
+        if tileset in {"OVERWORLD", "GYM"}:
+            map_authorities[name].add("CUT_TREE")
+    for name in _GENERIC_REPLACE_TILE_BLOCK_MAPS:
+        map_authorities[name].add("REPLACE_TILE_BLOCK")
+    for name in _SPINNER_ARROW_MAPS:
+        map_authorities[name].add("SPINNER_ARROW_TILES")
+    map_authorities["CINNABAR_GYM"].add("CINNABAR_GYM_GATE_BLOCKS")
+    normalized_maps = {
+        name: tuple(sorted(identities)) for name, identities in map_authorities.items()
+    }
+    tileset_authorities: dict[str, set[str]] = {}
+    for name, identities in normalized_maps.items():
+        tileset_authorities.setdefault(map_tilesets[name], set()).update(identities)
+    normalized_tilesets = {
+        name: tuple(sorted(identities))
+        for name, identities in tileset_authorities.items()
+    }
+    return normalized_tilesets, normalized_maps
 
 
 def _expected_batch(tileset: str) -> str | None:
@@ -2149,8 +2362,11 @@ class MapBackgroundAuthority:
         discovered_maps = _maps(root)
         payloads = _payload_pointer_authorities(root, discovered_tilesets)
         roofs = _roof_authorities(root)
+        production_roof_region_rules(root)
         production_map_override_rules(root)
-        _validate_phase1_semantic_identities(root)
+        tileset_replacements, map_replacements = _production_replacement_authorities(
+            root, discovered_maps
+        )
         animation_authorities = _tileset_animation_authorities(
             root, discovered_tilesets
         )
@@ -2195,7 +2411,7 @@ class MapBackgroundAuthority:
                     f"tileset {row.name}: batch is outside the Phase 1 closed partition"
                 )
             expected_animations = animation_authorities.get(row.name, ())
-            expected_replacements = _PHASE1_REPLACEMENTS.get(row.name, ())
+            expected_replacements = tileset_replacements.get(row.name, ())
             if row.animations != expected_animations:
                 findings.append(
                     f"tileset {row.name}: animations disagree with Phase 1 metadata contract"
@@ -2243,7 +2459,7 @@ class MapBackgroundAuthority:
                     f"map {row.name}: batch disagrees with the Phase 1 tileset partition"
                 )
             expected_animations = animation_authorities.get(row.tileset, ())
-            expected_replacements = _PHASE1_REPLACEMENTS.get(row.tileset, ())
+            expected_replacements = map_replacements.get(row.name, ())
             if row.animations != expected_animations:
                 findings.append(
                     f"map {row.name}: animations disagree with Phase 1 metadata contract"

@@ -1,9 +1,250 @@
 {
+  "audit_only_source_regions": [
+    {
+      "audit_address": 31748,
+      "audit_bank": 3,
+      "audit_rom_offset": 64516,
+      "body_sha256": "4ea859f41567ef6eba165e8be3b83726871368babf222e009b479cac92f9c65b",
+      "conditional_anchor_symbol": "EnsureFreeFullColorPhase5DescriptorSelected.reclaim",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 397,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 389,
+      "symbol": "EnsureFreeFullColorPhase5DescriptorSelected.reclaim"
+    },
+    {
+      "audit_address": 32077,
+      "audit_bank": 3,
+      "audit_rom_offset": 64845,
+      "body_sha256": "c26138c75544f3ffb49e607ece1f41b250a121f1826f3b31efdf0c3939b101a0",
+      "conditional_anchor_symbol": "FullColorPhase5BeginVBlankBudgetFar",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 627,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 603,
+      "symbol": "FullColorPhase5BeginVBlankBudgetFar"
+    },
+    {
+      "audit_address": 31469,
+      "audit_bank": 3,
+      "audit_rom_offset": 64237,
+      "body_sha256": "df1ae959fb318fdb4ab73dfaa1f7631b6357a37e467a3e4db2ef28648772e042",
+      "conditional_anchor_symbol": "FullColorPhase5PrepareOwnedMainlineFrame",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 266,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 232,
+      "symbol": "FullColorPhase5PrepareOwnedMainlineFrame"
+    },
+    {
+      "audit_address": 31660,
+      "audit_bank": 3,
+      "audit_rom_offset": 64428,
+      "body_sha256": "50cfb358cb357329ee7e672265fb492e3596fc74811bda558ce001709e7b10b1",
+      "conditional_anchor_symbol": "FullColorPhase5PrepareOwnedMainlineFrame.done",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 345,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 337,
+      "symbol": "FullColorPhase5PrepareOwnedMainlineFrame.done"
+    },
+    {
+      "audit_address": 31575,
+      "audit_bank": 3,
+      "audit_rom_offset": 64343,
+      "body_sha256": "95bc7a2bf5f790560a2e0db9a4aaa7e7c06ae4a394c8c700a4953d137fd4a505",
+      "conditional_anchor_symbol": "FullColorPhase5PrepareOwnedMainlineFrame.nextResident",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 313,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 280,
+      "symbol": "FullColorPhase5PrepareOwnedMainlineFrame.nextResident"
+    },
+    {
+      "audit_address": 31689,
+      "audit_bank": 3,
+      "audit_rom_offset": 64457,
+      "body_sha256": "72b767ba14b8affbbc2b5f766b1741aa59a792f709ff98e5a02233160938c1f9",
+      "conditional_anchor_symbol": "FullColorPhase5PrepareOwnedMainlineFrame.pressureSelected",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 362,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 354,
+      "symbol": "FullColorPhase5PrepareOwnedMainlineFrame.pressureSelected"
+    },
+    {
+      "audit_address": 31710,
+      "audit_bank": 3,
+      "audit_rom_offset": 64478,
+      "body_sha256": "b7e37073d22c8bdf990a07fe47ab4e168d9c0007815dd9f8463810c7b14a9687",
+      "conditional_anchor_symbol": "FullColorPhase5PrepareOwnedMainlineFrame.skip",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 370,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 363,
+      "symbol": "FullColorPhase5PrepareOwnedMainlineFrame.skip"
+    },
+    {
+      "audit_address": 31753,
+      "audit_bank": 3,
+      "audit_rom_offset": 64521,
+      "body_sha256": "26946e1b3a0744291690f0f1033988834ac2987d7a3ff7d9d8e7d1942420513e",
+      "conditional_anchor_symbol": "FullColorPhase5PressureMainline",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 411,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 398,
+      "symbol": "FullColorPhase5PressureMainline"
+    },
+    {
+      "audit_address": 31811,
+      "audit_bank": 3,
+      "audit_rom_offset": 64579,
+      "body_sha256": "bb08fdc38d534672eefb1798acf19f2d5c39136e8d1e856c719bd9d63fe59591",
+      "conditional_anchor_symbol": "FullColorPhase5PressureMainline.activeNext",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 464,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 434,
+      "symbol": "FullColorPhase5PressureMainline.activeNext"
+    },
+    {
+      "audit_address": 31987,
+      "audit_bank": 3,
+      "audit_rom_offset": 64755,
+      "body_sha256": "9f96de17fe9a468dd820c0a90c00d746e5ee817d767508c0cba5c79c88f66333",
+      "conditional_anchor_symbol": "FullColorPhase5PressureMainline.admissionFailedSelected",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 544,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 539,
+      "symbol": "FullColorPhase5PressureMainline.admissionFailedSelected"
+    },
+    {
+      "audit_address": 31970,
+      "audit_bank": 3,
+      "audit_rom_offset": 64738,
+      "body_sha256": "d6bb2e90bf2b356bcb2f7eb2f196b3a4640be612eb690c7d8aec78aa08071519",
+      "conditional_anchor_symbol": "FullColorPhase5PressureMainline.admittedSelected",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 538,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 529,
+      "symbol": "FullColorPhase5PressureMainline.admittedSelected"
+    },
+    {
+      "audit_address": 31906,
+      "audit_bank": 3,
+      "audit_rom_offset": 64674,
+      "body_sha256": "bd92b1442f326e9ef02bc030582e914acfcc7741d118b1755ee7874905cebf78",
+      "conditional_anchor_symbol": "FullColorPhase5PressureMainline.copyDescriptor",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 500,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 491,
+      "symbol": "FullColorPhase5PressureMainline.copyDescriptor"
+    },
+    {
+      "audit_address": 31920,
+      "audit_bank": 3,
+      "audit_rom_offset": 64688,
+      "body_sha256": "cbfdb3af69f1390c433c97f66447a48629fffaf33714bb8d7861b855a7002355",
+      "conditional_anchor_symbol": "FullColorPhase5PressureMainline.generation",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 528,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 501,
+      "symbol": "FullColorPhase5PressureMainline.generation"
+    },
+    {
+      "audit_address": 31996,
+      "audit_bank": 3,
+      "audit_rom_offset": 64764,
+      "body_sha256": "167704130d2609251a047282e89903033c0585234e9e9ca0bfd253da1142f273",
+      "conditional_anchor_symbol": "FullColorPhase5PressureMainline.restore",
+      "current_file_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
+      "end_line": 554,
+      "path": "engine/gfx/sprite_oam.asm",
+      "reviewed_file_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56",
+      "start_line": 545,
+      "symbol": "FullColorPhase5PressureMainline.restore"
+    },
+    {
+      "audit_address": 22674,
+      "audit_bank": 4,
+      "audit_rom_offset": 71826,
+      "body_sha256": "a38f024dbb6a4fe03462885d1f8c352e3d68c66580e9858663f4266f0e9a371f",
+      "conditional_anchor_symbol": "DrawPartyMenu_.clearLogicalTileMap",
+      "current_file_sha256": "81eca80bad012a8d695421a55ccaf2b5d8bf5dfccee5cf2096cccf2bc039f01d",
+      "end_line": 40,
+      "path": "engine/menus/party_menu.asm",
+      "reviewed_file_sha256": "89e8bf731a312da335c8b45d2c9c3fa7d2043d55ac782c70b113075bcb8d917a",
+      "start_line": 28,
+      "symbol": "DrawPartyMenu_.clearLogicalTileMap"
+    },
+    {
+      "audit_address": 7753,
+      "audit_bank": 0,
+      "audit_rom_offset": 7753,
+      "body_sha256": "f3c13cea35574d63ea45c705009967e37618a89a12322307ccf4dbeb8cf4333e",
+      "conditional_anchor_symbol": "FullColorPhase5YellowOwner",
+      "current_file_sha256": "928f387528f59d64bb11a871ef78981f80788622f51684fddf991eb8162e1f3f",
+      "end_line": 36,
+      "path": "home/vblank.asm",
+      "reviewed_file_sha256": "39c29d247841dbcc20d91394966f6567b5449b3d9e94fd2a4bf7bb203441d4e3",
+      "start_line": 36,
+      "symbol": "FullColorPhase5YellowOwner"
+    },
+    {
+      "audit_address": 7876,
+      "audit_bank": 0,
+      "audit_rom_offset": 7876,
+      "body_sha256": "f3c13cea35574d63ea45c705009967e37618a89a12322307ccf4dbeb8cf4333e",
+      "conditional_anchor_symbol": "FullColorPhase5YellowOwner",
+      "current_file_sha256": "928f387528f59d64bb11a871ef78981f80788622f51684fddf991eb8162e1f3f",
+      "end_line": 36,
+      "path": "home/vblank.asm",
+      "reviewed_file_sha256": "39c29d247841dbcc20d91394966f6567b5449b3d9e94fd2a4bf7bb203441d4e3",
+      "start_line": 36,
+      "symbol": "FullColorPhase5YellowOwner.skipDec"
+    }
+  ],
   "baseline_manifest_sha256": "75c058f0d0df07a25918c710dc8ddebf43d3e5b809a06faaf7391cf015a9d774",
-  "current_source_sha256": "d3e54ead0eb0401117d1b8cfa32b3ae37463ed70db674b93ec55d3fbbb488ee2",
+  "current_source_sha256": "feef43bf61c9eae47b6ea2a6486501a31febf5d48ab86df46c5baa7a9ed69d10",
+  "product_identities": {
+    "audit": {
+      "rom_sha256": "9eda2f63f84d6e15cf97d9ed62da61833e55000b5a78e7911b37864ca6d6f724",
+      "sym_sha256": "a57cfac8168f4ea84cf737f58fc3a39a18cc7833a2fca2748257edb98f4766ff"
+    },
+    "debug": {
+      "rom_sha256": "c4efaee95d03a40f8d065f654bdf6c9275f644e3908dc46d99dc0d9dcf43f561",
+      "sym_sha256": "b9b318fdca31f7d72e45d74168d05af6879bf41446420bb37730dbdf95616134"
+    },
+    "normal": {
+      "rom_sha256": "32649785eb15c48dd8150e3e1774b1a6cd3d07e5d4a1c31faa5ef77d921bef1b",
+      "sym_sha256": "f8fd50c7fab32910d44a04644a39773e14d02428ff9a2a7514f6db2dfddd8929"
+    },
+    "vc": {
+      "rom_sha256": "a0e3ba99a9206306554dfa28fba73a92d73455f3ff0949062d05b595c7eaef11",
+      "sym_sha256": "a8aa2524b7f8a25dad45d670702fb9892481dd29c1a45d3b82f279a9a96d7100"
+    }
+  },
   "reviewed_delta_paths": {
     "constants/full_color_constants.asm": {
-      "current_sha256": "33ea30e6b29ba1c5b14ddade6fdb4e6a049640810404a4859b402721f5b2446c",
+      "current_sha256": "4a6c4262ee21ce4f53bb3d35b828b4e489134ab0cbc53acebeed8d2056529fa0",
       "reviewed_sha256": "da3032835057223116f29f463feaf21fb2f5b52ddc617a6de1f3a70b02b6ddb8"
     },
     "constants/gfx_constants.asm": {
@@ -15,11 +256,11 @@
       "reviewed_sha256": "b9413152b2b6c846ca918544f6f517ca9c775446d0bb2d93e231adb7e5aec4ee"
     },
     "data/tilesets/full_color_interiors.asm": {
-      "current_sha256": "318afdc195d5645a4bd34c0f04b7c841152c87f65211e82ba1c1e86407ad9587",
+      "current_sha256": "47a464487df40ac928bab832e1af5cbeab5025ccc2062514079c51a8e5092e10",
       "reviewed_sha256": null
     },
     "data/tilesets/full_color_overworld.asm": {
-      "current_sha256": "13d7448c0489c47295356b2f5d12fcb3c9d109410b6dcb2b429aab2c1d9632dc",
+      "current_sha256": "4223c5292f8c76b1514c587d9a282bedc1c8497dee6a34fcd70945c12f0a58c7",
       "reviewed_sha256": null
     },
     "engine/battle/init_battle.asm": {
@@ -35,11 +276,11 @@
       "reviewed_sha256": "d5ed0b768270718269d8767776383935846953c3e564643486b239a356a99018"
     },
     "engine/full_color/lifecycle.asm": {
-      "current_sha256": "b9a69ad6db5719125614773500164017290ea14b2f278319002f0631b092f329",
+      "current_sha256": "295d5f29e012f00ebb6458590bb45c907ed2f812d6421edb01dcd0ba9e7b15cd",
       "reviewed_sha256": null
     },
     "engine/full_color/oam.asm": {
-      "current_sha256": "db51627ecc22ed7bba02cc4afd485b286f7fdb5e2aaa59b41a220280c4b940b6",
+      "current_sha256": "168062b9d62829590f584828b5443738194be1fcebdb69f03373add23483a103",
       "reviewed_sha256": null
     },
     "engine/full_color/ownership.asm": {
@@ -47,32 +288,40 @@
       "reviewed_sha256": "ded865bd6bc643941ebb7657988f9788ca4e286410c7d09c078d46fec74febed"
     },
     "engine/full_color/palettes.asm": {
-      "current_sha256": "7106a1e8c3bd0f30d8ea9975ef223f920b582507fb882746c3f666bed3f03250",
+      "current_sha256": "545ba1c70273fddd709786407373b0ace5ae10d126dc305e723842fe1ee2ed26",
       "reviewed_sha256": null
     },
     "engine/full_color/passive_overworld.asm": {
-      "current_sha256": "fb462f944adf37d4c576aff35dfebb20bb08bc5f58300a567f5825c90360b6cb",
+      "current_sha256": "4483216137e7e08c55fb3ae863ebf1a72dc17735bf92550ce115111f44ea1630",
       "reviewed_sha256": null
     },
     "engine/full_color/passive_palette_refresh.asm": {
-      "current_sha256": "de26905b5c6499d17007a66d30273a0e9274d88866f489870957c0f4dc8bd839",
+      "current_sha256": "2573226736cf3dad1a7c4a8dafc640086c3c95e4869935ecf87cd4e1d9ee6aa5",
       "reviewed_sha256": null
     },
     "engine/full_color/phase2_audit.asm": {
-      "current_sha256": "5d0636ceb05915768923991d7fbab6a1e51d5556f1f1aa8c45b9c45c103b56a8",
+      "current_sha256": "f2194355195f8ff1f710c70652b61dade9c69271d0978731c8e9ec11001a1ff1",
+      "reviewed_sha256": null
+    },
+    "engine/full_color/phase5_audit.asm": {
+      "current_sha256": "9d982612f1a82d353ff4ca2625d8de752498854b8d6932708af4791eadb37e54",
       "reviewed_sha256": null
     },
     "engine/full_color/scheduler.asm": {
-      "current_sha256": "d8ab395da667a27142a3f379867485e7aa86552c1887956029722b60718f6530",
+      "current_sha256": "0b874fca62288b759e96b4b6b2b10715f3068438ea449de13dc9681819f50cbf",
       "reviewed_sha256": null
     },
     "engine/full_color/transfers.asm": {
-      "current_sha256": "64d7e46870c536a504cc5386d5ce010f2be320961a6f2610061cb99f9085a363",
+      "current_sha256": "5d8b614240e622311bdb56a10dd4f5f4d9e11a51642d3186555da5b52e3c67e1",
       "reviewed_sha256": null
     },
     "engine/gfx/bg_map_attributes.asm": {
       "current_sha256": "3a6e38eb0188d6ab01bfcc6b7016ce1497913f590e21e2c45b0e93bb0797de16",
       "reviewed_sha256": "d7b5b7e89c68b0c237ed384f8ad8f410e0068a0205c807619e400bb5b725fe0d"
+    },
+    "engine/gfx/mon_icons.asm": {
+      "current_sha256": "4ab272f1f6c8085441cc42588f43ec0574405ef978445aa8fc27425a23a596aa",
+      "reviewed_sha256": "1b688870b257ac2a4bb1e6fe707325f5fdd5ef20152b3e37dbc6bb2e88b72bc5"
     },
     "engine/gfx/oam_dma.asm": {
       "current_sha256": "5691ddc6ebfdda98fa860e8a640c4665f2b77a2cd6a102c1ba8173f7c8d3bff1",
@@ -83,7 +332,7 @@
       "reviewed_sha256": "3291a5b1d096b8380eb4d5abb0085f0ea1d37c67b64f09917a06062eebde0ea9"
     },
     "engine/gfx/sprite_oam.asm": {
-      "current_sha256": "a6271ebe31e60143833c4dee6c4de00b6367a5f3e5b4b92782b6193e1ec176ad",
+      "current_sha256": "338dd56e0ed85d0d1f2acc4499072d4cc52543d63c97c6e49aef21add6ff5b8c",
       "reviewed_sha256": "9f1700bb23ddea4971d2e8d0e703f003113c6764015f1da019b7a4ea3400bb56"
     },
     "engine/menus/display_text_id_init.asm": {
@@ -94,8 +343,12 @@
       "current_sha256": "e4de8c8768541378d31d9fb2d8f6534a5f22988c4ca2c6d2a5d667c3c080dd26",
       "reviewed_sha256": "02fb70fc77c287ecbd2d89ec51d4b98871f4ccb05c82eb2a68289c4bf948a1a4"
     },
+    "engine/menus/party_menu.asm": {
+      "current_sha256": "81eca80bad012a8d695421a55ccaf2b5d8bf5dfccee5cf2096cccf2bc039f01d",
+      "reviewed_sha256": "89e8bf731a312da335c8b45d2c9c3fa7d2043d55ac782c70b113075bcb8d917a"
+    },
     "engine/menus/start_sub_menus.asm": {
-      "current_sha256": "3bf33c9a03755d5e29a058d2291f81b86a66daf44c999d554f4d7eb8dcbab06b",
+      "current_sha256": "bf9be55e715648c79722b569681ad0df242de06c20d43136d9f87c46bdcd7e65",
       "reviewed_sha256": "5bea70e45cfca86946e8785525675347f222ba26ba7bc1d8559fd220f85819e7"
     },
     "engine/menus/text_box.asm": {
@@ -127,8 +380,12 @@
       "reviewed_sha256": null
     },
     "home/overworld.asm": {
-      "current_sha256": "8b1325fe84fafc3b8ca0c843bb19c60390ddad095641a2fdb782fa697e429ab2",
+      "current_sha256": "e3c0d0d1d74ef32f1d6ba1fcc089180c24b96035891166bc74722c1acae05e75",
       "reviewed_sha256": "6cb540cf227b35178b5f9370e73fb73cb649627393526bdae231cf4021af4142"
+    },
+    "home/pokemon.asm": {
+      "current_sha256": "8a555196d4589bb560bb45f29e770b99a85d664ba45777a37e054d443e310791",
+      "reviewed_sha256": "3bd22ac35b3c796d585714fd2d6ca28b2475168147577cedf58ed80063472d9f"
     },
     "home/start_menu.asm": {
       "current_sha256": "5080fd6c47c207be00f494d1b341cdb68360fb3114ac9d4af67b93ca26203039",
@@ -139,7 +396,7 @@
       "reviewed_sha256": "5c1e27cbc633f465f59042da17d1557466d53007fb9f369430e8778c8c1e39c2"
     },
     "home/vblank.asm": {
-      "current_sha256": "cf87f1edb513b113f2d51889954d2a47a13fbd0e1e9340680ff6cef3c375a744",
+      "current_sha256": "928f387528f59d64bb11a871ef78981f80788622f51684fddf991eb8162e1f3f",
       "reviewed_sha256": "39c29d247841dbcc20d91394966f6567b5449b3d9e94fd2a4bf7bb203441d4e3"
     },
     "home/vcopy.asm": {
@@ -151,7 +408,7 @@
       "reviewed_sha256": "15bfc18e71cf452acdf6c1f7e986fdb583d8d794a3796efbb09c28ca8626ed13"
     },
     "main.asm": {
-      "current_sha256": "92e086308467e64d31b0f0f047fc38c4f9c34bac870a0bf99a17bd153b440a50",
+      "current_sha256": "4b45d63771bdc30281cd8ac8f3497929f91c7e50af6c37c2f0eeb3609ccca162",
       "reviewed_sha256": "4097614148ed9256427f73557d5a99948b5af3b069ee4ba4172aed85015b4164"
     },
     "ram/hram.asm": {
@@ -163,7 +420,7 @@
       "reviewed_sha256": "dcbeca2292520e120f7c516bbbb3daa37507d644a7d60f1d678e3c4fd57dd26e"
     },
     "ram/wram.asm": {
-      "current_sha256": "0c641c45b251955ef52d9422dd67995c1fc62b94097137b10f63786d17a3430b",
+      "current_sha256": "b2185f0b7079de45b0b16065a827cdbf414fd54d075e3f6b6bef4a7a3c7a44dd",
       "reviewed_sha256": "4d611450cde6c95ea60b9f9290032417d802a89e4b995a5a5dafc48d4f2171bf"
     }
   },
@@ -174,11 +431,11 @@
     "d8a2f9a60f46b40f5ac4c5840751ba15be8aaff6bf51475bb57d97fbfb42ebc5": "81e69e02959d6a798a5b982c87523a36a95a4757b95f802a4269fac1bd09f6a4",
     "dc34621211e5f4bb2e053b0e578695229270d61a94d0bc1864dfacd3724e4c5e": "5ac1d2159ebc8b0e86599a182545da58fc33b3a2934494eb87a0bd2941e308de"
   },
-  "schema": "full-color-production-source-transition-v3",
+  "schema": "full-color-production-source-transition-v4",
   "subject_rebindings": {
-    "0040a529de49cbc46b61cf1a893ef631dea4143457d9e59144c92ee98cfa2f63": "12ee7aa3cd187f5af516793cb1f533829adc160b986049d116c68eeafa98e24c",
+    "0040a529de49cbc46b61cf1a893ef631dea4143457d9e59144c92ee98cfa2f63": "34a4797f6b1295d6c3b8eea0915c46476707fc8743bbc6380dba694793c132e3",
     "3439e6ba26569f399121526b13bdb3ead32028f49d500e31e4aeb1b00750a734": "64dde8044190cfa543d4227ccf40d1d2bb0fff390cd9b385a0f55fa590e642a5",
     "37bad8316662bd143cd8ddc8e29c44717b62f4818edd52b5690145ae80b301a4": "37bad8316662bd143cd8ddc8e29c44717b62f4818edd52b5690145ae80b301a4",
-    "cdef35527516830b0f1044a1020f3cd4dc4984c617fff66224f7a0b5786b080f": "a78fd3c899a67cf1e698d5e374231cac1a75fb77e01c767ae8c1b9f8ea43debc"
+    "cdef35527516830b0f1044a1020f3cd4dc4984c617fff66224f7a0b5786b080f": "535c08efd20c42118d46a09fb119debe974c55a3693cb18084972852f84dceea"
   }
 }

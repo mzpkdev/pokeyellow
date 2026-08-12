@@ -1,4 +1,45 @@
 DrawPartyMenu_::
+IF DEF(PHASE2_AUDIT)
+	; Fine-grained producer ledger for the poisoned Party reconstruction.  This
+	; is deliberately local to the audit product; the eight architectural
+	; ledger items remain the public lifecycle contract.
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_FONT EQU 1 << 0
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_TEXTBOX EQU 1 << 1
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_HP_STATUS EQU 1 << 2
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_CLEAR_OAM EQU 1 << 3
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_ICON_TILES EQU 1 << 4
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_ICON_OAM EQU 1 << 5
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_PALETTE_ATTRIBUTES EQU 1 << 6
+	DEF FULL_COLOR_PHASE5_PARTY_STEP_LOGICAL_TILEMAP EQU 1 << 7
+
+	farcall IsFullColorPhase5PartyYellowReconstructing
+	jr c, .ordinary
+	; The complete Party unit is rebuilt behind the lifecycle-owned LCD-off
+	; boundary.  Clear logical authority without ClearScreen's three visible
+	; transfer frames, and do not let the icon loader re-enable the LCD midway.
+	; PartyMenuInit has just published HP/status patterns after the Start-menu
+	; seam's font and textbox producers, preserving their intentional overlap.
+	ld c, FULL_COLOR_PHASE5_PARTY_STEP_HP_STATUS
+	farcall RecordFullColorPhase5PartyYellowProducerStep
+	ld hl, wTileMap
+	ld bc, SCREEN_AREA
+	inc b
+	ld a, ' '
+.clearLogicalTileMap
+	ld [hli], a
+	dec c
+	jr nz, .clearLogicalTileMap
+	dec b
+	jr nz, .clearLogicalTileMap
+	call ClearSprites
+	ld c, FULL_COLOR_PHASE5_PARTY_STEP_CLEAR_OAM
+	farcall RecordFullColorPhase5PartyYellowProducerStep
+	farcall LoadMonPartySpriteGfxLCDAlreadyDisabled
+	ld c, FULL_COLOR_PHASE5_PARTY_STEP_ICON_TILES
+	farcall RecordFullColorPhase5PartyYellowProducerStep
+	jr RedrawPartyMenu_
+.ordinary
+ENDC
 	xor a
 	ldh [hAutoBGTransferEnabled], a
 	call ClearScreen
@@ -177,8 +218,23 @@ RedrawPartyMenu_::
 .notAbleToEvolveText
 	db "NOT ABLE@"
 .afterDrawingMonEntries
+IF DEF(PHASE2_AUDIT)
+	farcall IsFullColorPhase5PartyYellowReconstructing
+	jr c, .palette
+	; Every Party entry has now been emitted from logical party/species state.
+	; ClearSprites and these writes are the sole shadow-OAM authority.
+	ld c, FULL_COLOR_PHASE5_PARTY_STEP_ICON_OAM
+	farcall RecordFullColorPhase5PartyYellowProducerStep
+.palette
+ENDC
 	ld b, SET_PAL_PARTY_MENU
 	call RunPaletteCommand
+IF DEF(PHASE2_AUDIT)
+	farcall IsFullColorPhase5PartyYellowReconstructing
+	jr c, .printMessage
+	ld c, FULL_COLOR_PHASE5_PARTY_STEP_PALETTE_ATTRIBUTES
+	farcall RecordFullColorPhase5PartyYellowProducerStep
+ENDC
 .printMessage
 	ld hl, wStatusFlags5
 	ld a, [hl]
@@ -196,6 +252,20 @@ RedrawPartyMenu_::
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
+IF DEF(PHASE2_AUDIT)
+	farcall IsFullColorPhase5PartyYellowReconstructing
+	jr c, .ordinaryMessage
+	; The text-script `done` command waits for a visible frame even with letter
+	; delay disabled. Render the normal Start-menu prompt directly from linked
+	; ROM authority while the lifecycle-owned LCD-off boundary is still closed.
+	hlcoord 1, 16
+	ld de, FullColorPhase5PartyNormalText
+	call PlaceString
+	ld c, FULL_COLOR_PHASE5_PARTY_STEP_LOGICAL_TILEMAP
+	farcall RecordFullColorPhase5PartyYellowProducerStep
+	jr .done
+.ordinaryMessage
+ENDC
 	call PrintText
 .done
 	pop hl
@@ -203,6 +273,17 @@ RedrawPartyMenu_::
 	ld [hl], a
 	ld a, 1
 	ldh [hAutoBGTransferEnabled], a
+IF DEF(PHASE2_AUDIT)
+	farcall IsFullColorPhase5PartyYellowReconstructing
+	jr c, .ordinaryReveal
+	; Recreate Yellow's transformed hardware palettes while hidden.  The
+	; lifecycle then publishes the finished tilemap, attributes, and OAM at its
+	; sole physical barrier.
+	call GBPalNormal
+	farcall CompleteFullColorPhase5PartyYellowReconstruction
+	ret
+.ordinaryReveal
+ENDC
 	call Delay3
 	jp GBPalNormal
 .printItemUseMessage
@@ -241,6 +322,11 @@ PartyMenuMessagePointers:
 	dw PartyMenuUseTMText
 	dw PartyMenuSwapMonText
 	dw PartyMenuItemUseText
+
+IF DEF(PHASE2_AUDIT)
+FullColorPhase5PartyNormalText:
+	db "Choose a #MON.@"
+ENDC
 
 PartyMenuNormalText:
 	text_far _PartyMenuNormalText

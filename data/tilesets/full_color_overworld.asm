@@ -115,6 +115,16 @@ FullColorOverworldRoofAssignments::
 	db FULL_COLOR_ROOF_CERULEAN  ; ROUTE_25
 FullColorOverworldRoofAssignmentsEnd::
 
+DEF FULL_COLOR_ROOF_REGION_RULE_SIZE EQU 4
+DEF NUM_FULL_COLOR_ROOF_REGION_RULES EQU 1
+
+; Coordinate-dependent roof selection is data, not map-specific dispatch.
+; Each record is map ID, lower-region Y boundary, upper roof, lower roof.
+; The runtime also uses the selected record half as its invalidation identity.
+FullColorOverworldRoofRegionRules::
+	db ROUTE_6, 2, FULL_COLOR_ROOF_SAFFRON, FULL_COLOR_ROOF_VERMILION
+FullColorOverworldRoofRegionRulesEnd::
+
 ; Middle colors for palette 6. Colors 0 and 3 stay OUTDOOR_ROOF values.
 FullColorOverworldRoofPalettes::
 	RGB 31, 31, 31 ; Pallet
@@ -186,6 +196,7 @@ ENDC
 
 ASSERT FullColorOverworldBGPalettesEnd - FullColorOverworldBGPalettes == 8 * 4 * 2
 ASSERT FullColorOverworldRoofAssignmentsEnd - FullColorOverworldRoofAssignments == FIRST_INDOOR_MAP
+ASSERT FullColorOverworldRoofRegionRulesEnd - FullColorOverworldRoofRegionRules == NUM_FULL_COLOR_ROOF_REGION_RULES * FULL_COLOR_ROOF_REGION_RULE_SIZE
 ASSERT FullColorOverworldRoofPalettesEnd - FullColorOverworldRoofPalettes == NUM_FULL_COLOR_ROOFS * 2 * 2
 IF DEF(PHASE2_AUDIT)
 ASSERT FullColorCanaryOBJPalettesEnd - FullColorCanaryOBJPalettes == 8 * 4 * 2

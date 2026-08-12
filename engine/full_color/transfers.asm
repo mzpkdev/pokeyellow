@@ -103,110 +103,10 @@ CommitFullColorPairedTransferSelected::
 	ld [wFullColorActiveDescriptor], a
 	ld a, h
 	ld [wFullColorActiveDescriptor + 1], a
-	push hl
-	ld de, FULL_COLOR_DESCRIPTOR_DESIRED_STATE
-	add hl, de
-	ld a, [hli]
-	ld [wFullColorRequestStaging], a ; width
-	ld a, [hl]
-	ld [wFullColorRequestStaging + 1], a ; height
-	pop hl
-	ld de, FULL_COLOR_DESCRIPTOR_DESTINATION
-	add hl, de
-	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	ld de, wFullColorAttributeRectangle
-	xor a
-	ld [wFullColorRequestStaging + 2], a
-	ld a, h
-	and $fc
-	ld [wFullColorTimingState], a ; selected map base high
-	ldh a, [rVBK]
-	ld [wFullColorTimingState + 1], a
-	xor a
-	ldh [rVBK], a
-	call CommitFullColorMapPlaneSelected
-	ld a, 1
-	ldh [rVBK], a
-	ld de, wFullColorBGPaletteBase
-	ld [wFullColorRequestStaging + 2], a
-	call LoadFullColorActiveMapDestinationSelected
-	call CommitFullColorMapPlaneSelected
-	ld a, [wFullColorTimingState + 1]
-	ldh [rVBK], a
+	; The measured cell writer lives in the added-only auto-ROMX Phase 5 region;
+	; this paid fixed-window seam only preserves the descriptor ABI.
+	farcall CommitFullColorPhase5PairedTransferFastSelected
 	call LoadFullColorActiveDescriptorSelected
-	ret
-
-; DE packed source, HL first destination. Width/height are in staging.
-CommitFullColorMapPlaneSelected:
-	ld a, l
-	ld [wFullColorRequestStaging + 3], a
-	ld a, h
-	ld [wFullColorRequestStaging + 4], a
-	ld a, [wFullColorRequestStaging + 1]
-	ld c, a
-.row
-	ld a, [wFullColorRequestStaging + 3]
-	ld l, a
-	ld a, [wFullColorRequestStaging + 4]
-	ld h, a
-	ld a, [wFullColorRequestStaging]
-	ld b, a
-.cell
-	ld a, [wFullColorRequestStaging + 2]
-	and a
-	jr z, .load
-	ld a, d
-	cp HIGH(wFullColorAttributeRectangle)
-	jr nz, .load
-	ld a, e
-	cp LOW(wFullColorAttributeRectangle)
-	jr nz, .load
-	ld de, wFullColorShadowOAMBatch
-.load
-	ld a, [de]
-	ld [hl], a
-	inc de
-	call AdvanceFullColorMapCellSelected
-	dec b
-	jr nz, .cell
-	ld a, [wFullColorRequestStaging + 3]
-	ld l, a
-	ld a, [wFullColorRequestStaging + 4]
-	ld h, a
-	call AdvanceFullColorMapRowSelected
-	ld a, l
-	ld [wFullColorRequestStaging + 3], a
-	ld a, h
-	ld [wFullColorRequestStaging + 4], a
-	dec c
-	jr nz, .row
-	ret
-
-AdvanceFullColorMapCellSelected:
-	inc hl
-	ld a, [wFullColorTimingState]
-	add 4
-	cp h
-	ret nz
-	ld a, [wFullColorTimingState]
-	ld h, a
-	ret
-
-AdvanceFullColorMapRowSelected:
-	ld a, l
-	add 32
-	ld l, a
-	jr nc, .range
-	inc h
-.range
-	ld a, [wFullColorTimingState]
-	add 4
-	cp h
-	ret nz
-	ld a, [wFullColorTimingState]
-	ld h, a
 	ret
 
 LoadFullColorActiveDescriptorSelected:
@@ -225,6 +125,7 @@ LoadFullColorActiveMapDestinationSelected:
 	ld l, a
 	ret
 
+FullColorPhase5AnimationStart::
 CommitFullColorAnimationReplacementSelected::
 	ld a, l
 	ld [wFullColorActiveDescriptor], a
@@ -260,6 +161,7 @@ CommitFullColorAnimationReplacementSelected::
 	ld a, [wFullColorTimingState + 1]
 	ldh [rVBK], a
 	call LoadFullColorActiveDescriptorSelected
+FullColorPhase5AnimationEnd::
 	ret
 
 ASSERT wFullColorBGPaletteBase + 256 == wFullColorAttributeRectangle

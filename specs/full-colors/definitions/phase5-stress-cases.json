@@ -1,0 +1,1122 @@
+{
+  "schema": "full-color-phase5-stress-cases-v1",
+  "phase": 5,
+  "activation": "PHASE2_AUDIT_ONLY",
+  "production_activation": false,
+  "runtime_admission": {
+    "color_presented_maps": 196,
+    "yellow_presented_maps": 28,
+    "changed": false
+  },
+  "reviewed_evidence": {
+    "path": "specs/full-colors/evidence/phase5-stress.json",
+    "schema": "full-color-phase5-stress-reviewed-v1",
+    "promotion_forbidden_in_ci": true,
+    "fresh_semantic_comparison": "EXACT",
+    "capture_artifact_identities_are_separate": true
+  },
+  "capture_contract": {
+    "fresh_runs": 2,
+    "minimum_natural_executions_per_path_per_run": 32,
+    "stable_outputs_traces_and_frame_strips": true
+  },
+  "requirements": [
+    "R1.15",
+    "R1.16",
+    "R1.21",
+    "R1.22",
+    "R1.23",
+    "R1.24",
+    "R1.25",
+    "R1.27",
+    "R1.28",
+    "R2.10",
+    "R2.11",
+    "R2.12",
+    "R2.13",
+    "R7.1",
+    "R7.3",
+    "R7.4",
+    "R10.4",
+    "R10.5",
+    "R10.8",
+    "R10.9",
+    "R10.10"
+  ],
+  "acceptance": {
+    "closes": [
+      "AC-COMMIT-01",
+      "AC-JOB-01",
+      "AC-REQUEST-01",
+      "AC-STRESS-01",
+      "AC-STRESS-03",
+      "AC-TIME-01"
+    ],
+    "progress_only": [
+      "AC-RETURN-01",
+      "AC-STRESS-02"
+    ]
+  },
+  "inventory": {
+    "writers": [
+      {
+        "id": "WR-P5-AUDIT-ANIMATION-TILE-ATTRIBUTE",
+        "source_path": "engine/full_color/transfers.asm",
+        "linked_symbol": "CommitFullColorAnimationReplacementSelected",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA", "BG_ATTRIBUTES"],
+        "commit_unit": "ANIMATION_REPLACEMENT",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-BG-PALETTE",
+        "source_path": "engine/full_color/palettes.asm",
+        "linked_symbol": "CommitFullColorBGPaletteSelected",
+        "kind": "DIRECT",
+        "resources": ["BG_PALETTES"],
+        "commit_unit": "PALETTE_PAYLOAD",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-CANONICAL-PAIRED-COLUMN2X18",
+        "source_path": "engine/full_color/phase5_audit.asm",
+        "linked_symbol": "CommitFullColorPhase5Paired2x18Selected",
+        "write_start_symbol": "FullColorPhase5Paired2x18WritesStart",
+        "write_end_symbol": "FullColorPhase5Paired2x18WritesEnd",
+        "kind": "DIRECT",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "width": 2,
+        "height": 18,
+        "extent": 36,
+        "public_target_writes": 72,
+        "commit_unit": "PAIRED_PLANES",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-CANONICAL-PAIRED-DISPATCH",
+        "source_path": "engine/full_color/phase5_audit.asm",
+        "linked_symbol": "CommitFullColorPhase5PairedCanonicalTimedSelected",
+        "kind": "WRAPPER",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "commit_unit": "PAIRED_PLANES",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": [
+          "WR-P5-AUDIT-CANONICAL-PAIRED-COLUMN2X18",
+          "WR-P5-AUDIT-CANONICAL-PAIRED-ROW20X2"
+        ]
+      },
+      {
+        "id": "WR-P5-AUDIT-CANONICAL-PAIRED-ROW20X2",
+        "source_path": "engine/full_color/phase5_audit.asm",
+        "linked_symbol": "CommitFullColorPhase5Paired20x2Selected",
+        "write_start_symbol": "FullColorPhase5Paired20x2WritesStart",
+        "write_end_symbol": "FullColorPhase5Paired20x2WritesEnd",
+        "kind": "DIRECT",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "width": 20,
+        "height": 2,
+        "extent": 40,
+        "public_target_writes": 80,
+        "commit_unit": "PAIRED_PLANES",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-OAM-BUILD",
+        "source_path": "engine/gfx/sprite_oam.asm",
+        "linked_symbol": "PrepareFullColorOAMDataForOwnedVBlank",
+        "kind": "DIRECT",
+        "resources": ["SHADOW_OAM"],
+        "commit_unit": "OAM_FRAME",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-OAM-DMA",
+        "source_path": "engine/full_color/oam.asm",
+        "linked_symbol": "CommitFullColorOAMBatchSelected",
+        "kind": "DMA",
+        "resources": ["HARDWARE_OAM"],
+        "commit_unit": "OAM_FRAME",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": ["WR-P2-YELLOW-OAM-DMA"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-ACTIVATION",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "CompleteFullColorPhase5PartyColorPresentation",
+        "kind": "ACTIVATION",
+        "resources": ["AUTHORITY_STATE"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-AUTHORITY-LOAD",
+        "source_path": "home/overworld.asm",
+        "linked_symbol": "FullColorAuditLoadMapDataHomeAuthority",
+        "kind": "WRAPPER",
+        "resources": ["MAP_IDENTITY", "MAP_HEADER", "BLOCK_DATA", "COORDINATES", "REPLACEMENTS", "TILE_DATA", "SPRITE_IDENTITY", "LOGICAL_VIEWPORT"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-RECONSTRUCTION"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-BARRIER",
+        "source_path": "home/overworld.asm",
+        "linked_symbol": "FullColorPhase5PartyHandoffToColorDeadline",
+        "kind": "PRESENTATION_BARRIER",
+        "resources": ["DISPLAY_REGISTER"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-ACTIVATION"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-LEGACY-PALETTE-ACK",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "FullColorPhase5AcknowledgeLegacyPaletteRegisters",
+        "kind": "AUDIT_LEDGER",
+        "resources": ["PALETTE_REGISTER_AUTHORITY"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-BARRIER"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-MAP-SPRITE-TILE-DATA",
+        "source_path": "home/copy.asm",
+        "linked_symbol": "CopyVideoDataAlternate",
+        "route_path": "engine/overworld/map_sprites.asm",
+        "route_symbol": "LoadMapSpriteTilePatterns",
+        "selection_path": "home/palettes.asm",
+        "selection_symbol": "InitMapSprites",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA", "MAP_SPRITE_TILE_DATA"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-OAM-BUILD",
+        "source_path": "engine/gfx/sprite_oam.asm",
+        "linked_symbol": "PrepareFullColorOAMDataForOwnedVBlank",
+        "kind": "DIRECT",
+        "resources": ["SHADOW_OAM"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-PAIRED-BRIDGE",
+        "source_path": "engine/full_color/transfers.asm",
+        "linked_symbol": "CommitFullColorPairedTransferSelected",
+        "kind": "WRAPPER",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-PAIRED-FAST"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-PAIRED-FAST",
+        "source_path": "engine/full_color/phase5_audit.asm",
+        "linked_symbol": "CommitFullColorPhase5PairedTransferFastSelected",
+        "kind": "WRAPPER",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-PAIRED-GENERAL"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-PAIRED-GENERAL",
+        "source_path": "engine/full_color/phase5_audit.asm",
+        "linked_symbol": "FullColorPhase5PairedGeneralSelected",
+        "kind": "WRAPPER",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-PAIRED-MAP-PLANE"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-PAIRED-MAP-PLANE",
+        "source_path": "engine/full_color/phase5_audit.asm",
+        "linked_symbol": "CommitFullColorPhase5MapPlaneSelected",
+        "kind": "DIRECT",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "write_count": 2,
+        "plane_order": ["BG_TILE_IDS", "BG_ATTRIBUTES"],
+        "destination": "vBGMap0",
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-PALETTE-DERIVATION",
+        "source_path": "engine/full_color/palettes.asm",
+        "linked_symbol": "CopyAndTransformFullColorPaletteSelected",
+        "kind": "DIRECT",
+        "resources": ["BG_PALETTES", "OBJ_PALETTES", "PALETTE_TRANSFORMS"],
+        "source_authorities": [
+          "FullColorOverworldBGPalettes",
+          "FullColorCanaryOBJPalettes"
+        ],
+        "ordering": "AFTER_PAIRED_ATTRIBUTE_SCRATCH",
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-PALETTE-PUBLISH"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-PALETTE-PUBLISH",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "FullColorPhase5PublishPartyColorPalettesSelected",
+        "kind": "DIRECT",
+        "resources": ["BG_PALETTES", "OBJ_PALETTES"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-COLOR-LEGACY-PALETTE-ACK"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-PLAYER-TILE-DATA",
+        "source_path": "home/copy.asm",
+        "linked_symbol": "CopyVideoDataAlternate",
+        "route_path": "home/overworld.asm",
+        "route_symbol": "LoadPlayerSpriteGraphicsCommon",
+        "selection_symbol": "LoadPlayerSpriteGraphics",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA", "PLAYER_TILE_DATA"],
+        "write_contract": [
+          {"source": "RedSprite", "destination": "$8000", "tiles": 12},
+          {"source": "RedSprite+$c0", "destination": "$8800", "tiles": 12}
+        ],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-POISON",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "PoisonFullColorPhase5PartyState",
+        "kind": "DIRECT",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES", "TILE_DATA", "BG_PALETTES", "OBJ_PALETTES", "SHADOW_OAM", "HARDWARE_OAM", "TILEMAP_BACKUPS", "PALETTE_ATTRIBUTE_OAM_SCRATCH", "SCHEDULER_STATE", "RENDERER_JOB_STATE", "VIEWPORT_REGISTERS", "TRANSFER_STATE", "AUTHORITY_STATE"],
+        "preserved_machine_state": ["INTERRUPT_STATE", "ROM_BANK", "STACK_POINTER", "VRAM_BANK", "WRAM_BANK"],
+        "commit_unit": "HIDDEN_DESTINATION",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-RECONSTRUCTION",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "ReconstructFullColorMapEntry",
+        "kind": "DIRECT",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES", "BG_PALETTES", "OBJ_PALETTES", "SHADOW_OAM", "HARDWARE_OAM", "VIEWPORT_REGISTERS", "AUTHORITY_STATE"],
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": [
+          "WR-P2-YELLOW-OAM-DMA",
+          "WR-P5-AUDIT-PARTY-COLOR-BARRIER",
+          "WR-P5-AUDIT-PARTY-COLOR-MAP-SPRITE-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-COLOR-OAM-BUILD",
+          "WR-P5-AUDIT-PARTY-COLOR-PAIRED-BRIDGE",
+          "WR-P5-AUDIT-PARTY-COLOR-PALETTE-DERIVATION",
+          "WR-P5-AUDIT-PARTY-COLOR-PLAYER-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-COLOR-TILESET-TILE-DATA"
+        ]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-COLOR-TILESET-TILE-DATA",
+        "source_path": "home/overworld.asm",
+        "linked_symbol": "FullColorPhase5PartyColorTilesetProducerStart",
+        "route_path": "home/overworld.asm",
+        "route_symbol": "FullColorPhase5PartyColorTilesetProducerReturn",
+        "producer_symbol": "LoadTilesetTilePatternData",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA", "TILESET_TILE_DATA"],
+        "source_authority": "wTilesetBank:wTilesetGfxPtr",
+        "destination": "vTileset",
+        "bytes": 1536,
+        "commit_unit": "FULL_MAP",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-ACTIVATION",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "CompleteFullColorPhase5PartyYellowReconstruction",
+        "kind": "ACTIVATION",
+        "resources": ["AUTHORITY_STATE"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-ATTRIBUTES",
+        "source_path": "engine/gfx/bg_map_attributes.asm",
+        "linked_symbol": "LoadBGMapAttributes",
+        "kind": "DIRECT",
+        "resources": ["BG_ATTRIBUTES"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-BARRIER",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "FullColorPhase5PartyHandoffToYellowDeadline",
+        "kind": "PRESENTATION_BARRIER",
+        "resources": ["DISPLAY_REGISTER"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-YELLOW-ACTIVATION"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-FONT-TILE-DATA",
+        "source_path": "home/load_font.asm",
+        "linked_symbol": "LoadFontTilePatterns",
+        "route_path": "engine/menus/start_sub_menus.asm",
+        "route_symbol": "StartMenu_Pokemon.phase5EntryReady",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-HP-STATUS-TILE-DATA",
+        "source_path": "home/load_font.asm",
+        "linked_symbol": "LoadHpBarAndStatusTilePatterns",
+        "route_path": "home/pokemon.asm",
+        "route_symbol": "PartyMenuInit",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-ICON-TILE-DATA",
+        "source_path": "engine/gfx/mon_icons.asm",
+        "linked_symbol": "LoadMonPartySpriteGfxLCDAlreadyDisabled",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-OAM-CLEAR",
+        "source_path": "home/clear_sprites.asm",
+        "linked_symbol": "ClearSprites",
+        "kind": "DIRECT",
+        "resources": ["SHADOW_OAM"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-YELLOW-SHADOW-OAM"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-PALETTE-CONSTRUCTION",
+        "source_path": "engine/gfx/palettes.asm",
+        "linked_symbol": "InitCGBPalettes",
+        "kind": "DIRECT",
+        "resources": ["BG_PALETTES", "OBJ_PALETTES", "PALETTE_SOURCE_POINTERS"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-YELLOW-ATTRIBUTES"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-PALETTE-TRANSFORM",
+        "source_path": "home/palettes.asm",
+        "linked_symbol": "GBPalNormal",
+        "kind": "DIRECT",
+        "resources": ["BG_PALETTES", "OBJ_PALETTES"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-POISON",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "PoisonFullColorPhase5PartyState",
+        "kind": "DIRECT",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES", "TILE_DATA", "BG_PALETTES", "OBJ_PALETTES", "SHADOW_OAM", "HARDWARE_OAM", "TILEMAP_BACKUPS", "PALETTE_ATTRIBUTE_OAM_SCRATCH", "SCHEDULER_STATE", "RENDERER_JOB_STATE", "VIEWPORT_REGISTERS", "TRANSFER_STATE", "AUTHORITY_STATE"],
+        "preserved_machine_state": ["INTERRUPT_STATE", "ROM_BANK", "STACK_POINTER", "VRAM_BANK", "WRAM_BANK"],
+        "commit_unit": "HIDDEN_DESTINATION",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-PRESENTATION",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "CompleteFullColorPhase5PartyYellowReconstruction",
+        "kind": "DIRECT",
+        "resources": ["BG_TILE_IDS", "HARDWARE_OAM", "VIEWPORT_REGISTERS"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": [
+          "WR-P2-YELLOW-OAM-DMA",
+          "WR-P5-AUDIT-PARTY-YELLOW-BARRIER"
+        ]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-PRODUCER-LEDGER",
+        "source_path": "engine/full_color/lifecycle.asm",
+        "linked_symbol": "RecordFullColorPhase5PartyYellowProducerStep",
+        "kind": "AUDIT_LEDGER",
+        "resources": ["AUTHORITY_STATE"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": ["WR-P5-AUDIT-PARTY-YELLOW-PRESENTATION"]
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-SHADOW-OAM",
+        "source_path": "engine/gfx/mon_icons.asm",
+        "linked_symbol": "WriteMonPartySpriteOAM",
+        "kind": "DIRECT",
+        "resources": ["SHADOW_OAM", "OAM_SAVED_COPY"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-TEXTBOX-TILE-DATA",
+        "source_path": "home/load_font.asm",
+        "linked_symbol": "LoadTextBoxTilePatterns",
+        "route_path": "engine/menus/start_sub_menus.asm",
+        "route_symbol": "StartMenu_Pokemon.phase5EntryReady",
+        "kind": "DIRECT",
+        "resources": ["TILE_DATA"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-PARTY-YELLOW-TILEMAP",
+        "source_path": "engine/menus/party_menu.asm",
+        "linked_symbol": "DrawPartyMenu_",
+        "kind": "WRAPPER",
+        "resources": ["BG_TILE_IDS"],
+        "commit_unit": "STANDALONE_SCREEN",
+        "owner": "RENDERER_YELLOW",
+        "phase": "YELLOW_RECONSTRUCTING",
+        "generation_checked": false,
+        "downstream": []
+      },
+      {
+        "id": "WR-P5-AUDIT-VISIBLE-UNIT-DISPATCH",
+        "source_path": "engine/full_color/palettes.asm",
+        "linked_symbol": "CommitFullColorVisibleUnitSelected",
+        "kind": "WRAPPER",
+        "resources": ["BG_TILE_IDS", "BG_ATTRIBUTES", "TILE_DATA", "BG_PALETTES", "SHADOW_OAM", "HARDWARE_OAM"],
+        "commit_unit": "DESCRIPTOR_SELECTED",
+        "owner": "RENDERER_FULL_COLOR_OVERWORLD",
+        "phase": "OVERWORLD_ACTIVE",
+        "generation_checked": true,
+        "downstream": [
+          "WR-P5-AUDIT-ANIMATION-TILE-ATTRIBUTE",
+          "WR-P5-AUDIT-BG-PALETTE",
+          "WR-P5-AUDIT-OAM-DMA"
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "id": "SC-P5-AUDIT-PALLET-ROUTE1-NORTH",
+        "case_id": "RC-P5-CONNECTION-PALLET-NORTH",
+        "route_path": "home/overworld.asm",
+        "route_symbol": "FullColorAuditScheduleNorthRow",
+        "source_path": "engine/full_color/scheduler.asm",
+        "source_symbol": "EnqueueFullColorMapConnection",
+        "destination_path": "engine/full_color/phase5_audit.asm",
+        "destination_symbol": "CommitFullColorPhase5Paired20x2Selected",
+        "direction": "MAP_TO_MAP",
+        "owner_before_destination_initialization": "RENDERER_FULL_COLOR_OVERWORLD",
+        "reconstruction": "NONE",
+        "first_writer_ids": ["WR-P5-AUDIT-CANONICAL-PAIRED-ROW20X2"]
+      },
+      {
+        "id": "SC-P5-AUDIT-PARTY-ENTRY",
+        "case_id": "RC-P5-PARTY-RETURN-PALLET",
+        "source_path": "engine/menus/start_sub_menus.asm",
+        "source_symbol": "StartMenu_Pokemon.phase5Entry",
+        "destination_path": "engine/full_color/lifecycle.asm",
+        "destination_symbol": "CompleteFullColorPhase5PartyYellowReconstruction",
+        "direction": "MAP_TO_YELLOW",
+        "owner_before_destination_initialization": "RENDERER_YELLOW",
+        "reconstruction": "REQUIRED",
+        "first_writer_ids": ["WR-P5-AUDIT-PARTY-YELLOW-POISON"]
+      },
+      {
+        "id": "SC-P5-AUDIT-PARTY-RETURN",
+        "case_id": "RC-P5-PARTY-RETURN-PALLET",
+        "source_path": "engine/menus/start_sub_menus.asm",
+        "source_symbol": "StartMenu_Pokemon.phase5ColorHandoff",
+        "destination_path": "engine/full_color/lifecycle.asm",
+        "destination_symbol": "CompleteFullColorPhase5PartyColorPresentation",
+        "direction": "YELLOW_TO_MAP",
+        "owner_before_destination_initialization": "RENDERER_FULL_COLOR_OVERWORLD",
+        "reconstruction": "REQUIRED",
+        "first_writer_ids": ["WR-P5-AUDIT-PARTY-COLOR-POISON"]
+      }
+    ],
+    "mutations": [
+      {
+        "id": "MU-P5-AUDIT-COMBINED-ANIMATION",
+        "case_id": "RC-P5-COMBINED-PRESSURE-PALLET",
+        "behavior": "ANIMATION",
+        "commit_unit": "ANIMATION_REPLACEMENT",
+        "writer_ids": ["WR-P5-AUDIT-ANIMATION-TILE-ATTRIBUTE"]
+      },
+      {
+        "id": "MU-P5-AUDIT-COMBINED-OAM-BUILD",
+        "case_id": "RC-P5-COMBINED-PRESSURE-PALLET",
+        "behavior": "OAM_BATCH",
+        "commit_unit": "OAM_FRAME",
+        "writer_ids": ["WR-P5-AUDIT-OAM-BUILD"]
+      },
+      {
+        "id": "MU-P5-AUDIT-COMBINED-OAM-DMA",
+        "case_id": "RC-P5-COMBINED-PRESSURE-PALLET",
+        "behavior": "OAM_DMA",
+        "commit_unit": "OAM_FRAME",
+        "writer_ids": ["WR-P5-AUDIT-OAM-DMA"]
+      },
+      {
+        "id": "MU-P5-AUDIT-COMBINED-PALETTE",
+        "case_id": "RC-P5-COMBINED-PRESSURE-PALLET",
+        "behavior": "PALETTE",
+        "commit_unit": "PALETTE_PAYLOAD",
+        "writer_ids": ["WR-P5-AUDIT-BG-PALETTE"]
+      },
+      {
+        "id": "MU-P5-AUDIT-COMBINED-VERTICAL",
+        "case_id": "RC-P5-COMBINED-PRESSURE-PALLET",
+        "behavior": "SCROLL_VERTICAL",
+        "commit_unit": "PAIRED_PLANES",
+        "writer_ids": [
+          "WR-P5-AUDIT-CANONICAL-PAIRED-COLUMN2X18",
+          "WR-P5-AUDIT-CANONICAL-PAIRED-DISPATCH"
+        ]
+      },
+      {
+        "id": "MU-P5-AUDIT-CONNECTION-NORTH",
+        "case_id": "RC-P5-CONNECTION-PALLET-NORTH",
+        "behavior": "CONNECTION_NORTH",
+        "commit_unit": "PAIRED_PLANES",
+        "writer_ids": [
+          "WR-P5-AUDIT-CANONICAL-PAIRED-DISPATCH",
+          "WR-P5-AUDIT-CANONICAL-PAIRED-ROW20X2"
+        ],
+        "supersession": {
+          "source_path": "engine/full_color/phase5_audit.asm",
+          "linked_symbol": "RetireFullColorPhase5SupersededMovementSelected",
+          "cancellation_symbol": "CancelFullColorPhase5FastDescriptorSelected",
+          "transition_sequence": ["CANCELLED", "ACCEPTED", "COMPLETE"],
+          "predecessor": {
+            "request_class": "FULL_COLOR_REQUEST_MAP_ROW_PAIRED",
+            "state": "PREPARED",
+            "flag": "FULL_COLOR_FLAG_MOVEMENT_STRIP",
+            "required_cycles": "$ffff",
+            "authority_map": "PALLET_TOWN",
+            "live_map": "ROUTE_1",
+            "destination_relation": "DISTINCT",
+            "old_public_writes": 0
+          },
+          "successor": {
+            "request_class": "FULL_COLOR_REQUEST_MAP_CONNECTION_PAIRED",
+            "width": 20,
+            "height": 2,
+            "extent": 40,
+            "destination": "$991c",
+            "complete_count": 1,
+            "presentation_count": 1
+          },
+          "revalidates": [
+            "OWNER",
+            "GENERATION",
+            "RESOURCES",
+            "AUTHORITY_SNAPSHOT",
+            "OLD_DESTINATION",
+            "NEW_GEOMETRY",
+            "NEW_DESTINATION"
+          ]
+        }
+      },
+      {
+        "id": "MU-P5-AUDIT-PARTY-RECONSTRUCTION",
+        "case_id": "RC-P5-PARTY-RETURN-PALLET",
+        "behavior": "RECONSTRUCTION",
+        "commit_unit": "POISON_REBUILD_BARRIER",
+        "writer_ids": [
+          "WR-P5-AUDIT-PARTY-COLOR-ACTIVATION",
+          "WR-P5-AUDIT-PARTY-COLOR-AUTHORITY-LOAD",
+          "WR-P5-AUDIT-PARTY-COLOR-BARRIER",
+          "WR-P5-AUDIT-PARTY-COLOR-LEGACY-PALETTE-ACK",
+          "WR-P5-AUDIT-PARTY-COLOR-MAP-SPRITE-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-COLOR-OAM-BUILD",
+          "WR-P5-AUDIT-PARTY-COLOR-PAIRED-BRIDGE",
+          "WR-P5-AUDIT-PARTY-COLOR-PAIRED-FAST",
+          "WR-P5-AUDIT-PARTY-COLOR-PAIRED-GENERAL",
+          "WR-P5-AUDIT-PARTY-COLOR-PAIRED-MAP-PLANE",
+          "WR-P5-AUDIT-PARTY-COLOR-PALETTE-DERIVATION",
+          "WR-P5-AUDIT-PARTY-COLOR-PALETTE-PUBLISH",
+          "WR-P5-AUDIT-PARTY-COLOR-PLAYER-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-COLOR-POISON",
+          "WR-P5-AUDIT-PARTY-COLOR-RECONSTRUCTION",
+          "WR-P5-AUDIT-PARTY-COLOR-TILESET-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-YELLOW-ACTIVATION",
+          "WR-P5-AUDIT-PARTY-YELLOW-ATTRIBUTES",
+          "WR-P5-AUDIT-PARTY-YELLOW-BARRIER",
+          "WR-P5-AUDIT-PARTY-YELLOW-FONT-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-YELLOW-HP-STATUS-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-YELLOW-ICON-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-YELLOW-OAM-CLEAR",
+          "WR-P5-AUDIT-PARTY-YELLOW-PALETTE-CONSTRUCTION",
+          "WR-P5-AUDIT-PARTY-YELLOW-PALETTE-TRANSFORM",
+          "WR-P5-AUDIT-PARTY-YELLOW-POISON",
+          "WR-P5-AUDIT-PARTY-YELLOW-PRESENTATION",
+          "WR-P5-AUDIT-PARTY-YELLOW-PRODUCER-LEDGER",
+          "WR-P5-AUDIT-PARTY-YELLOW-SHADOW-OAM",
+          "WR-P5-AUDIT-PARTY-YELLOW-TEXTBOX-TILE-DATA",
+          "WR-P5-AUDIT-PARTY-YELLOW-TILEMAP"
+        ],
+        "hostile_guard_writer_id": "WR-P5-AUDIT-PARTY-YELLOW-PRESENTATION",
+        "hostile_blocked_writer_ids": [
+          "WR-P5-AUDIT-PARTY-YELLOW-ACTIVATION",
+          "WR-P5-AUDIT-PARTY-YELLOW-BARRIER"
+        ],
+        "color_presentation_guard": {
+          "source_path": "engine/full_color/lifecycle.asm",
+          "start_symbol": "FullColorPhase5PartyReconstructColorPresentationGuardStart",
+          "end_symbol": "FullColorPhase5PartyReconstructColorPresentationGuardEnd",
+          "exact_bytes": "c506370520fdc1",
+          "t_cycles": 912,
+          "minimum_reconstruct_end_to_deadline_t_cycles": 920,
+          "preserves": ["BC", "STACK_POINTER", "DISPLAY_HIDDEN"],
+          "temporal_relation": [
+            "FullColorPhase5PartyReconstructColorEnd",
+            "FullColorPhase5PartyReconstructColorPresentationGuardStart",
+            "FullColorPhase5PartyReconstructColorPresentationGuardEnd",
+            "FullColorPhase5AcknowledgeLegacyPaletteRegisters",
+            "FullColorPhase5PartyReconstructColorDeadline"
+          ]
+        },
+        "color_tileset_hostiles": [
+          {
+            "injection": "SKIP_PRODUCER",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_SKIPPED_ITEM",
+            "affected_resources": ["TILESET_TILE_DATA"],
+            "deadline_reached": false
+          },
+          {
+            "injection": "WRONG_BANK",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_WRONG_BANK",
+            "affected_resources": ["ROM_BANK", "TILESET_TILE_DATA"],
+            "deadline_reached": false
+          },
+          {
+            "injection": "WRONG_SOURCE",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_STALE_AUTHORITY",
+            "affected_resources": ["TILESET_TILE_DATA"],
+            "deadline_reached": false
+          }
+        ],
+        "color_player_hostiles": [
+          {
+            "injection": "SKIP_FIRST_HALF",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_SKIPPED_ITEM",
+            "affected_resources": ["PLAYER_TILE_DATA:$8000"],
+            "deadline_reached": false
+          },
+          {
+            "injection": "SKIP_SECOND_HALF",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_SKIPPED_ITEM",
+            "affected_resources": ["PLAYER_TILE_DATA:$8800"],
+            "deadline_reached": false
+          },
+          {
+            "injection": "WRONG_BANK",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_WRONG_BANK",
+            "affected_resources": ["ROM_BANK", "PLAYER_TILE_DATA"],
+            "deadline_reached": false
+          },
+          {
+            "injection": "WRONG_SOURCE",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_STALE_AUTHORITY",
+            "affected_resources": ["PLAYER_TILE_DATA"],
+            "deadline_reached": false
+          },
+          {
+            "injection": "WRONG_DESTINATION",
+            "mutation": "FULL_COLOR_PHASE5_MUTATION_STALE_AUTHORITY",
+            "affected_resources": ["PLAYER_TILE_DATA"],
+            "deadline_reached": false
+          }
+        ],
+        "hostile_variants": [
+          "FULL_COLOR_PHASE5_MUTATION_DOUBLE_BARRIER",
+          "FULL_COLOR_PHASE5_MUTATION_EARLY_BARRIER",
+          "FULL_COLOR_PHASE5_MUTATION_INTERRUPT",
+          "FULL_COLOR_PHASE5_MUTATION_MISSING_POISON",
+          "FULL_COLOR_PHASE5_MUTATION_PASSIVE_AUTHORITY",
+          "FULL_COLOR_PHASE5_MUTATION_PREMATURE_MARKER_CLEAR",
+          "FULL_COLOR_PHASE5_MUTATION_SAVED_AUTHORITY",
+          "FULL_COLOR_PHASE5_MUTATION_SKIPPED_ITEM",
+          "FULL_COLOR_PHASE5_MUTATION_STACK",
+          "FULL_COLOR_PHASE5_MUTATION_STALE_AUTHORITY",
+          "FULL_COLOR_PHASE5_MUTATION_STALE_GENERATION",
+          "FULL_COLOR_PHASE5_MUTATION_WRONG_BANK"
+        ],
+        "hostile_variant_bindings": [
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_DOUBLE_BARRIER",
+            "fault_class": "BARRIER_CARDINALITY",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["DISPLAY_REGISTER", "AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_EARLY_BARRIER",
+            "fault_class": "BARRIER_ORDERING",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["DISPLAY_REGISTER", "AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_INTERRUPT",
+            "fault_class": "INTERRUPT_PRESERVATION",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["INTERRUPT_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_MISSING_POISON",
+            "fault_class": "POISON_COMPLETENESS",
+            "injection": "POISON_LEDGER_BIT_CLEARED",
+            "source_writer_ids": ["WR-P5-AUDIT-PARTY-YELLOW-POISON"],
+            "observable_invariants": [
+              "POISON_LEDGER_IDENTITY_BIT_CLEAR",
+              "YELLOW_DEADLINE_NOT_REACHED"
+            ],
+            "affected_resources": ["AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_PASSIVE_AUTHORITY",
+            "fault_class": "PASSIVE_AUTHORITY_REJECTION",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_PREMATURE_MARKER_CLEAR",
+            "fault_class": "RETURN_MARKER_LIFETIME",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_SAVED_AUTHORITY",
+            "fault_class": "SAVED_AUTHORITY_REJECTION",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["AUTHORITY_STATE", "TILEMAP_BACKUPS"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_SKIPPED_ITEM",
+            "fault_class": "PRODUCER_LEDGER_COMPLETENESS",
+            "injection": "FONT_PRODUCER_AND_LEDGER_BIT_SUPPRESSED",
+            "source_writer_ids": [
+              "WR-P5-AUDIT-PARTY-YELLOW-FONT-TILE-DATA",
+              "WR-P5-AUDIT-PARTY-YELLOW-PRODUCER-LEDGER"
+            ],
+            "observable_invariants": [
+              "VFONT_0X800_BYTES_REMAIN_D3",
+              "PRODUCER_LEDGER_BIT_0_CLEAR",
+              "TILES_REPLACEMENTS_LEDGER_CLEAR",
+              "YELLOW_DEADLINE_NOT_REACHED"
+            ],
+            "affected_resources": ["TILE_DATA", "TILES_REPLACEMENTS", "AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_STACK",
+            "fault_class": "STACK_PRESERVATION",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["STACK_POINTER"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_STALE_AUTHORITY",
+            "fault_class": "AUTHORITY_FRESHNESS",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_STALE_GENERATION",
+            "fault_class": "GENERATION_FRESHNESS",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["AUTHORITY_STATE"]
+          },
+          {
+            "variant": "FULL_COLOR_PHASE5_MUTATION_WRONG_BANK",
+            "fault_class": "BANK_PRESERVATION",
+            "injection": "HOSTILE_SELECTOR_FAILS_BEFORE_PRESENTATION",
+            "affected_resources": ["ROM_BANK", "VRAM_BANK", "WRAM_BANK"]
+          }
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "RC-P5-COMBINED-PRESSURE-PALLET",
+      "check_ids": ["CHK-STRESS-01"],
+      "natural_request_class": "FULL_COLOR_REQUEST_MAP_COLUMN_PAIRED",
+      "boundary_request_class": "FULL_COLOR_REQUEST_MAP_ROW_PAIRED",
+      "timing_rows": [
+        "RC-P5-COMBINED-PRESSURE-PALLET/VBlank",
+        "RC-P5-COMBINED-PRESSURE-PALLET/palette",
+        "RC-P5-COMBINED-PRESSURE-PALLET/vertical",
+        "RC-P5-COMBINED-PRESSURE-PALLET/animation",
+        "RC-P5-COMBINED-PRESSURE-PALLET/OAM-build",
+        "RC-P5-COMBINED-PRESSURE-PALLET/OAM-DMA"
+      ],
+      "writer_ids": [
+        "WR-P5-AUDIT-ANIMATION-TILE-ATTRIBUTE",
+        "WR-P5-AUDIT-BG-PALETTE",
+        "WR-P5-AUDIT-CANONICAL-PAIRED-COLUMN2X18",
+        "WR-P5-AUDIT-CANONICAL-PAIRED-DISPATCH",
+        "WR-P5-AUDIT-OAM-BUILD",
+        "WR-P5-AUDIT-OAM-DMA",
+        "WR-P5-AUDIT-VISIBLE-UNIT-DISPATCH"
+      ],
+      "scene_ids": [],
+      "mutation_ids": [
+        "MU-P5-AUDIT-COMBINED-ANIMATION",
+        "MU-P5-AUDIT-COMBINED-OAM-BUILD",
+        "MU-P5-AUDIT-COMBINED-OAM-DMA",
+        "MU-P5-AUDIT-COMBINED-PALETTE",
+        "MU-P5-AUDIT-COMBINED-VERTICAL"
+      ],
+      "dependency_inventory_rows": [
+        "MU-P2-ANIMATED-TERRAIN",
+        "WR-P2-YELLOW-OAM-DMA"
+      ],
+      "dependency_roots": [
+        {
+          "row_id": "MU-P2-ANIMATED-TERRAIN",
+          "executed_root": "UpdateMovingBgTiles",
+          "scope": "PARTIAL_ROOT_ONLY"
+        },
+        {
+          "row_id": "WR-P2-YELLOW-OAM-DMA",
+          "executed_root": "hDMARoutine",
+          "linked_origin": "DMARoutine",
+          "scope": "PHYSICAL_DMA_ROOT_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "RC-P5-PARTY-RETURN-PALLET",
+      "check_ids": ["CHK-STRESS-02"],
+      "natural_request_class": "FULL_COLOR_REQUEST_MAP_RECTANGLE_PAIRED",
+      "boundary_request_class": "FULL_COLOR_REQUEST_MAP_ROW_PAIRED",
+      "timing_rows": [
+        "RC-P5-PARTY-RETURN-PALLET/handoff-to-Yellow",
+        "RC-P5-PARTY-RETURN-PALLET/handoff-to-Color",
+        "RC-P5-PARTY-RETURN-PALLET/reconstruct-Color"
+      ],
+      "runtime_invariants": [
+        "PRODUCER_ORDER_FONT_TEXT_HP_CLEAR_OAM_ICON_TILES_ICON_OAM_PALETTE_ATTRIBUTES_LOGICAL_TILEMAP",
+        "PRODUCER_CALL_COUNTS_FONT_TEXT_HP_ICON_TILES_EQUAL_1",
+        "PRODUCER_LEDGER_FF_BEFORE_YELLOW_BARRIER",
+        "VFONT_TEXT_HP_MATCH_LINKED_ROM_AUTHORITY",
+        "VISIBLE_TILEMAP_EQUALS_WTILEMAP",
+        "ATTRIBUTES_NONPOISON",
+        "SHADOW_OAM_EQUALS_HARDWARE_OAM",
+        "UNUSED_OAM_ZERO",
+        "ICON_TILES_NONPOISON",
+        "SKIPPED_ITEM_LEAVES_VFONT_D3_FLAGS_FE_TILES_REPLACEMENTS_CLEAR_AND_NO_DEADLINE",
+        "COLOR_TILESET_MATCHES_LINKED_BANK_POINTER_AUTHORITY",
+        "COLOR_MAP_SPRITE_TILES_REBUILT_BEFORE_BASE_TILESET",
+        "COLOR_MAP0_TILE_AND_ATTRIBUTE_PLANES_MATCH_LOGICAL_AUTHORITY",
+        "COLOR_PALETTES_REPOPULATED_AFTER_PAIRED_ATTRIBUTE_SCRATCH",
+        "COLOR_PLAYER_TILES_COPY_REDSPRITE_TO_8000_AND_8800_WHILE_HIDDEN",
+        "COLOR_OAM_REBUILT_AND_DMA_PUBLISHED_WHILE_HIDDEN",
+        "COLOR_GUARD_912_T_CYCLES_THEN_LEGACY_PALETTE_ACK_THEN_DEADLINE",
+        "ALL_EIGHT_COLOR_TILESET_AND_PLAYER_HOSTILES_FAIL_BEFORE_DEADLINE"
+      ],
+      "writer_ids": [
+        "WR-P5-AUDIT-PARTY-COLOR-ACTIVATION",
+        "WR-P5-AUDIT-PARTY-COLOR-AUTHORITY-LOAD",
+        "WR-P5-AUDIT-PARTY-COLOR-BARRIER",
+        "WR-P5-AUDIT-PARTY-COLOR-LEGACY-PALETTE-ACK",
+        "WR-P5-AUDIT-PARTY-COLOR-MAP-SPRITE-TILE-DATA",
+        "WR-P5-AUDIT-PARTY-COLOR-OAM-BUILD",
+        "WR-P5-AUDIT-PARTY-COLOR-PAIRED-BRIDGE",
+        "WR-P5-AUDIT-PARTY-COLOR-PAIRED-FAST",
+        "WR-P5-AUDIT-PARTY-COLOR-PAIRED-GENERAL",
+        "WR-P5-AUDIT-PARTY-COLOR-PAIRED-MAP-PLANE",
+        "WR-P5-AUDIT-PARTY-COLOR-PALETTE-DERIVATION",
+        "WR-P5-AUDIT-PARTY-COLOR-PALETTE-PUBLISH",
+        "WR-P5-AUDIT-PARTY-COLOR-PLAYER-TILE-DATA",
+        "WR-P5-AUDIT-PARTY-COLOR-POISON",
+        "WR-P5-AUDIT-PARTY-COLOR-RECONSTRUCTION",
+        "WR-P5-AUDIT-PARTY-COLOR-TILESET-TILE-DATA",
+        "WR-P5-AUDIT-PARTY-YELLOW-ACTIVATION",
+        "WR-P5-AUDIT-PARTY-YELLOW-ATTRIBUTES",
+        "WR-P5-AUDIT-PARTY-YELLOW-BARRIER",
+        "WR-P5-AUDIT-PARTY-YELLOW-FONT-TILE-DATA",
+        "WR-P5-AUDIT-PARTY-YELLOW-HP-STATUS-TILE-DATA",
+        "WR-P5-AUDIT-PARTY-YELLOW-ICON-TILE-DATA",
+        "WR-P5-AUDIT-PARTY-YELLOW-OAM-CLEAR",
+        "WR-P5-AUDIT-PARTY-YELLOW-PALETTE-CONSTRUCTION",
+        "WR-P5-AUDIT-PARTY-YELLOW-PALETTE-TRANSFORM",
+        "WR-P5-AUDIT-PARTY-YELLOW-POISON",
+        "WR-P5-AUDIT-PARTY-YELLOW-PRESENTATION",
+        "WR-P5-AUDIT-PARTY-YELLOW-PRODUCER-LEDGER",
+        "WR-P5-AUDIT-PARTY-YELLOW-SHADOW-OAM",
+        "WR-P5-AUDIT-PARTY-YELLOW-TEXTBOX-TILE-DATA",
+        "WR-P5-AUDIT-PARTY-YELLOW-TILEMAP"
+      ],
+      "scene_ids": [
+        "SC-P5-AUDIT-PARTY-ENTRY",
+        "SC-P5-AUDIT-PARTY-RETURN"
+      ],
+      "mutation_ids": ["MU-P5-AUDIT-PARTY-RECONSTRUCTION"],
+      "dependency_inventory_rows": [
+        "MU-P2-MAP-RECONSTRUCTION",
+        "MU-P2-OAM-FOLLOWER-NPC",
+        "MU-P2-PALETTE-PAYLOADS",
+        "MU-P2-START-MENU-OVERLAY",
+        "SC-P2-PARTY-ENTRY",
+        "WR-P2-YELLOW-OAM-BUILD",
+        "WR-P2-YELLOW-OAM-DMA"
+      ],
+      "dependency_roots": [
+        {
+          "row_id": "MU-P2-MAP-RECONSTRUCTION",
+          "executed_root": "LoadMapData",
+          "scope": "PARTIAL_ROOT_ONLY"
+        },
+        {
+          "row_id": "MU-P2-OAM-FOLLOWER-NPC",
+          "executed_root": "PrepareOAMData.build",
+          "scope": "PARTIAL_ROOT_ONLY"
+        },
+        {
+          "row_id": "MU-P2-PALETTE-PAYLOADS",
+          "executed_root": "TransferBGPPals",
+          "scope": "PARTIAL_ROOT_ONLY"
+        },
+        {
+          "row_id": "MU-P2-START-MENU-OVERLAY",
+          "executed_root": "DisplayStartMenu",
+          "scope": "PRE_ARM_ROOT_ONLY"
+        },
+        {
+          "row_id": "SC-P2-PARTY-ENTRY",
+          "executed_root": "DisplayPartyMenu -> PartyMenuInit",
+          "scope": "NESTED_EDGE_ONLY"
+        },
+        {
+          "row_id": "WR-P2-YELLOW-OAM-BUILD",
+          "executed_root": "PrepareOAMData.build",
+          "scope": "COLOR_RECONSTRUCTION_ROOT_ONLY"
+        },
+        {
+          "row_id": "WR-P2-YELLOW-OAM-DMA",
+          "executed_root": "hDMARoutine",
+          "linked_origin": "DMARoutine",
+          "scope": "PHYSICAL_DMA_ROOT_ONLY"
+        }
+      ]
+    },
+    {
+      "id": "RC-P5-CONNECTION-PALLET-NORTH",
+      "check_ids": ["CHK-STRESS-03"],
+      "natural_request_class": "FULL_COLOR_REQUEST_MAP_CONNECTION_PAIRED",
+      "boundary_request_class": "FULL_COLOR_REQUEST_MAP_ROW_PAIRED",
+      "timing_rows": ["RC-P5-CONNECTION-PALLET-NORTH/connection"],
+      "writer_ids": [
+        "WR-P5-AUDIT-CANONICAL-PAIRED-DISPATCH",
+        "WR-P5-AUDIT-CANONICAL-PAIRED-ROW20X2"
+      ],
+      "scene_ids": ["SC-P5-AUDIT-PALLET-ROUTE1-NORTH"],
+      "mutation_ids": ["MU-P5-AUDIT-CONNECTION-NORTH"],
+      "dependency_inventory_rows": ["MU-P2-MAP-CONNECTION-NORTH"],
+      "dependency_roots": [
+        {
+          "row_id": "MU-P2-MAP-CONNECTION-NORTH",
+          "executed_root": "LoadNorthSouthConnectionsTileMap",
+          "scope": "PARTIAL_ROOT_ONLY"
+        }
+      ]
+    }
+  ]
+}

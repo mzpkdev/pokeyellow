@@ -172,6 +172,7 @@ def _write_retained_manifest(
                 "mode": mode,
                 "kind": kind,
                 "natural_driver": list(route.natural_driver),
+                "replacements": list(checkpoint.replacements),
                 "tile_sample_purposes": purposes,
                 "tile_samples": [
                     {

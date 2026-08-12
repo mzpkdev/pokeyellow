@@ -41,9 +41,17 @@ EnterMap::
 	ld [wJoyIgnore], a
 
 OverworldLoop::
-	call DelayFrame
+	IF DEF(PHASE2_AUDIT)
+		call FullColorPhase5PrepareOwnedMainlineFrameHome
+	ELSE
+		call DelayFrame
+	ENDC
 OverworldLoopLessDelay::
-	call DelayFrame
+	IF DEF(PHASE2_AUDIT)
+		call FullColorPhase5PrepareOwnedMainlineFrameHome
+	ELSE
+		call DelayFrame
+	ENDC
 	call IsSurfingPikachuInParty
 	; Yellow still computes its steady BGP cache and object palettes. An active
 	; authored map suppresses only the buffered BG hardware publication.
@@ -872,6 +880,9 @@ INCLUDE "data/tilesets/bike_riding_tilesets.asm"
 
 ; load the tile pattern data of the current tileset into VRAM
 LoadTilesetTilePatternData::
+	IF DEF(PHASE2_AUDIT)
+FullColorPhase5PartyColorTilesetProducerStart::
+	ENDC
 	ld a, [wTilesetGfxPtr]
 	ld l, a
 	ld a, [wTilesetGfxPtr + 1]
@@ -1460,9 +1471,14 @@ ScheduleNorthRowRedraw::
 	ldh [hRedrawRowOrColumnDest], a
 	ld a, [wMapViewVRAMPointer + 1]
 	ldh [hRedrawRowOrColumnDest + 1], a
+	IF DEF(PHASE2_AUDIT)
+FullColorPhase5NorthConnectionOrigin::
+	farcall FullColorAuditScheduleNorthRow
+	ELSE
 	farcall PassiveFullColorPrepareRedrawAttributes
 	ld a, REDRAW_ROW
 	ldh [hRedrawRowOrColumnMode], a
+	ENDC
 	ret
 CopyToRedrawRowOrColumnSrcTiles::
 	ld de, wRedrawRowOrColumnSrcTiles
@@ -1489,9 +1505,13 @@ ScheduleSouthRowRedraw::
 	ldh [hRedrawRowOrColumnDest + 1], a
 	ld a, l
 	ldh [hRedrawRowOrColumnDest], a
+	IF DEF(PHASE2_AUDIT)
+	farcall FullColorAuditScheduleMovementRow
+	ELSE
 	farcall PassiveFullColorPrepareRedrawAttributes
 	ld a, REDRAW_ROW
 	ldh [hRedrawRowOrColumnMode], a
+	ENDC
 	ret
 ScheduleEastColumnRedraw::
 	hlcoord 18, 0
@@ -1507,9 +1527,13 @@ ScheduleEastColumnRedraw::
 	ldh [hRedrawRowOrColumnDest], a
 	ld a, [wMapViewVRAMPointer + 1]
 	ldh [hRedrawRowOrColumnDest + 1], a
+	IF DEF(PHASE2_AUDIT)
+	call FullColorPhase5ScheduleMovementColumnHome
+	ELSE
 	farcall PassiveFullColorPrepareColumnAttributes
 	ld a, REDRAW_COL
 	ldh [hRedrawRowOrColumnMode], a
+	ENDC
 	ret
 ScheduleColumnRedrawHelper::
 	ld de, wRedrawRowOrColumnSrcTiles
@@ -1537,9 +1561,13 @@ ScheduleWestColumnRedraw::
 	ldh [hRedrawRowOrColumnDest], a
 	ld a, [wMapViewVRAMPointer + 1]
 	ldh [hRedrawRowOrColumnDest + 1], a
+	IF DEF(PHASE2_AUDIT)
+	call FullColorPhase5ScheduleMovementColumnHome
+	ELSE
 	farcall PassiveFullColorPrepareColumnAttributes
 	ld a, REDRAW_COL
 	ldh [hRedrawRowOrColumnMode], a
+	ENDC
 	ret
 ; function to write the tiles that make up a tile block to memory
 ; Input: c = tile block ID, hl = destination address
@@ -1765,7 +1793,11 @@ LoadPlayerSpriteGraphicsCommon::
 	push hl
 	push bc
 	ld c, $c
+	IF DEF(PHASE2_AUDIT)
+	call CopyVideoDataAlternate
+	ELSE
 	call CopyVideoData
+	ENDC
 	pop bc
 	pop hl
 	pop de
@@ -1777,7 +1809,11 @@ LoadPlayerSpriteGraphicsCommon::
 .noCarry
 	set 3, h ; add $800 ($80 tiles) to hl (1 << 3 == $8)
 	ld c, $c
+	IF DEF(PHASE2_AUDIT)
+	jp CopyVideoDataAlternate
+	ELSE
 	jp CopyVideoData
+	ENDC
 ; function to load data from the map header
 LoadMapHeader::
 	farcall MarkTownVisitedAndLoadToggleableObjects
@@ -1939,14 +1975,38 @@ CopySignData::
 	ret
 ; function to load map data
 LoadMapData::
+	IF DEF(PHASE2_AUDIT)
+		; Decide bounded ownership before the first video writer. The authority
+		; producers below must remain in Home because LoadMapHeader deliberately
+		; leaves the current map ROM bank selected when it returns.
+		farcall FullColorAuditLoadMapData
+		ret c
+FullColorAuditLoadMapDataHomeAuthority::
+	ENDC
 	ldh a, [hLoadedROMBank]
 	push af
+	IF DEF(PHASE2_AUDIT)
+	ldh a, [rLCDC]
+	add a ; LCD-enable bit 7 enters carry; A and the other flags are dead.
+	call c, DisableLCD
+	ELSE
 	call DisableLCD
+	ENDC
 	call ResetMapVariables
 	call LoadTextBoxTilePatterns
 	call LoadMapHeader
 	call InitMapSprites ; load tile pattern data for sprites
 	call LoadScreenRelatedData
+	IF DEF(PHASE2_AUDIT)
+		farcall FullColorAuditFinishLoadMapDataFromAuthority
+		; POP/LD and BankswitchCommon preserve the returned carry, so one tail
+		; restores the caller's bank and exact success/failure result.
+FullColorAuditLoadMapDataRestoreRomBank::
+		pop bc
+		ld a, b
+		call BankswitchCommon
+		ret
+	ELSE
 	call CopyMapViewToVRAM
 	ld a, $01
 	ld [wUpdateSpritesEnabled], a
@@ -1970,9 +2030,13 @@ LoadMapData::
 	pop af
 	call BankswitchCommon
 	ret
+	ENDC
 LoadScreenRelatedData::
 	call LoadTileBlockMap
 	call LoadTilesetTilePatternData
+	IF DEF(PHASE2_AUDIT)
+FullColorPhase5PartyColorTilesetProducerReturn::
+	ENDC
 	call LoadCurrentMapView
 	ret
 ReloadMapAfterSurfingMinigame::
@@ -2311,6 +2375,17 @@ LoadDestinationWarpPosition::
 	ret
 
 IF DEF(PHASE2_AUDIT)
+; Pay each duplicated banked target once in Home. These ordinary CALL wrappers
+; retain FARCALL's complete bank-save/restore return path; unlike a tail FARJP,
+; each wrapper has its own concrete return address and RET.
+FullColorPhase5PrepareOwnedMainlineFrameHome:
+	farcall FullColorPhase5PrepareOwnedMainlineFrameAndDelayFrame
+	ret
+
+FullColorPhase5ScheduleMovementColumnHome:
+	farcall FullColorAuditScheduleMovementColumn
+	ret
+
 PUSHS
 SECTION "Full Color Overworld Audit Integration", ROMX, BANK[FULL_COLOR_PHASE2_ROM_BANK]
 
@@ -2430,26 +2505,35 @@ FullColorAuditScheduleMovementColumn:
 ; The WRAM authority path stays identical through LoadScreenRelatedData. Once
 ; full color owns the map, legacy tile/palette/player presentation is skipped;
 ; the banked lifecycle contract completes reconstruction before LCD enable.
-FullColorAuditLoadMapData:
-	ldh a, [hLoadedROMBank]
-	push af
-	ldh a, [rLCDC]
-	bit B_LCDC_ENABLE, a
-	call nz, DisableLCD
-	call ResetMapVariables
-	call LoadTextBoxTilePatterns
-	call LoadMapHeader
-	call InitMapSprites
-	call LoadScreenRelatedData
+FullColorAuditLoadMapData::
+	jp FullColorAuditBeginBoundedMapEntry
+
+FullColorPhase5ReloadMapFromAuthority::
+	.retryPhase5Reconstruction
+	farcall BeginFullColorPhase5PartyColorReconstruction
+	jr c, .retryPhase5Reconstruction
+	and a
+	ret
+
+FullColorAuditFinishLoadMapDataFromAuthority::
 	call GetRendererOwner
 	cp RENDERER_FULL_COLOR_OVERWORLD
-	jr nz, .yellow_presentation
+	jr nz, FullColorAuditLoadMapDataYellowPresentation
 	call SnapshotFullColorMapAuthority
 	call ReconstructFullColorMapEntry
-	jr c, .failed_restore
+FullColorPhase5PartyReconstructColorEnd::
+	jr c, FullColorAuditLoadMapDataFailedRestore
+	farcall FullColorPhase5PartyReconstructColorPresentationGuardStart
+	; Cancel all stale Yellow DMG-to-CGB conversions before activation; the
+	; freshly-authored hardware palettes remain the sole presentation authority.
+	farcall FullColorPhase5AcknowledgeLegacyPaletteRegisters
+FullColorPhase5PartyHandoffToColorDeadline::
+FullColorPhase5PartyReconstructColorDeadline::
 	call EnableLCD
-	jr .music
-.yellow_presentation
+	farcall FullColorPhase5CompletePartyColorPresentationIfPending
+	jr c, FullColorAuditLoadMapDataFailedRestore
+	jr FullColorAuditLoadMapDataMusic
+FullColorAuditLoadMapDataYellowPresentation:
 	call CopyMapViewToVRAM
 	ld a, $01
 	ld [wUpdateSpritesEnabled], a
@@ -2457,23 +2541,19 @@ FullColorAuditLoadMapData:
 	ld b, SET_PAL_OVERWORLD
 	call RunPaletteCommand
 	call LoadPlayerSpriteGraphics
-.music
+FullColorAuditLoadMapDataMusic:
 	ld a, [wStatusFlags6]
 	and 1 << BIT_DUNGEON_WARP | 1 << BIT_FLY_WARP
-	jr nz, .success_restore
+	jr nz, FullColorAuditLoadMapDataSuccess
 	ld a, [wStatusFlags7]
 	bit BIT_NO_MAP_MUSIC, a
-	jr nz, .success_restore
+	jr nz, FullColorAuditLoadMapDataSuccess
 	call UpdateMusic6Times
 	call PlayDefaultMusicFadeOutCurrent
-.success_restore
-	pop af
-	call BankswitchCommon
+FullColorAuditLoadMapDataSuccess:
 	and a
 	ret
-.failed_restore
-	pop af
-	call BankswitchCommon
+FullColorAuditLoadMapDataFailedRestore:
 	scf
 	ret
 

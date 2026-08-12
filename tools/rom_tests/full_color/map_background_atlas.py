@@ -30,6 +30,7 @@ from PIL import Image, ImageDraw
 from .map_background_content import (
     MapBackgroundAuthority,
     production_map_override_rules,
+    production_roof_region_rules,
 )
 from .rom_discovery import SymbolTable, load_sym
 
@@ -1040,12 +1041,22 @@ def _animation_frames(
     return records
 
 
-def _replacement_records(root: Path, blockset: bytes) -> list[dict[str, object]]:
+def _replacement_records(
+    root: Path, blockset: bytes, tileset: str
+) -> list[dict[str, object]]:
     source = (root / "data/tilesets/cut_tree_blocks.asm").read_text(encoding="utf-8")
     pairs = [
         (int(a, 16), int(b, 16))
         for a, b in re.findall(r"db \$([0-9A-Fa-f]{2}), \$([0-9A-Fa-f]{2})", source)
     ]
+    if tileset == "OVERWORLD":
+        pairs = pairs[:5]
+    elif tileset == "GYM":
+        pairs = pairs[5:]
+    else:
+        raise MapBackgroundAtlasError(
+            f"{tileset}: CUT_TREE is not callable for this blockset"
+        )
     records = []
     for before, after in pairs:
         for identity in (before, after):
@@ -1059,6 +1070,111 @@ def _replacement_records(root: Path, blockset: bytes) -> list[dict[str, object]]
                 "observation": "artifact-only-rendered-pair",
                 "before_block": before,
                 "after_block": after,
+            }
+        )
+    return records
+
+
+def _spinner_replacement_records(
+    root: Path,
+    rom: bytes,
+    symbols: SymbolTable,
+    tileset: str,
+    graphics: bytes,
+    attributes: bytes,
+    palettes: bytes,
+) -> list[dict[str, object]]:
+    """Render the exact animated/restored spinner destinations for one blockset."""
+    path = root / "data/tilesets/spinner_tiles.asm"
+    source = path.read_text(encoding="utf-8")
+    expected = {
+        "FACILITY": (
+            ("SpinnerArrowAnimTiles", 0x00, 0x20),
+            ("SpinnerArrowAnimTiles", 0x01, 0x21),
+            ("SpinnerArrowAnimTiles", 0x02, 0x30),
+            ("SpinnerArrowAnimTiles", 0x03, 0x31),
+            ("Facility_GFX", 0x20, 0x20),
+            ("Facility_GFX", 0x21, 0x21),
+            ("Facility_GFX", 0x30, 0x30),
+            ("Facility_GFX", 0x31, 0x31),
+        ),
+        "GYM": (
+            ("SpinnerArrowAnimTiles", 0x01, 0x3C),
+            ("SpinnerArrowAnimTiles", 0x03, 0x3D),
+            ("SpinnerArrowAnimTiles", 0x00, 0x4C),
+            ("SpinnerArrowAnimTiles", 0x02, 0x4D),
+            ("Gym_GFX", 0x3C, 0x3C),
+            ("Gym_GFX", 0x3D, 0x3D),
+            ("Gym_GFX", 0x4C, 0x4C),
+            ("Gym_GFX", 0x4D, 0x4D),
+        ),
+    }
+    try:
+        expected_rows = expected[tileset]
+    except KeyError as exc:
+        raise MapBackgroundAtlasError(
+            f"{tileset}: SPINNER_ARROW_TILES is not callable for this blockset"
+        ) from exc
+    section = re.search(
+        rf"^{tileset.title()}SpinnerArrows:\s*$"
+        r"(?P<body>.*?)(?=^[A-Za-z][A-Za-z0-9_]*:\s*$|\Z)",
+        source,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        raise MapBackgroundAtlasError(
+            f"{path}: {tileset} spinner replacement authority is absent"
+        )
+    parsed = tuple(
+        (symbol, int(source_id, 16), int(destination, 16))
+        for symbol, source_id, destination in re.findall(
+            r"^\s*spinner\s+([A-Za-z][A-Za-z0-9_]*),\s*"
+            r"\$?([0-9A-Fa-f]{1,2}),\s*\$([0-9A-Fa-f]{2})\s*$",
+            section.group("body"),
+            re.MULTILINE,
+        )
+    )
+    if parsed != expected_rows:
+        raise MapBackgroundAtlasError(
+            f"{path}: {tileset} spinner replacement semantics drifted"
+        )
+    spinner_path = Path("gfx/overworld/spinners.2bpp")
+    spinner_source = _source_2bpp_from_snapshot(
+        root,
+        spinner_path,
+        (root / spinner_path).with_suffix(".png").read_bytes(),
+    )
+    if len(spinner_source) != 4 * 16:
+        raise MapBackgroundAtlasError(
+            "SPINNER_ARROW_TILES source must contain exactly four tiles"
+        )
+    spinner = _linked_source(
+        rom, symbols, "SpinnerArrowAnimTiles", spinner_source
+    )
+    decoded_palettes = decode_palettes(palettes)
+    records: list[dict[str, object]] = []
+    for index, (symbol, source_id, destination) in enumerate(parsed):
+        source_bytes = spinner.data if symbol == "SpinnerArrowAnimTiles" else graphics
+        tile_data = source_bytes[source_id * 16 : (source_id + 1) * 16]
+        if len(tile_data) != 16:
+            raise MapBackgroundAtlasError(
+                f"{tileset}: spinner source tile ${source_id:02x} is absent"
+            )
+        records.append(
+            {
+                "identity": "SPINNER_ARROW_TILES",
+                "observation": "artifact-only-linked-tile-replacement",
+                "phase": "animated" if index < 4 else "restored",
+                "source_symbol": symbol,
+                "source_tile": source_id,
+                "destination_tile": destination,
+                "source_sha256": _sha(tile_data),
+                "linked_spinner_payload": spinner.manifest(),
+                "image": render_tile(
+                    decode_2bpp(tile_data)[0],
+                    decoded_palettes[attributes[destination] & 7],
+                    scale=8,
+                ),
             }
         )
     return records
@@ -1096,6 +1212,7 @@ def _build_atlases_in_directory(
     authority = MapBackgroundAuthority.load(root)
     toolchain = graphics_toolchain(root)
     override_rules = production_map_override_rules(root)
+    roof_region_rules = production_roof_region_rules(root)
     rom_path, sym_path = root / f"{product}.gbc", root / f"{product}.sym"
     rom, sym_bytes = rom_path.read_bytes(), sym_path.read_bytes()
     symbols = load_sym(sym_path)
@@ -1103,6 +1220,54 @@ def _build_atlases_in_directory(
         rom, symbols, "FullColorOverworldRoofAssignments", 37
     )
     roof_palettes = _linked_payload(rom, symbols, "FullColorOverworldRoofPalettes", 44)
+    linked_roof_regions = _linked_payload(
+        rom, symbols, "FullColorOverworldRoofRegionRules", 4
+    )
+    linked_map_overrides = _linked_payload(
+        rom, symbols, "FullColorMapAttributeOverrides", 15
+    )
+    map_ids = {row.name: row.id for row in authority.maps}
+    roof_ids = {
+        "PALLET": 0,
+        "VIRIDIAN": 1,
+        "PEWTER": 2,
+        "CERULEAN": 3,
+        "LAVENDER": 4,
+        "VERMILION": 5,
+        "CELADON": 6,
+        "FUCHSIA": 7,
+        "CINNABAR": 8,
+        "INDIGO": 9,
+        "SAFFRON": 10,
+    }
+    expected_roof_regions = bytes(
+        byte
+        for rule in roof_region_rules
+        for byte in (
+            map_ids[str(rule["map"])],
+            int(rule["y_split"]),
+            roof_ids[str(rule["upper_roof"])],
+            roof_ids[str(rule["lower_roof"])],
+        )
+    )
+    expected_map_overrides = bytes(
+        byte
+        for rule in override_rules
+        for byte in (
+            map_ids[str(rule["map"])],
+            len(rule["tiles"]),
+            int(rule["palette_value"]),
+            *rule["tiles"],
+        )
+    )
+    if linked_roof_regions.data != expected_roof_regions:
+        raise MapBackgroundAtlasError(
+            "linked roof-region bytes disagree with reviewed source semantics"
+        )
+    if linked_map_overrides.data != expected_map_overrides:
+        raise MapBackgroundAtlasError(
+            "linked map-override bytes disagree with reviewed full-byte semantics"
+        )
     map_sources, dimensions = _map_sources(root, authority), _map_dimensions(root)
     tileset_rows = {row.name: row for row in authority.tilesets}
     maps_by_tileset: dict[str, list[object]] = {}
@@ -1183,10 +1348,12 @@ def _build_atlases_in_directory(
                 artifact = _file_record(path, root=output)
                 all_artifacts.append(artifact)
                 animations.append({**record, "artifact": artifact})
-            replacements = (
-                _replacement_records(root, blockset) if tileset == "OVERWORLD" else []
+            cut_replacements = (
+                _replacement_records(root, blockset, tileset)
+                if "CUT_TREE" in row.replacements
+                else []
             )
-            for index, replacement in enumerate(replacements):
+            for index, replacement in enumerate(cut_replacements):
                 pair = Image.new("RGB", (64, 50), "white")
                 pair_draw = ImageDraw.Draw(pair)
                 pair_draw.text((2, 2), "before", fill="black")
@@ -1203,11 +1370,42 @@ def _build_atlases_in_directory(
                         title="",
                     ).crop((0, 18, 32, 50))
                     pair.paste(block_image, (column * 32, 18))
-                path = output / batch / "replacements" / f"cut-tree-{index:02d}.png"
+                path = (
+                    output
+                    / batch
+                    / "replacements"
+                    / f"{tileset.lower()}-cut-tree-{index:02d}.png"
+                )
                 _save_png(pair, path)
                 artifact = _file_record(path, root=output)
                 all_artifacts.append(artifact)
                 replacement["artifact"] = artifact
+            spinner_replacements = (
+                _spinner_replacement_records(
+                    root,
+                    rom,
+                    symbols,
+                    tileset,
+                    graphics,
+                    attributes.data,
+                    palette.data,
+                )
+                if "SPINNER_ARROW_TILES" in row.replacements
+                else []
+            )
+            for index, replacement in enumerate(spinner_replacements):
+                image = replacement.pop("image")
+                path = (
+                    output
+                    / batch
+                    / "replacements"
+                    / f"{tileset.lower()}-spinner-{index:02d}.png"
+                )
+                _save_png(image, path)
+                artifact = _file_record(path, root=output)
+                all_artifacts.append(artifact)
+                replacement["artifact"] = artifact
+            replacements = cut_replacements + spinner_replacements
 
             map_records = []
             for map_row in sorted(
@@ -1280,6 +1478,7 @@ def _build_atlases_in_directory(
                             {"tile_id": tile_id, "palette": palette_id}
                             for tile_id, palette_id in sorted(map_overrides.items())
                         ],
+                        "replacements": list(map_row.replacements),
                         "source": _file_record(map_path, root=root),
                         "artifact": artifact,
                     }
@@ -1302,6 +1501,7 @@ def _build_atlases_in_directory(
                     "tiles": tile_records,
                     "animations": animations,
                     "replacements": replacements,
+                    "replacement_identities": list(row.replacements),
                     "maps": map_records,
                 }
             )
@@ -1317,6 +1517,10 @@ def _build_atlases_in_directory(
             "sha256": _sha(sym_bytes),
         },
         "graphics_toolchain": toolchain,
+        "semantic_tables": {
+            "roof_region_rules": linked_roof_regions.manifest(),
+            "map_attribute_overrides": linked_map_overrides.manifest(),
+        },
         "batches": [
             {"name": name, "tilesets": list(BATCH_TILESETS[name])} for name in batches
         ],

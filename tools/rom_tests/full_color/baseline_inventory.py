@@ -27,6 +27,10 @@ from .inventory import (
     reconcile,
 )
 from .source_transition import _rebound_rom_finding, _rebound_source_finding
+from .conditional_source_authority import (
+    ConditionalSourceAuthorityError,
+    validate_regions,
+)
 
 PROGRESS_SCHEMA = "full-color-inventory-progress-v2"
 REVIEWED_SLICE = "initial-map-entry-v1"
@@ -174,10 +178,10 @@ def _reviewed_source_view(
     expected_keys = {
         "schema", "reviewed_source_sha256", "current_source_sha256",
         "baseline_manifest_sha256", "reviewed_delta_paths", "subject_rebindings",
-        "rom_subject_rebindings",
+        "rom_subject_rebindings", "audit_only_source_regions", "product_identities",
     }
     if set(transition) != expected_keys or transition["schema"] != (
-        "full-color-production-source-transition-v3"
+        "full-color-production-source-transition-v4"
     ):
         raise InventoryReconciliationError("malformed audit-only source transition")
     if transition["current_source_sha256"] != source_report.source_sha256:
@@ -233,6 +237,15 @@ def _reviewed_source_view(
         raise InventoryReconciliationError(
             "current source changed outside the hash-bound reviewed change set"
         )
+    try:
+        validate_regions(
+            repository,
+            transition["audit_only_source_regions"],
+            transition["product_identities"],
+            transition["reviewed_delta_paths"],
+        )
+    except (ConditionalSourceAuthorityError, OSError, UnicodeError, ValueError) as exc:
+        raise InventoryReconciliationError(str(exc)) from exc
     source_rows = {
         row.subject.sha256: row
         for row in assignments.rows

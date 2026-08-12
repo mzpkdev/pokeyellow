@@ -129,6 +129,10 @@ LoadMonPartySpriteGfxWithLCDDisabled:
 ; Load mon party sprite tile patterns into VRAM immediately by disabling the
 ; LCD.
 	call DisableLCD
+	IF DEF(PHASE2_AUDIT)
+	call LoadMonPartySpriteGfxLCDAlreadyDisabledInternal
+	jp EnableLCD
+	ELSE
 	ld hl, MonPartySpritePointers
 	ld a, $1e
 	ld bc, $0
@@ -161,6 +165,53 @@ LoadMonPartySpriteGfxWithLCDDisabled:
 	dec a
 	jr nz, .loop
 	jp EnableLCD
+	ENDC
+
+IF DEF(PHASE2_AUDIT)
+LoadMonPartySpriteGfxLCDAlreadyDisabled::
+; Phase 5 owns one larger hidden reconstruction boundary.  Do not reveal the
+; half-built Party screen from this nested graphics producer.
+	ldh a, [rLCDC]
+	bit B_LCDC_ENABLE, a
+	ret nz
+	jp LoadMonPartySpriteGfxLCDAlreadyDisabledInternal
+
+LoadMonPartySpriteGfxLCDAlreadyDisabledInternal:
+	; Kept as a local fallthrough target for the ordinary disable/load/enable
+	; wrapper above.
+	ld hl, MonPartySpritePointers
+	ld a, $1e
+	ld bc, $0
+.loop
+	push af
+	push bc
+	push hl
+	add hl, bc
+	ld a, [hli]
+	ld e, a
+	ld a, [hli]
+	ld d, a
+	push de
+	ld a, [hli]
+	ld c, a
+	swap c
+	ld b, $0
+	ld a, [hli]
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	pop hl
+	call FarCopyData
+	pop hl
+	pop bc
+	ld a, $6
+	add c
+	ld c, a
+	pop af
+	dec a
+	jr nz, .loop
+	ret
+ENDC
 
 INCLUDE "data/icon_pointers.asm"
 

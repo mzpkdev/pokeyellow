@@ -185,6 +185,20 @@ GetCryData::
 	ret
 
 DisplayPartyMenu::
+	IF DEF(PHASE2_AUDIT)
+	ldh a, [hTileAnimations]
+	push af
+	xor a
+	ldh [hTileAnimations], a
+	farcall IsFullColorPhase5PartyYellowReconstructing
+	jr nc, .phase5Hidden
+	call GBPalWhiteOutWithDelay3
+	call ClearSprites
+.phase5Hidden
+	call PartyMenuInit
+	call DrawPartyMenu
+	jp HandlePartyMenuInput
+	ELSE
 	ldh a, [hTileAnimations]
 	push af
 	xor a
@@ -194,6 +208,7 @@ DisplayPartyMenu::
 	call PartyMenuInit
 	call DrawPartyMenu
 	jp HandlePartyMenuInput
+	ENDC
 
 GoBackToPartyMenu::
 	ldh a, [hTileAnimations]
